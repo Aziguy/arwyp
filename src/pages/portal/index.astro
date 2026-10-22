@@ -1,0 +1,323 @@
+---
+import AppLayout from '@/layouts/AppLayout.astro';
+import Icon from '@/components/ui/Icon.astro';
+import Avatar from '@/components/ui/Avatar.astro';
+import { patient, appointments, records, invoices } from '@/data/app/portal';
+import { TODAY, weekdayShort, dayMonth } from '@/data/app/common';
+import { badgeClass } from '@/lib/app/status';
+import { money, longDate } from '@/lib/format';
+import { url } from '@/lib/paths';
+
+const next = appointments.find((a) => a.date >= TODAY && a.status !== 'Cancelled')!;
+const due = invoices.filter((i) => i.status !== 'Paid');
+const balance = due.reduce((s, i) => s + i.amount, 0);
+const actions = [
+  { icon: 'calendar-plus', label: 'Book appointment', href: '/specialists/' },
+  { icon: 'clipboard-check', label: 'Pre-admission', href: '/patients/pre-admission/' },
+  { icon: 'credit-card', label: 'Pay invoice', href: '/portal/billing/' },
+  { icon: 'message-square', label: 'Message rooms', href: '/portal/messages/' },
+];
+---
+
+<AppLayout title="Patient portal" area="portal">
+  <header class="ph-portal">
+    <div>
+      <p class="eyebrow">Patient portal <span class="tag-b"></span></p>
+      <h1>Hello, {patient.first}</h1>
+    </div>
+    <button type="button" class="btn btn--outline btn--sm" data-pwa-install hidden><Icon name="download" /> Install app</button>
+  </header>
+
+  <div class="app-grid app-grid--main">
+    <section class="next">
+      <p class="next__label"><Icon name="calendar-check" size={16} /> Next appointment</p>
+      <div class="next__main">
+        <span class="next__date">
+          <small>{weekdayShort(next.date)}</small>
+          <strong>{dayMonth(next.date)}</strong>
+          <small>{next.time}</small>
+        </span>
+        <span class="next__who">
+          <Avatar name={next.specialist} size={44} />
+          <span>
+            <strong>{next.specialist}</strong>
+            <small>{next.discipline} &middot; {next.type}</small>
+            <small><Icon name="map-pin" size={12} /> {next.rooms}</small>
+          </span>
+        </span>
+      </div>
+      <div class="next__actions">
+        <button class="btn btn--light btn--sm" data-toast-click="Added to your calendar"><Icon name="calendar-plus" /> Add to calendar</button>
+        <a class="btn btn--outline-light btn--sm" href={url('/portal/appointments/')}>Reschedule</a>
+        <span class={badgeClass(next.paid)}>{next.paid}</span>
+      </div>
+    </section>
+
+    <section class="panel">
+      <header class="panel__head">
+        <h2 class="panel__title">Quick actions</h2>
+      </header>
+      <ul class="qa" role="list">
+        {
+          actions.map((a) => (
+            <li>
+              <a href={url(a.href)}>
+                <span class="icon-dot">
+                  <Icon name={a.icon} size={18} />
+                </span>
+                {a.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+  </div>
+
+  <div class="app-grid app-grid--3 portal-row">
+    <section class="panel">
+      <header class="panel__head">
+        <h2 class="panel__title">New results</h2>
+        <a class="btn btn--ghost btn--sm" href={url('/portal/records/')}>All <Icon name="arrow-right" /></a>
+      </header>
+      <ul class="list-rows portal-list" role="list">
+        {
+          records.slice(0, 3).map((r) => (
+            <li>
+              <span class="icon-dot icon-dot--navy">
+                <Icon name={r.icon} size={16} />
+              </span>
+              <span class="list-rows__main">
+                <strong>{r.title}</strong>
+                <small>{longDate(r.date)}</small>
+              </span>
+              <span class={badgeClass(r.status)}>{r.status}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <section class="panel">
+      <header class="panel__head">
+        <h2 class="panel__title">Balance due</h2>
+      </header>
+      <div class="panel__body bal">
+        <p class="bal__value tabular">{money(balance)}</p>
+        <p class="panel__sub">{due.length} open invoice{due.length === 1 ? '' : 's'}, medical aid claims tracked automatically</p>
+        <a class="btn btn--accent btn--sm" href={url('/portal/billing/')}><Icon name="credit-card" /> Pay now</a>
+      </div>
+    </section>
+
+    <section class="panel">
+      <header class="panel__head">
+        <h2 class="panel__title">Medical aid</h2>
+      </header>
+      <div class="panel__body">
+        <div class="aid">
+          <p class="aid__scheme">{patient.scheme}</p>
+          <p class="aid__plan">{patient.plan}</p>
+          <p class="aid__num masked">{patient.member}</p>
+          <p class="aid__holder">{patient.name}</p>
+        </div>
+        <p class="aid__ok"><Icon name="circle-check" size={14} /> Benefits verified today</p>
+      </div>
+    </section>
+  </div>
+</AppLayout>
+
+<style>
+  .ph-portal {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--sp-4);
+    margin-bottom: var(--sp-6);
+  }
+
+  .ph-portal .eyebrow {
+    display: flex;
+    gap: var(--sp-2);
+  }
+
+  .ph-portal h1 {
+    font-size: clamp(1.625rem, 1.3rem + 1.2vw, 2.25rem);
+  }
+
+  .next {
+    display: grid;
+    gap: var(--sp-5);
+    padding: var(--sp-6);
+    border-radius: var(--radius-lg);
+    background:
+      radial-gradient(70% 120% at 100% 0%, rgb(0 216 206 / 0.28), transparent 60%),
+      linear-gradient(140deg, var(--navy-800), var(--navy-950));
+    color: rgb(255 255 255 / 0.78);
+  }
+
+  .next__label {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+    font-size: var(--fs-xs);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--teal-400);
+  }
+
+  .next__main {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sp-5);
+  }
+
+  .next__date {
+    display: grid;
+    justify-items: center;
+    min-width: 84px;
+    padding: var(--sp-3) var(--sp-4);
+    border-radius: var(--radius-md);
+    background: rgb(255 255 255 / 0.08);
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.12);
+    line-height: 1.2;
+  }
+
+  .next__date strong {
+    font-size: var(--fs-xl);
+    color: #fff;
+  }
+
+  .next__date small {
+    font-size: var(--fs-xs);
+  }
+
+  .next__who {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3);
+    min-width: 0;
+    line-height: 1.4;
+  }
+
+  .next__who strong {
+    display: block;
+    font-size: var(--fs-lg);
+    color: #fff;
+  }
+
+  .next__who small {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: var(--fs-xs);
+  }
+
+  .next__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sp-2);
+  }
+
+  .next__actions .badge {
+    margin-left: auto;
+  }
+
+  .qa {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--sp-3);
+    margin: 0;
+    padding: var(--sp-4) var(--sp-6) var(--sp-6);
+  }
+
+  .qa a {
+    display: grid;
+    gap: var(--sp-3);
+    padding: var(--sp-4);
+    border-radius: var(--radius-md);
+    background: var(--surface-2);
+    color: var(--navy-900);
+    font-size: var(--fs-sm);
+    font-weight: 650;
+    text-decoration: none;
+    transition: background-color var(--dur) var(--ease);
+  }
+
+  .qa a:hover {
+    background: var(--teal-50);
+    color: var(--navy-900);
+  }
+
+  .portal-row {
+    margin-top: var(--sp-6);
+  }
+
+  .portal-list {
+    padding-top: var(--sp-3);
+  }
+
+  .bal {
+    display: grid;
+    gap: var(--sp-2);
+    justify-items: start;
+  }
+
+  .bal__value {
+    font-size: 2rem;
+    font-weight: 650;
+    letter-spacing: -0.02em;
+    color: var(--navy-950);
+  }
+
+  .bal .btn {
+    margin-top: var(--sp-2);
+  }
+
+  .aid {
+    display: grid;
+    gap: 2px;
+    padding: var(--sp-5);
+    border-radius: var(--radius-lg);
+    background:
+      radial-gradient(80% 120% at 100% 0%, rgb(255 255 255 / 0.25), transparent 60%),
+      linear-gradient(135deg, var(--teal-700), var(--teal-800));
+    color: rgb(255 255 255 / 0.85);
+    aspect-ratio: 1.7;
+    align-content: space-between;
+    font-size: var(--fs-xs);
+  }
+
+  .aid__scheme {
+    font-size: var(--fs-md);
+    font-weight: 750;
+    color: #fff;
+  }
+
+  .aid__num {
+    font-size: var(--fs-lg);
+    color: #fff;
+  }
+
+  .aid__ok {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+    margin-top: var(--sp-3);
+    font-size: var(--fs-xs);
+    font-weight: 600;
+    color: #006300;
+  }
+
+  @media (max-width: 560px) {
+    .next {
+      padding: var(--sp-5);
+    }
+    .qa {
+      padding: var(--sp-4);
+    }
+  }
+</style>

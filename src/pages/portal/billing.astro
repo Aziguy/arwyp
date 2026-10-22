@@ -1,0 +1,165 @@
+---
+import AppLayout from '@/layouts/AppLayout.astro';
+import PageHeader from '@/components/app/PageHeader.astro';
+import DataTable from '@/components/app/DataTable.astro';
+import FormPanel from '@/components/app/FormPanel.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { invoices, patient } from '@/data/app/portal';
+import { money } from '@/lib/format';
+
+const due = invoices.filter((i) => i.status !== 'Paid');
+const balance = due.reduce((s, i) => s + i.amount, 0);
+---
+
+<AppLayout title="Billing" area="portal">
+  <PageHeader title="Billing & invoices" subtitle="Itemised invoices, medical aid claim status, tax certificates and secure online payment.">
+    <button class="btn btn--outline btn--sm" data-toast-click="Tax certificate 2026 downloaded"><Icon name="file-down" /> Tax certificate</button>
+  </PageHeader>
+
+  <div class="app-grid app-grid--3 bill">
+    <section class="panel bill__due">
+      <div class="panel__body">
+        <p class="panel__sub">Outstanding balance</p>
+        <p class="bill__value tabular">{money(balance)}</p>
+        <button class="btn btn--accent btn--block" data-open="pay"><Icon name="credit-card" /> Pay now</button>
+      </div>
+    </section>
+    <section class="panel">
+      <div class="panel__body">
+        <p class="panel__sub">Medical aid</p>
+        <p class="bill__line">{patient.scheme}</p>
+        <p class="panel__sub">{patient.plan} &middot; <span class="masked">{patient.member}</span></p>
+      </div>
+    </section>
+    <section class="panel">
+      <div class="panel__body">
+        <p class="panel__sub">Claims this year</p>
+        <p class="bill__line">3 paid &middot; 1 partial</p>
+        <p class="panel__sub">Tracked from submission to payment</p>
+      </div>
+    </section>
+  </div>
+
+  <section class="panel">
+    <DataTable
+      id="invoices"
+      search={false}
+      kicker="Invoice"
+      titleKey="ref"
+      rows={invoices}
+      columns={[
+        { key: 'ref', label: 'Invoice', kind: 'mono' },
+        { key: 'description', label: 'Description', kind: 'strong', hideSm: true },
+        { key: 'date', label: 'Date', kind: 'date', hideSm: true },
+        { key: 'claim', label: 'Claim', kind: 'status', hideSm: true },
+        { key: 'amount', label: 'Amount', kind: 'money', align: 'end' },
+        { key: 'status', label: 'Status', kind: 'status' },
+      ]}
+    />
+  </section>
+
+  <FormPanel id="pay" title="Pay outstanding balance" submit={`Pay ${money(balance)}`} toast="Payment successful, receipt emailed" center>
+    <p class="field-label">Pay with</p>
+    <div class="gw" role="radiogroup" aria-label="Payment gateway">
+      <label class="gw__opt">
+        <input type="radio" name="gw" checked />
+        <span><strong>PayFast</strong><small>Card, Instant EFT, SnapScan</small></span>
+      </label>
+      <label class="gw__opt">
+        <input type="radio" name="gw" />
+        <span><strong>Peach Payments</strong><small>Card, Apple Pay, Google Pay</small></span>
+      </label>
+    </div>
+    <ul class="gw__lines" role="list">
+      {
+        due.map((i) => (
+          <li>
+            <span>{i.description}</span>
+            <span class="tabular">{money(i.amount)}</span>
+          </li>
+        ))
+      }
+    </ul>
+    <p class="secure-note"><Icon name="lock" size={14} /> You will be redirected to a PCI-DSS compliant payment page.</p>
+  </FormPanel>
+</AppLayout>
+
+<style>
+  .bill {
+    margin-bottom: var(--sp-6);
+  }
+
+  .bill__due {
+    background: var(--teal-50);
+    box-shadow: 0 0 0 1px var(--teal-100);
+  }
+
+  .bill__value {
+    margin: var(--sp-1) 0 var(--sp-4);
+    font-size: 2rem;
+    font-weight: 650;
+    letter-spacing: -0.02em;
+    color: var(--navy-950);
+  }
+
+  .bill__line {
+    margin: var(--sp-1) 0;
+    font-size: var(--fs-lg);
+    font-weight: 650;
+    color: var(--navy-900);
+  }
+
+  .gw {
+    display: grid;
+    gap: var(--sp-2);
+  }
+
+  .gw__opt input {
+    position: absolute;
+    opacity: 0;
+  }
+
+  .gw__opt span {
+    display: grid;
+    padding: var(--sp-3) var(--sp-4);
+    border: 1px solid var(--line-2);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    line-height: 1.35;
+  }
+
+  .gw__opt strong {
+    color: var(--navy-900);
+  }
+
+  .gw__opt small {
+    font-size: var(--fs-xs);
+    color: var(--ink-3);
+  }
+
+  .gw__opt input:checked + span {
+    border-color: var(--teal-600);
+    background: var(--teal-50);
+    box-shadow: inset 0 0 0 1px var(--teal-600);
+  }
+
+  .gw__opt input:focus-visible + span {
+    box-shadow: var(--ring);
+  }
+
+  .gw__lines {
+    display: grid;
+    gap: var(--sp-2);
+    margin: 0;
+    padding: var(--sp-4) 0 0;
+    border-top: 1px solid var(--line);
+    font-size: var(--fs-sm);
+  }
+
+  .gw__lines li {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--sp-3);
+    color: var(--ink-2);
+  }
+</style>

@@ -1,0 +1,83 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Logo from '@/components/site/Logo.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { site } from '@/config/site';
+import { url } from '@/lib/paths';
+---
+
+<BaseLayout title="You are offline">
+  <main id="main" class="off">
+    <div class="off__card">
+      <Logo />
+      <span class="off__icon"><Icon name="wifi-off" size={28} /></span>
+      <h1>You are offline</h1>
+      <p>Pages you visited recently are still available. Reconnect to book, pay or send messages.</p>
+      <div class="off__actions">
+        <button type="button" class="btn" onclick="location.reload()"><Icon name="refresh-cw" /> Try again</button>
+        <a class="btn btn--outline" href={url('/portal/')}>Open portal</a>
+      </div>
+      <a class="off__sos" href={site.emergency.href}><Icon name="siren" size={18} /> Emergency {site.emergency.display}</a>
+    </div>
+  </main>
+</BaseLayout>
+
+<style>
+  .off {
+    display: grid;
+    place-items: center;
+    min-height: 100dvh;
+    padding: var(--sp-6) var(--gutter);
+    background:
+      radial-gradient(50% 50% at 50% 0%, rgb(0 216 206 / 0.12), transparent 70%),
+      var(--surface-2);
+  }
+
+  .off__card {
+    display: grid;
+    justify-items: center;
+    gap: var(--sp-4);
+    width: min(460px, 100%);
+    padding: var(--sp-10) var(--sp-8);
+    border-radius: var(--radius-xl);
+    background: var(--surface);
+    box-shadow: var(--shadow-md), 0 0 0 1px var(--line);
+    text-align: center;
+  }
+
+  .off__icon {
+    display: grid;
+    place-items: center;
+    width: 4rem;
+    height: 4rem;
+    margin-top: var(--sp-4);
+    border-radius: 50%;
+    background: var(--surface-3);
+    color: var(--ink-2);
+  }
+
+  .off h1 {
+    font-size: var(--fs-2xl);
+  }
+
+  .off p {
+    color: var(--ink-2);
+  }
+
+  .off__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--sp-3);
+  }
+
+  .off__sos {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-2);
+    margin-top: var(--sp-2);
+    font-weight: 700;
+    color: var(--red-600);
+    text-decoration: none;
+  }
+</style>

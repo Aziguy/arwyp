@@ -1,0 +1,137 @@
+---
+import AppLayout from '@/layouts/AppLayout.astro';
+import PageHeader from '@/components/app/PageHeader.astro';
+import FormPanel from '@/components/app/FormPanel.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { vault, patient } from '@/data/app/portal';
+import { badgeClass } from '@/lib/app/status';
+---
+
+<AppLayout title="Health vault" area="portal">
+  <PageHeader title="Health vault" subtitle="Your history, allergies, chronic medication and emergency contacts, available to any Arwyp doctor you consult.">
+    <button class="btn btn--sm" data-open="vault-edit"><Icon name="pencil" /> Update</button>
+  </PageHeader>
+
+  <div class="app-grid app-grid--2">
+    <section class="panel">
+      <header class="panel__head">
+        <h2 class="panel__title">Allergies</h2>
+        <span class="vault__blood"><Icon name="droplet" size={14} /> Blood type {vault.bloodType}</span>
+      </header>
+      <ul class="list-rows vault__list" role="list">
+        {
+          vault.allergies.map((a) => (
+            <li>
+              <span class="icon-dot icon-dot--red">
+                <Icon name="triangle-alert" size={16} />
+              </span>
+              <span class="list-rows__main">
+                <strong>{a.name}</strong>
+                <small>{a.reaction}</small>
+              </span>
+              <span class={badgeClass(a.severity)}>{a.severity}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <section class="panel">
+      <header class="panel__head">
+        <h2 class="panel__title">Emergency contacts</h2>
+      </header>
+      <ul class="list-rows vault__list" role="list">
+        {
+          vault.contacts.map((c) => (
+            <li>
+              <span class="icon-dot">
+                <Icon name="phone" size={16} />
+              </span>
+              <span class="list-rows__main">
+                <strong>{c.name}</strong>
+                <small>{c.relation}</small>
+              </span>
+              <span class="masked">{c.phone}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <section class="panel">
+      <header class="panel__head">
+        <h2 class="panel__title">Chronic conditions</h2>
+      </header>
+      <ul class="list-rows vault__list" role="list">
+        {
+          vault.conditions.map((c) => (
+            <li>
+              <span class="icon-dot icon-dot--navy">
+                <Icon name="activity" size={16} />
+              </span>
+              <span class="list-rows__main">
+                <strong>{c}</strong>
+              </span>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <section class="panel">
+      <header class="panel__head">
+        <h2 class="panel__title">Chronic medication</h2>
+      </header>
+      <ul class="list-rows vault__list" role="list">
+        {
+          vault.medication.map((m) => (
+            <li>
+              <span class="icon-dot icon-dot--green">
+                <Icon name="pill" size={16} />
+              </span>
+              <span class="list-rows__main">
+                <strong>{m}</strong>
+              </span>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+  </div>
+
+  <p class="secure-note vault__note"><Icon name="shield-check" size={14} /> {patient.name} controls who can see this. Sharing preferences can be changed at any time under POPIA.</p>
+
+  <FormPanel id="vault-edit" title="Update health vault" submit="Save" toast="Health vault updated">
+    <div class="field"><label for="vu-allergy">Add allergy</label><input id="vu-allergy" class="input" placeholder="e.g. Sulfa drugs" /></div>
+    <div class="field">
+      <label for="vu-sev">Severity</label>
+      <select id="vu-sev" class="select"><option>Mild</option><option>Moderate</option><option>Severe</option></select>
+    </div>
+    <div class="field"><label for="vu-med">Add chronic medication</label><input id="vu-med" class="input" /></div>
+    <div class="form-row">
+      <div class="field"><label for="vu-cn">Emergency contact name</label><input id="vu-cn" class="input" /></div>
+      <div class="field"><label for="vu-cp">Phone</label><input id="vu-cp" class="input" type="tel" /></div>
+    </div>
+    <label class="check"><input type="checkbox" checked /> Share my vault with any Arwyp doctor I consult</label>
+  </FormPanel>
+</AppLayout>
+
+<style>
+  .vault__list {
+    padding-top: var(--sp-3);
+    padding-bottom: var(--sp-2);
+  }
+
+  .vault__blood {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: var(--fs-xs);
+    font-weight: 700;
+    color: var(--red-700);
+  }
+
+  .vault__note {
+    margin-top: var(--sp-6);
+  }
+</style>

@@ -1,0 +1,72 @@
+---
+import AuthLayout from '@/layouts/AuthLayout.astro';
+import Icon from '@/components/ui/Icon.astro';
+---
+
+<AuthLayout title="Patient portal" heading="Sign in to your portal" intro="Use your SA ID or passport number and the mobile number on your file." variant="patient">
+  <div class="only-b">
+    <form class="form" data-step="id">
+      <div class="field">
+        <label for="pl-id">ID or passport number</label>
+        <input id="pl-id" class="input" inputmode="numeric" value="840314 **** 08 7" autocomplete="username" required />
+      </div>
+      <div class="field">
+        <label for="pl-phone">Mobile number</label>
+        <input id="pl-phone" class="input" type="tel" value="+27 82 000 4410" autocomplete="tel" required />
+      </div>
+      <button class="btn btn--lg btn--block" type="submit">Send one-time PIN <Icon name="arrow-right" /></button>
+      <button class="btn btn--outline btn--lg btn--block" type="button" data-bio><Icon name="fingerprint" /> Use Face ID or fingerprint</button>
+      <p class="auth__alt">New patient? Your account is created automatically at your first booking.</p>
+    </form>
+
+    <form class="form" data-step="otp" hidden>
+      <div class="auth__otp-head">
+        <span class="icon-dot"><Icon name="message-square" size={18} /></span>
+        <p>We sent a 6-digit PIN to <strong>+27 82 *** 4410</strong>.</p>
+      </div>
+      <div class="otp" role="group" aria-label="One-time PIN">
+        {Array.from({ length: 6 }, (_, i) => <input class="input otp__box" inputmode="numeric" maxlength="1" aria-label={`Digit ${i + 1}`} value={String((i * 7 + 2) % 10)} />)}
+      </div>
+      <button class="btn btn--lg btn--block" type="submit"><Icon name="lock-keyhole" /> Verify & sign in</button>
+      <p class="auth__alt">Didn't get it? <a href="#" data-resend>Resend PIN</a></p>
+    </form>
+  </div>
+
+  <div class="only-a pl-a">
+    <span class="tag-b"></span>
+    <p>The secure patient portal and installable app are part of Quote B. In Quote A, patients book by phone through each specialist's rooms.</p>
+    <button type="button" class="btn btn--accent btn--block" data-set-quote="b"><Icon name="sparkles" /> Preview with Quote B</button>
+  </div>
+</AuthLayout>
+
+<script>
+  import { url } from '@/lib/paths';
+  const id = document.querySelector<HTMLFormElement>('[data-step="id"]')!;
+  const otp = document.querySelector<HTMLFormElement>('[data-step="otp"]')!;
+  const enter = () => location.assign(url('/portal/'));
+  id.addEventListener('submit', (e) => {
+    e.preventDefault();
+    id.hidden = true;
+    otp.hidden = false;
+    otp.querySelector<HTMLInputElement>('input')?.focus();
+  });
+  otp.addEventListener('submit', (e) => {
+    e.preventDefault();
+    enter();
+  });
+  document.querySelector('[data-bio]')?.addEventListener('click', enter);
+  document.querySelector('[data-resend]')?.addEventListener('click', (e) => e.preventDefault());
+</script>
+
+<style>
+  .pl-a {
+    display: grid;
+    gap: var(--sp-4);
+    justify-items: start;
+    padding: var(--sp-6);
+    border-radius: var(--radius-lg);
+    background: var(--teal-50);
+    color: var(--ink-2);
+    font-size: var(--fs-sm);
+  }
+</style>

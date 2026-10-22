@@ -1,0 +1,279 @@
+---
+import AppLayout from '@/layouts/AppLayout.astro';
+import PageHeader from '@/components/app/PageHeader.astro';
+import Tabs from '@/components/app/Tabs.astro';
+import FormPanel from '@/components/app/FormPanel.astro';
+import Avatar from '@/components/ui/Avatar.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { appointments } from '@/data/app/portal';
+import { TODAY, weekdayShort, dayMonth, addDays } from '@/data/app/common';
+import { badgeClass } from '@/lib/app/status';
+import { url } from '@/lib/paths';
+
+const upcoming = appointments.filter((a) => a.date >= TODAY);
+const past = appointments.filter((a) => a.date < TODAY);
+const groups = [
+  { id: 'upcoming', items: upcoming },
+  { id: 'past', items: past },
+];
+const options = Array.from({ length: 6 }, (_, i) => addDays(TODAY, i + 3));
+---
+
+<AppLayout title="Appointments" area="portal">
+  <PageHeader title="Appointments" subtitle="Reschedule, cancel or add to your phone's calendar in one tap.">
+    <a class="btn btn--sm" href={url('/specialists/')}><Icon name="calendar-plus" /> Book new</a>
+  </PageHeader>
+
+  <section class="panel" data-tabs-scope>
+    <div class="ap__tabs">
+      <Tabs label="Appointments" tabs={[{ id: 'upcoming', label: 'Upcoming', count: upcoming.length }, { id: 'past', label: 'Past', count: past.length }]} />
+    </div>
+    {
+      groups.map((g, gi) => (
+        <ul class="ap" role="list" data-tab-panel={g.id} hidden={gi > 0}>
+          {g.items.map((a) => (
+            <li class="ap__item">
+              <span class="ap__date">
+                <small>{weekdayShort(a.date)}</small>
+                <strong>{dayMonth(a.date)}</strong>
+                <small>{a.time}</small>
+              </span>
+              <span class="ap__who">
+                <Avatar name={a.specialist} size={40} />
+                <span>
+                  <strong>{a.specialist}</strong>
+                  <small>
+                    {a.discipline} &middot; {a.type}
+                  </small>
+                  <small>
+                    {a.rooms} &middot; <span class="mono">{a.ref}</span>
+                  </small>
+                </span>
+              </span>
+              <span class="ap__status">
+                <span class={badgeClass(a.status)}>{a.status}</span>
+                <span class="ap__paid">{a.paid}</span>
+              </span>
+              <span class="ap__actions">
+                {g.id === 'upcoming' ? (
+                  <>
+                    {a.status === 'Pending payment' && (
+                      <button class="btn btn--accent btn--sm" data-toast-click="Redirecting to PayFast...">
+                        <Icon name="credit-card" /> Pay deposit
+                      </button>
+                    )}
+                    <button class="btn btn--outline btn--sm" data-open="reschedule" data-title={`Reschedule with ${a.specialist}`}>
+                      Reschedule
+                    </button>
+                    <button class="icon-btn" aria-label="Add to calendar" data-toast-click="Added to your calendar">
+                      <Icon name="calendar-plus" size={18} />
+                    </button>
+                    <button class="icon-btn ap__cancel" aria-label="Cancel appointment" data-toast-click="Appointment cancelled, refund initiated">
+                      <Icon name="x" size={18} />
+                    </button>
+                  </>
+                ) : (
+                  <a class="btn btn--outline btn--sm" href={url(`/specialists/${a.slug}/`)}>
+                    Book again
+                  </a>
+                )}
+              </span>
+            </li>
+          ))}
+        </ul>
+      ))
+    }
+  </section>
+
+  <FormPanel id="reschedule" title="Reschedule" submit="Confirm new time" toast="Rescheduled, confirmation sent by SMS" center>
+    <p class="field-label">Available days</p>
+    <div class="slots" role="radiogroup" aria-label="Day">
+      {
+        options.map((d, i) => (
+          <label class="slot">
+            <input type="radio" name="rs-day" checked={i === 0} />
+            <span>
+              <small>{weekdayShort(d)}</small>
+              {dayMonth(d)}
+            </span>
+          </label>
+        ))
+      }
+    </div>
+    <p class="field-label">Available times</p>
+    <div class="slots" role="radiogroup" aria-label="Time">
+      {
+        ['08:30', '09:00', '10:30', '11:00', '14:00', '15:30'].map((t, i) => (
+          <label class="slot">
+            <input type="radio" name="rs-time" checked={i === 2} />
+            <span>{t}</span>
+          </label>
+        ))
+      }
+    </div>
+  </FormPanel>
+</AppLayout>
+
+<style>
+  .ap__tabs {
+    padding: var(--sp-2) var(--sp-5) 0;
+  }
+
+  .ap {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .ap__item {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto auto;
+    align-items: center;
+    gap: var(--sp-5);
+    padding: var(--sp-5);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .ap__item:last-child {
+    border-bottom: 0;
+  }
+
+  .ap__date {
+    display: grid;
+    justify-items: center;
+    min-width: 72px;
+    padding: var(--sp-2) var(--sp-3);
+    border-radius: var(--radius-md);
+    background: var(--surface-2);
+    line-height: 1.2;
+  }
+
+  .ap__date strong {
+    font-size: var(--fs-lg);
+    color: var(--navy-900);
+  }
+
+  .ap__date small {
+    font-size: var(--fs-xs);
+    color: var(--ink-3);
+  }
+
+  .ap__who {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3);
+    min-width: 0;
+    line-height: 1.4;
+  }
+
+  .ap__who > span {
+    min-width: 0;
+  }
+
+  .ap__who strong {
+    display: block;
+    color: var(--navy-900);
+  }
+
+  .ap__who small {
+    display: block;
+    font-size: var(--fs-xs);
+    color: var(--ink-3);
+    overflow-wrap: anywhere;
+  }
+
+  .ap__status {
+    display: grid;
+    justify-items: end;
+    gap: 4px;
+  }
+
+  .ap__paid {
+    font-size: var(--fs-xs);
+    color: var(--ink-3);
+  }
+
+  .ap__actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--sp-2);
+  }
+
+  .ap__cancel:hover {
+    color: var(--red-700);
+    background: var(--red-50);
+  }
+
+  .slots {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(88px, 1fr));
+    gap: var(--sp-2);
+  }
+
+  .slot input {
+    position: absolute;
+    opacity: 0;
+  }
+
+  .slot span {
+    display: grid;
+    justify-items: center;
+    padding: var(--sp-2);
+    border: 1px solid var(--line-2);
+    border-radius: var(--radius-md);
+    font-size: var(--fs-sm);
+    font-weight: 650;
+    color: var(--navy-900);
+    cursor: pointer;
+    line-height: 1.3;
+    transition:
+      border-color var(--dur) var(--ease),
+      background-color var(--dur) var(--ease);
+  }
+
+  .slot small {
+    font-size: var(--fs-xs);
+    font-weight: 500;
+    color: var(--ink-3);
+  }
+
+  .slot input:checked + span {
+    border-color: var(--teal-600);
+    background: var(--teal-50);
+    box-shadow: inset 0 0 0 1px var(--teal-600);
+  }
+
+  .slot input:focus-visible + span {
+    box-shadow: var(--ring);
+  }
+
+  @media (max-width: 900px) {
+    .ap__item {
+      grid-template-columns: auto minmax(0, 1fr);
+      gap: var(--sp-3) var(--sp-4);
+    }
+    .ap__status {
+      grid-column: 2;
+      justify-items: start;
+      grid-auto-flow: column;
+      align-items: center;
+    }
+    .ap__actions {
+      grid-column: 1 / -1;
+      justify-content: flex-start;
+    }
+    .ap__status {
+      gap: var(--sp-3);
+    }
+  }
+
+  @media (max-width: 480px) {
+    .ap__item {
+      padding: var(--sp-4);
+    }
+    .ap__actions {
+      gap: var(--sp-1);
+    }
+  }
+</style>

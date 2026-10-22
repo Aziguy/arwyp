@@ -1,0 +1,138 @@
+---
+import AppLayout from '@/layouts/AppLayout.astro';
+import PageHeader from '@/components/app/PageHeader.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { records } from '@/data/app/portal';
+import { badgeClass } from '@/lib/app/status';
+import { longDate } from '@/lib/format';
+
+const kinds = [...new Set(records.map((r) => r.kind))];
+---
+
+<AppLayout title="Medical records" area="portal">
+  <PageHeader title="Medical records" subtitle="Lab results, radiology reports, discharge summaries and doctor notes, available securely any time." />
+
+  <div class="rec__filters" role="group" aria-label="Filter records">
+    <button type="button" class="chip" aria-pressed="true" data-kind="">All</button>
+    {kinds.map((k) => <button type="button" class="chip" aria-pressed="false" data-kind={k}>{k}</button>)}
+  </div>
+
+  <ul class="rec" role="list">
+    {
+      records.map((r) => (
+        <li class="rec__item" data-kind-item={r.kind}>
+          <span class="icon-dot icon-dot--navy rec__icon">
+            <Icon name={r.icon} size={20} />
+          </span>
+          <span class="rec__main">
+            <span class="rec__kind">{r.kind}</span>
+            <strong>{r.title}</strong>
+            <small>
+              {r.source} &middot; {longDate(r.date)}
+            </small>
+          </span>
+          <span class={badgeClass(r.status)}>{r.status}</span>
+          <span class="rec__actions">
+            <button class="btn btn--outline btn--sm" data-toast-click="Opening secure viewer">
+              <Icon name="eye" /> View
+            </button>
+            <button class="icon-btn" aria-label={`Download ${r.title}`} data-toast-click="Encrypted PDF downloaded">
+              <Icon name="download" size={18} />
+            </button>
+          </span>
+        </li>
+      ))
+    }
+  </ul>
+
+  <p class="secure-note rec__note"><Icon name="lock" size={14} /> Shared only with Arwyp doctors you consult. Every access is logged.</p>
+</AppLayout>
+
+<script>
+  const chips = document.querySelectorAll<HTMLButtonElement>('[data-kind]');
+  chips.forEach((chip) =>
+    chip.addEventListener('click', () => {
+      chips.forEach((c) => c.setAttribute('aria-pressed', String(c === chip)));
+      document.querySelectorAll<HTMLElement>('[data-kind-item]').forEach((item) => {
+        item.hidden = !!chip.dataset.kind && item.dataset.kindItem !== chip.dataset.kind;
+      });
+    }),
+  );
+</script>
+
+<style>
+  .rec__filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-2);
+    margin-bottom: var(--sp-5);
+  }
+
+  .rec {
+    display: grid;
+    gap: var(--sp-3);
+    margin: 0;
+  }
+
+  .rec__item {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto auto;
+    align-items: center;
+    gap: var(--sp-4);
+    padding: var(--sp-4) var(--sp-5);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    box-shadow: 0 0 0 1px var(--line);
+  }
+
+  .rec__icon {
+    width: 2.75rem;
+    height: 2.75rem;
+  }
+
+  .rec__main {
+    display: grid;
+    min-width: 0;
+    line-height: 1.4;
+  }
+
+  .rec__kind {
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--teal-700);
+  }
+
+  .rec__main strong {
+    color: var(--navy-900);
+  }
+
+  .rec__main small {
+    font-size: var(--fs-xs);
+    color: var(--ink-3);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .rec__actions {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+  }
+
+  .rec__note {
+    margin-top: var(--sp-6);
+  }
+
+  @media (max-width: 640px) {
+    .rec__item {
+      grid-template-columns: auto minmax(0, 1fr) auto;
+    }
+    .rec__actions {
+      grid-column: 1 / -1;
+      justify-content: flex-end;
+    }
+  }
+</style>
