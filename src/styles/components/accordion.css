@@ -1,0 +1,39 @@
+.faq {
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  box-shadow: 0 0 0 1px var(--line);
+}
+
+.faq + .faq {
+  margin-top: var(--sp-3);
+}
+
+.faq summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--sp-4);
+  padding: var(--sp-4) var(--sp-5);
+  font-weight: 650;
+  color: var(--navy-900);
+  cursor: pointer;
+  list-style: none;
+}
+
+.faq summary::-webkit-details-marker {
+  display: none;
+}
+
+.faq summary svg {
+  flex: none;
+  transition: transform var(--dur) var(--ease);
+}
+
+.faq[open] summary svg {
+  transform: rotate(45deg);
+}
+
+.faq p {
+  padding: 0 var(--sp-5) var(--sp-4);
+  color: var(--ink-2);
+}

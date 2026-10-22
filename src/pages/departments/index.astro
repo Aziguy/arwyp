@@ -1,0 +1,317 @@
+---
+import SiteLayout from '@/layouts/SiteLayout.astro';
+import PageHero from '@/components/ui/PageHero.astro';
+import SectionHeader from '@/components/ui/SectionHeader.astro';
+import Icon from '@/components/ui/Icon.astro';
+import CtaBand from '@/components/ui/CtaBand.astro';
+import { departments, departmentSpecialists, technologies } from '@/data/departments';
+import { url } from '@/lib/paths';
+
+const pillars = [
+  { icon: 'stethoscope', label: 'Specialist doctors' },
+  { icon: 'scissors', label: 'Modern operating theatres' },
+  { icon: 'scan-line', label: 'Advanced diagnostics' },
+  { icon: 'activity', label: 'Critical care' },
+  { icon: 'syringe', label: 'Anaesthesia' },
+  { icon: 'heart-handshake', label: 'Nursing & rehabilitation' },
+];
+---
+
+<SiteLayout title="Specialised Departments" description="Deep expertise, department by department.">
+  <PageHero
+    eyebrow="Specialised Departments"
+    title="Deep expertise, <span class='serif'>department by department.</span>"
+    subtitle="Each of our specialised departments combines dedicated facilities, focused clinical teams, and the latest relevant technology, giving patients a level of care that a general ward can't match."
+    crumbs={[{ label: 'Services', href: '/services/' }, { label: 'Specialised Departments' }]}
+  />
+
+  <section class="section">
+    <div class="container">
+      <SectionHeader
+        eyebrow="Coordinated specialist care under one roof"
+        title="One hospital. <span class='serif'>Multiple centres</span> of expertise."
+        intro="Arwyp brings together experienced specialists, multidisciplinary teams, advanced technology and comprehensive hospital infrastructure to deliver coordinated care for patients with complex healthcare needs, from diagnosis through recovery, and to give referring doctors a seamless pathway to specialist care."
+      />
+      <ul class="depts" role="list">
+        {
+          departments.map((d) => (
+            <li>
+              <a class={`dept dept--${d.tone}`} href={url(`/departments/${d.slug}/`)}>
+                <span class="dept__icon">
+                  <Icon name={d.icon} size={26} />
+                </span>
+                <span class="dept__count">{departmentSpecialists(d).length} specialists</span>
+                <h3>{d.name}</h3>
+                <p>{d.tagline}</p>
+                <span class="link-arrow">
+                  Explore department <Icon name="arrow-right" />
+                </span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <section class="section section--dark" id="technology">
+    <div class="container">
+      <SectionHeader
+        eyebrow="Advanced surgical technology"
+        title="Technology-enabled precision for <span class='serif'>complex surgical care</span>"
+        intro="Arwyp combines specialist surgical expertise with advanced imaging and operating theatre technology to support precision, safety and efficiency across selected complex procedures."
+      />
+      <div class="tech">
+        {
+          technologies.map((t) => (
+            <article>
+              <span class="tech__icon">
+                <Icon name={t.icon} size={26} />
+              </span>
+              <h3>{t.name}</h3>
+              <p>{t.text}</p>
+            </article>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--tint">
+    <div class="container integrated">
+      <div class="stack" style="--stack: var(--sp-5)">
+        <p class="eyebrow">An integrated specialist environment</p>
+        <h2>Coordinated care for patients and referring specialists</h2>
+        <p class="lead">
+          Across our specialised departments, Arwyp provides access to specialist doctors, modern operating theatres, advanced diagnostic capabilities, critical
+          care, anaesthesia, nursing and rehabilitation support.
+        </p>
+        <p>
+          This integrated model enables patients to receive coordinated care while providing referring specialists and healthcare partners with a reliable
+          hospital environment for diagnosis, intervention, recovery and follow-up.
+        </p>
+      </div>
+      <ul class="pillars" role="list">
+        {
+          pillars.map((p) => (
+            <li>
+              <Icon name={p.icon} /> {p.label}
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <CtaBand
+    eyebrow="For 40 years"
+    title="Connected, high-quality care for everyday and complex needs"
+    text="Arwyp has combined specialist expertise, advanced surgical technology and compassionate care in one integrated hospital environment."
+  >
+    <a class="btn btn--accent btn--lg" href={url('/specialists/')}><Icon name="search" /> Find a Specialist</a>
+    <a class="btn btn--outline-light btn--lg only-b" href={url('/gp-referral/')}><Icon name="send" /> Refer a patient</a>
+  </CtaBand>
+</SiteLayout>
+
+<style>
+  .depts {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--sp-6);
+    margin: 0;
+  }
+
+  .dept {
+    --dc: var(--teal-700);
+    --db: var(--teal-50);
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-3);
+    height: 100%;
+    padding: var(--sp-8);
+    border-radius: var(--radius-xl);
+    background: var(--surface);
+    box-shadow: 0 0 0 1px var(--line);
+    text-decoration: none;
+    color: var(--ink);
+    position: relative;
+    overflow: hidden;
+    transition:
+      box-shadow var(--dur) var(--ease),
+      transform var(--dur) var(--ease);
+  }
+
+  .dept::after {
+    content: '';
+    position: absolute;
+    top: -40%;
+    right: -30%;
+    width: 70%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: var(--db);
+    opacity: 0.7;
+    transition: transform 400ms var(--ease);
+    z-index: 0;
+  }
+
+  .dept > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  .dept:hover {
+    color: var(--ink);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md), 0 0 0 1px var(--line-2);
+  }
+
+  .dept:hover::after {
+    transform: scale(1.15);
+  }
+
+  .dept--navy {
+    --dc: var(--navy-800);
+    --db: var(--navy-100);
+  }
+
+  .dept--rose {
+    --dc: #8c3a55;
+    --db: #fbe7ec;
+  }
+
+  .dept--sky {
+    --dc: #1f4f86;
+    --db: #e3effb;
+  }
+
+  .dept--sand {
+    --dc: #6b5333;
+    --db: var(--sand-100);
+  }
+
+  .dept__icon {
+    display: grid;
+    place-items: center;
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: var(--radius-lg);
+    background: var(--dc);
+    color: #fff;
+  }
+
+  .dept__count {
+    margin-top: var(--sp-3);
+    font-size: var(--fs-xs);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+
+  .dept h3 {
+    font-size: var(--fs-lg);
+  }
+
+  .dept p {
+    font-size: var(--fs-sm);
+    color: var(--ink-2);
+  }
+
+  .dept .link-arrow {
+    margin-top: auto;
+    padding-top: var(--sp-3);
+  }
+
+  .tech {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--sp-6);
+  }
+
+  .tech article {
+    display: grid;
+    gap: var(--sp-3);
+    align-content: start;
+    padding: var(--sp-8);
+    border-radius: var(--radius-xl);
+    background: rgb(255 255 255 / 0.04);
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.1);
+  }
+
+  .tech__icon {
+    display: grid;
+    place-items: center;
+    width: 3.5rem;
+    height: 3.5rem;
+    margin-bottom: var(--sp-2);
+    border-radius: var(--radius-lg);
+    background: var(--teal-400);
+    color: var(--navy-950);
+  }
+
+  .tech p {
+    color: rgb(255 255 255 / 0.72);
+  }
+
+  .integrated {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+    gap: clamp(2rem, 1rem + 4vw, 5rem);
+    align-items: center;
+  }
+
+  .pillars {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--sp-3);
+    margin: 0;
+  }
+
+  .pillars li {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3);
+    padding: var(--sp-4);
+    border-radius: var(--radius-md);
+    background: var(--surface);
+    box-shadow: 0 0 0 1px var(--line);
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    color: var(--navy-900);
+  }
+
+  .pillars :global(svg) {
+    flex: none;
+    color: var(--teal-700);
+  }
+
+  @media (max-width: 1024px) {
+    .depts {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 820px) {
+    .tech,
+    .integrated {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 620px) {
+    .depts {
+      grid-template-columns: 1fr;
+    }
+    .dept,
+    .tech article {
+      padding: var(--sp-6);
+    }
+  }
+
+  @media (max-width: 420px) {
+    .pillars {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

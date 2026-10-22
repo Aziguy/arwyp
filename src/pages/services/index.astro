@@ -1,0 +1,107 @@
+---
+import SiteLayout from '@/layouts/SiteLayout.astro';
+import PageHero from '@/components/ui/PageHero.astro';
+import FeatureCard from '@/components/ui/FeatureCard.astro';
+import Icon from '@/components/ui/Icon.astro';
+import EmptyResults from '@/components/ui/EmptyResults.astro';
+import { services, serviceCategories } from '@/data/services';
+import { url } from '@/lib/paths';
+
+const prep = [
+  { icon: 'clipboard-check', title: 'Pre-Admission', text: 'What to bring, and forms to complete in advance.', href: '/patients/pre-admission/' },
+  { icon: 'clock', title: 'Visiting Hours', text: 'So your family knows when they can be with you.', href: '/patients/visiting-hours/' },
+  { icon: 'scale', title: "Patients' Rights Charter", text: 'Know what to expect from us.', href: '/patients/rights-charter/' },
+];
+---
+
+<SiteLayout title="Our Services" description="Comprehensive care, all in one place.">
+  <PageHero
+    eyebrow="Our Services"
+    title="Comprehensive care, <span class='serif'>all in one place.</span>"
+    subtitle="From your first consultation to complex surgery and recovery, Arwyp brings specialist expertise together under one roof, so your care stays coordinated, not scattered."
+    crumbs={[{ label: 'Services' }]}
+  >
+    <div slot="actions" class="cluster">
+      <a class="btn btn--accent" href={url('/specialists/')}><Icon name="search" /> Find a Specialist</a>
+      <a class="btn btn--outline" href={url('/departments/')}>Specialised Departments</a>
+    </div>
+  </PageHero>
+
+  <section class="section" data-filter>
+    <div class="container">
+      <div class="filterbar">
+        <div>
+          <h2 class="filterbar__title">Browse our specialised care</h2>
+          <p class="muted"><span data-count>{services.length}</span> services and facilities</p>
+        </div>
+        <label class="search-field">
+          <Icon name="search" size={18} />
+          <span class="sr-only">Search by service or condition</span>
+          <input class="input" type="search" placeholder="Search by service or condition, e.g. knee, MRI" data-search />
+        </label>
+      </div>
+
+      <div class="chips" role="toolbar" aria-label="Filter by department">
+        <button type="button" class="chip" data-facet="category" data-value="">All</button>
+        {
+          serviceCategories.map((c) => (
+            <button type="button" class="chip" data-facet="category" data-value={c}>
+              {c} <span class="count">{services.filter((s) => s.category === c).length}</span>
+            </button>
+          ))
+        }
+      </div>
+
+      <div class="grid" style="--grid-min: 270px">
+        {
+          services.map((s) => (
+            <div data-item data-category={s.category} data-text={`${s.name} ${s.text} ${s.conditions.join(' ')}`}>
+              <FeatureCard icon={s.icon} title={s.name} text={s.text} href={s.href} cta={s.href?.startsWith('/departments') ? 'View department' : 'Learn more'}>
+                <span class="badge svc__cat">{s.category}</span>
+              </FeatureCard>
+            </div>
+          ))
+        }
+      </div>
+      <EmptyResults />
+    </div>
+  </section>
+
+  <section class="section section--tint">
+    <div class="container">
+      <div class="prep">
+        <div class="stack" style="--stack: var(--sp-4)">
+          <p class="eyebrow">Getting ready for a procedure?</p>
+          <h2>Less admin, <span class="serif">less anxiety</span></h2>
+          <p class="lead">Everything you need before you arrive, in one place.</p>
+        </div>
+        <div class="grid" style="--grid-min: 220px">
+          {prep.map((p) => <FeatureCard {...p} cta="Read more" />)}
+        </div>
+      </div>
+    </div>
+  </section>
+</SiteLayout>
+
+<script>
+  import '@/scripts/filter';
+</script>
+
+<style>
+  .svc__cat {
+    align-self: flex-start;
+  }
+
+  .prep {
+    display: grid;
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 2fr);
+    gap: var(--sp-10);
+    align-items: center;
+  }
+
+  @media (max-width: 900px) {
+    .prep {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

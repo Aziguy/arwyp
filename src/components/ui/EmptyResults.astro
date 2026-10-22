@@ -1,0 +1,32 @@
+---
+import Icon from './Icon.astro';
+
+interface Props {
+  text?: string;
+}
+
+const { text = 'No results match your filters.' } = Astro.props;
+---
+
+<div class="empty" data-empty hidden>
+  <Icon name="search-x" size={28} />
+  <p>{text}</p>
+  <button type="button" class="btn btn--outline btn--sm" data-reset>Clear filters</button>
+</div>
+
+<style>
+  .empty {
+    display: grid;
+    justify-items: center;
+    gap: var(--sp-3);
+    padding: var(--sp-12) var(--sp-6);
+    border-radius: var(--radius-lg);
+    border: 1px dashed var(--line-2);
+    color: var(--ink-3);
+    text-align: center;
+  }
+
+  .empty[hidden] {
+    display: none;
+  }
+</style>
