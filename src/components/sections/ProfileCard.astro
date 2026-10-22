@@ -1,0 +1,101 @@
+---
+import Avatar from '@/components/ui/Avatar.astro';
+import type { Person } from '@/data/people';
+
+interface Props {
+  person: Person;
+  compact?: boolean;
+}
+
+const { person: p, compact = false } = Astro.props;
+---
+
+<article class:list={['pc', { 'pc--compact': compact }]}>
+  <div class="pc__photo">
+    <Avatar name={p.name} shape="portrait" />
+    <span class="pc__note">Headshot supplied by Arwyp</span>
+  </div>
+  <div class="pc__body">
+    <h3>{p.name}</h3>
+    <p class="pc__role">{p.role}</p>
+    <ul class="pc__meta" role="list">
+      <li><strong>{p.years}</strong> years experience</li>
+      {p.focus && <li>{p.focus}</li>}
+    </ul>
+    <p class="pc__bio">{p.bio}</p>
+  </div>
+</article>
+
+<style>
+  .pc {
+    display: grid;
+    grid-template-columns: 180px minmax(0, 1fr);
+    gap: var(--sp-6);
+    align-items: start;
+  }
+
+  .pc--compact {
+    grid-template-columns: 1fr;
+    gap: var(--sp-4);
+  }
+
+  .pc__photo {
+    position: relative;
+  }
+
+  .pc__note {
+    position: absolute;
+    left: var(--sp-2);
+    right: var(--sp-2);
+    bottom: var(--sp-2);
+    padding: 0.2rem 0.4rem;
+    border-radius: var(--radius-sm);
+    background: rgb(0 0 0 / 0.28);
+    color: rgb(255 255 255 / 0.85);
+    font-size: 0.625rem;
+    text-align: center;
+  }
+
+  .pc__body {
+    display: grid;
+    gap: var(--sp-2);
+  }
+
+  .pc h3 {
+    font-size: var(--fs-lg);
+  }
+
+  .pc__role {
+    font-size: var(--fs-sm);
+    font-weight: 650;
+    color: var(--teal-700);
+  }
+
+  .pc__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-2);
+    margin: var(--sp-1) 0;
+  }
+
+  .pc__meta li {
+    padding: 0.15rem 0.6rem;
+    border-radius: var(--radius-pill);
+    background: var(--surface-3);
+    font-size: var(--fs-xs);
+    color: var(--ink-2);
+  }
+
+  .pc__bio {
+    font-size: var(--fs-sm);
+    line-height: 1.7;
+    color: var(--ink-2);
+  }
+
+  @media (max-width: 520px) {
+    .pc {
+      grid-template-columns: 112px minmax(0, 1fr);
+      gap: var(--sp-4);
+    }
+  }
+</style>

@@ -1,0 +1,69 @@
+---
+import SiteLayout from '@/layouts/SiteLayout.astro';
+import PageHero from '@/components/ui/PageHero.astro';
+import SectionHeader from '@/components/ui/SectionHeader.astro';
+import ProfileCard from '@/components/sections/ProfileCard.astro';
+import CtaBand from '@/components/ui/CtaBand.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { executives, board } from '@/data/people';
+import { url } from '@/lib/paths';
+---
+
+<SiteLayout title="Management Team" description="The people steering Arwyp forward.">
+  <PageHero
+    eyebrow="Management Team"
+    title="The people <span class='serif'>steering Arwyp</span> forward."
+    subtitle="Our management team brings together decades of combined experience in hospital administration, clinical governance, and healthcare operations."
+    crumbs={[{ label: 'About Us', href: '/about/' }, { label: 'Management Team' }]}
+  />
+
+  <section class="section">
+    <div class="container">
+      <SectionHeader eyebrow="Leadership" title="Executive management" />
+      <div class="profiles">
+        {executives.map((p) => <ProfileCard person={p} />)}
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--tint">
+    <div class="container">
+      <SectionHeader eyebrow="Oversight" title="Board of directors" intro="Independent oversight of strategy, risk and clinical governance." />
+      <div class="board">
+        {board.map((p) => <ProfileCard person={p} compact />)}
+      </div>
+    </div>
+  </section>
+
+  <CtaBand
+    eyebrow="Governance you can trust"
+    title="Clinical governance and compliance at every level"
+    text="Arwyp's management team works within a framework of clinical governance and compliance designed to protect patients at every level. See our accreditation details and our Patients' Rights Charter."
+  >
+    <a class="btn btn--accent btn--lg" href={url('/about/investors/')}>View Investor Information <Icon name="arrow-right" /></a>
+    <a class="btn btn--outline-light btn--lg" href={url('/patients/rights-charter/')}>Patients' Rights</a>
+  </CtaBand>
+</SiteLayout>
+
+<style>
+  .profiles {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--sp-12) var(--sp-10);
+  }
+
+  .board {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--sp-8);
+  }
+
+  @media (max-width: 1000px) {
+    .profiles {
+      grid-template-columns: 1fr;
+    }
+    .board {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+</style>

@@ -1,0 +1,287 @@
+---
+import SiteLayout from '@/layouts/SiteLayout.astro';
+import PageHero from '@/components/ui/PageHero.astro';
+import SectionHeader from '@/components/ui/SectionHeader.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { url } from '@/lib/paths';
+
+const reasons = [
+  { icon: 'calendar-range', text: 'A 40-year operating track record in the Gauteng private healthcare market' },
+  { icon: 'shield-check', text: 'COHSASA-accredited quality and governance standards' },
+  { icon: 'layers', text: 'Diversified services across 28 specialised disciplines, reducing reliance on any single revenue stream' },
+  { icon: 'cpu', text: 'Ongoing capital investment in medical technology (e.g. O-Arm surgical imaging and Hybrid Theatre)' },
+  { icon: 'plane', text: "Positioned within South Africa's growing medical tourism sector via our Travel Clinic and inbound-patient services" },
+];
+
+const contacts = [
+  { topic: 'Financial and investment', who: 'Chief Financial Officer', email: 'investors@arwyp.example' },
+  { topic: 'Partnership opportunities', who: 'CFO & Head of Marketing', email: 'partnerships@arwyp.example' },
+];
+
+const documents = [
+  { name: 'Integrated Annual Report 2026', type: 'PDF', size: '8.4 MB', version: 'v2' },
+  { name: 'Audited Financial Statements FY2026', type: 'PDF', size: '2.1 MB', version: 'v1' },
+  { name: 'Board Charter & Committee Terms', type: 'PDF', size: '640 KB', version: 'v4' },
+  { name: 'Capital Investment Programme 2027-2030', type: 'PDF', size: '3.2 MB', version: 'v1' },
+];
+---
+
+<SiteLayout title="Investor Information" description="Investing in healthcare that lasts.">
+  <PageHero
+    tone="dark"
+    eyebrow="Investor Information"
+    title="Investing in healthcare <span class='serif'>that lasts.</span>"
+    subtitle="Arwyp Medical Centre has grown steadily since 1985 through disciplined investment in facilities, technology, and people."
+    crumbs={[{ label: 'About Us', href: '/about/' }, { label: 'Investors' }]}
+  />
+
+  <section class="section">
+    <div class="container">
+      <SectionHeader eyebrow="Why invest in Arwyp" title="Four decades of disciplined growth" />
+      <ol class="reasons" role="list">
+        {
+          reasons.map((r, i) => (
+            <li>
+              <span class="reasons__num">{String(i + 1).padStart(2, '0')}</span>
+              <span class="reasons__icon">
+                <Icon name={r.icon} />
+              </span>
+              <p>{r.text}</p>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <section class="section section--tint">
+    <div class="container gov">
+      <div class="stack" style="--stack: var(--sp-5)">
+        <p class="eyebrow">Corporate governance</p>
+        <h2>Oversight from management and board</h2>
+        <p class="lead">
+          Arwyp is managed according to established healthcare governance standards, with oversight from our management team and board. For details on our
+          compliance certifications and quality accreditations, see our Compliance page.
+        </p>
+        <a class="link-arrow" href={url('/about/management/')}>Management & board <Icon name="arrow-right" /></a>
+      </div>
+
+      <div class="hub">
+        <div class="only-a hub__a">
+          <p class="eyebrow">Shareholder & partner enquiries</p>
+          <h3>Speak to the right person</h3>
+          <p class="muted">For financial reports, shareholding structure, partnership opportunities, or investor relations enquiries, please contact:</p>
+          <ul class="contacts" role="list">
+            {
+              contacts.map((c) => (
+                <li>
+                  <span>
+                    <strong>{c.topic}</strong>
+                    <small>{c.who}</small>
+                  </span>
+                  <a href={`mailto:${c.email}`} class="btn btn--outline btn--sm">
+                    <Icon name="mail" /> Email
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+
+        <div class="only-b hub__b">
+          <div class="hub__head">
+            <span class="tag-b" data-label="Investor & Governance Hub"></span>
+            <span class="badge badge--navy"><Icon name="lock" size={12} /> Password-protected</span>
+          </div>
+          <h3>Investor documents</h3>
+          <ul class="docs" role="list">
+            {
+              documents.map((d) => (
+                <li>
+                  <span class="docs__icon">
+                    <Icon name="file-text" />
+                  </span>
+                  <span class="docs__name">
+                    <strong>{d.name}</strong>
+                    <small>
+                      {d.type} &middot; {d.size} &middot; {d.version}
+                    </small>
+                  </span>
+                  <Icon name="lock" size={16} class="docs__lock" />
+                </li>
+              ))
+            }
+          </ul>
+          <form class="hub__login" data-demo-form>
+            <input class="input" type="email" placeholder="Investor email" aria-label="Investor email" required />
+            <input class="input" type="password" placeholder="Password" aria-label="Password" required />
+            <button class="btn btn--accent" type="submit"><Icon name="log-in" /> Sign in</button>
+            <p class="form-success" tabindex="-1"><Icon name="circle-check" /> Demo: access granted. Documents are versioned and every download is logged.</p>
+          </form>
+          <p class="muted hub__alt">
+            Prefer to talk? <a href="mailto:investors@arwyp.example">investors@arwyp.example</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+</SiteLayout>
+
+<style>
+  .reasons {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: var(--sp-4);
+    margin: 0;
+  }
+
+  .reasons li {
+    display: grid;
+    gap: var(--sp-4);
+    align-content: start;
+    padding: var(--sp-6);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 0 0 1px var(--line);
+  }
+
+  .reasons__num {
+    font-size: var(--fs-xs);
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    color: var(--ink-3);
+  }
+
+  .reasons__icon {
+    display: grid;
+    place-items: center;
+    width: 3rem;
+    height: 3rem;
+    border-radius: var(--radius-md);
+    background: var(--navy-800);
+    color: var(--teal-400);
+  }
+
+  .reasons p {
+    font-size: var(--fs-sm);
+    font-weight: 550;
+    color: var(--navy-900);
+    line-height: 1.55;
+  }
+
+  .gov {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: clamp(2rem, 1rem + 4vw, 5rem);
+    align-items: start;
+  }
+
+  .hub > div {
+    display: grid;
+    gap: var(--sp-4);
+    padding: var(--sp-8);
+    border-radius: var(--radius-xl);
+    background: var(--surface);
+    box-shadow: var(--shadow-md), 0 0 0 1px var(--line);
+  }
+
+  .hub__head {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-2);
+  }
+
+  .contacts,
+  .docs {
+    display: grid;
+    gap: var(--sp-2);
+    margin: 0;
+  }
+
+  .contacts li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sp-4);
+    padding: var(--sp-4);
+    border-radius: var(--radius-md);
+    background: var(--surface-2);
+  }
+
+  .contacts strong,
+  .docs strong {
+    display: block;
+    font-size: var(--fs-sm);
+    color: var(--navy-900);
+  }
+
+  .contacts small,
+  .docs small {
+    font-size: var(--fs-xs);
+    color: var(--ink-3);
+  }
+
+  .docs li {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3);
+    padding: var(--sp-3);
+    border-radius: var(--radius-md);
+    box-shadow: 0 0 0 1px var(--line);
+  }
+
+  .docs__icon {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: var(--radius-sm);
+    background: var(--red-50);
+    color: var(--red-600);
+  }
+
+  .docs__name {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .docs :global(.docs__lock) {
+    color: var(--ink-3);
+  }
+
+  .hub__login {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+    gap: var(--sp-2);
+    margin-top: var(--sp-2);
+  }
+
+  .hub__login .form-success {
+    grid-column: 1 / -1;
+  }
+
+  .hub__alt {
+    font-size: var(--fs-sm);
+  }
+
+  @media (max-width: 1100px) {
+    .reasons {
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    }
+  }
+
+  @media (max-width: 900px) {
+    .gov {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 560px) {
+    .hub > div {
+      padding: var(--sp-5);
+    }
+    .hub__login {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

@@ -1,0 +1,262 @@
+---
+import SiteLayout from '@/layouts/SiteLayout.astro';
+import PageHero from '@/components/ui/PageHero.astro';
+import SectionHeader from '@/components/ui/SectionHeader.astro';
+import FeatureCard from '@/components/ui/FeatureCard.astro';
+import Visual from '@/components/ui/Visual.astro';
+import Icon from '@/components/ui/Icon.astro';
+import CtaBand from '@/components/ui/CtaBand.astro';
+import { url } from '@/lib/paths';
+
+const values = [
+  { icon: 'heart-handshake', title: 'Compassion first', text: 'Every interaction, from admissions to discharge, treats you as a person, not a case number.' },
+  { icon: 'award', title: 'Clinical excellence', text: 'Continuous investment in specialist skills and modern medical technology.' },
+  { icon: 'eye', title: 'Transparency', text: 'Clear information about your care, your costs, and your rights as a patient.' },
+  { icon: 'users', title: 'Community', text: 'Four decades of serving Kempton Park and the wider East Rand.' },
+];
+
+const milestones = [
+  { year: '1985', text: 'Arwyp opens its doors to the Kempton Park community.' },
+  { year: '1998', text: 'Expansion into a multidisciplinary medical centre with specialist rooms.' },
+  { year: '2009', text: 'Dedicated cardiac theatres and intensive care units commissioned.' },
+  { year: '2016', text: 'Neonatal ICU and refurbished maternity facilities open.' },
+  { year: '2023', text: 'Ziehm Vision RFD Hybrid Theatre and O-Arm imaging introduced.' },
+  { year: '2026', text: '100+ specialists across 28+ specialised services.' },
+];
+
+const onward = [
+  { icon: 'users', title: 'Meet the Management Team', text: 'The people leading Arwyp forward.', href: '/about/management/' },
+  { icon: 'trending-up', title: 'Investor Information', text: 'For shareholders and prospective partners.', href: '/about/investors/' },
+  { icon: 'stethoscope', title: 'Our Services', text: 'The full range of specialised care we provide.', href: '/services/' },
+];
+---
+
+<SiteLayout title="About Us" description="Forty years of care, built one patient at a time.">
+  <PageHero
+    eyebrow="About Arwyp"
+    title="Forty years of care, <span class='serif'>built one patient</span> at a time."
+    subtitle="Arwyp Medical Centre opened its doors in 1985 with a clear purpose: to provide the Kempton Park community with access to quality private healthcare, close to home, without the need to travel across the city."
+    crumbs={[{ label: 'About Us' }]}
+  >
+    <Visual slot="aside" icon="building-2" tone="navy" ratio="4 / 3" label="Hospital exterior photography" />
+  </PageHero>
+
+  <section class="section">
+    <div class="container two-col">
+      <div class="stack" style="--stack: var(--sp-5)">
+        <p class="eyebrow">Who we are</p>
+        <h2>A comprehensive private hospital, <span class="serif">close to home</span></h2>
+        <p class="lead">
+          More than 40 years later, that purpose remains unchanged. What has evolved is the extent of care we now provide. Today, Arwyp Medical Centre is a
+          comprehensive multidisciplinary private hospital, bringing together specialist expertise, advanced medical technology, and compassionate,
+          patient-centred care all under one roof.
+        </p>
+        <p>
+          Arwyp Medical Centre is a private hospital in Kempton Park, Gauteng, providing specialist medical and surgical care to patients from the local
+          community, across South Africa, and internationally. We combine modern facilities with advanced medical technology, including our state-of-the-art
+          Hybrid Theatre and O-Arm surgical imaging system, with something technology can never replace: compassionate healthcare professionals who take the
+          time to ensure every patient feels supported and cared for.
+        </p>
+      </div>
+      <aside class="accred">
+        <span class="accred__icon"><Icon name="shield-check" size={28} /></span>
+        <p class="eyebrow">Accreditation</p>
+        <h3>COHSASA accredited</h3>
+        <p>
+          We are accredited by the Council for Health Service Accreditation of Southern Africa (COHSASA), reflecting our ongoing commitment to clinical
+          excellence, patient safety, and the highest standards of quality healthcare.
+        </p>
+        <a class="link-arrow" href={url('/patients/rights-charter/')}>Patients' Rights Charter <Icon name="arrow-right" /></a>
+      </aside>
+    </div>
+  </section>
+
+  <section class="section section--dark">
+    <div class="container mv">
+      <article>
+        <span class="mv__icon"><Icon name="target" size={24} /></span>
+        <p class="eyebrow">Our mission</p>
+        <p class="mv__text">To deliver a comprehensive range of superior quality health care and wellness services, ensuring personalised and compassionate treatment for every patient.</p>
+      </article>
+      <article>
+        <span class="mv__icon"><Icon name="telescope" size={24} /></span>
+        <p class="eyebrow">Our vision</p>
+        <p class="mv__text">To be the premier reference centre for quality health care and wellness in South Africa, setting the standard for excellence in medical services and patient care.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <SectionHeader eyebrow="Our values" title="What we stand for" />
+      <div class="grid" style="--grid-min: 240px">
+        {values.map((v) => <FeatureCard {...v} variant="tint" />)}
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--sand">
+    <div class="container two-col two-col--top">
+      <div class="stack" style="--stack: var(--sp-5)">
+        <p class="eyebrow">Our growth</p>
+        <h2>A hospital that keeps growing <span class="serif">with its community</span></h2>
+        <p class="lead">
+          Since 1985, Arwyp has expanded from a single facility into a multi-disciplinary medical centre spanning emergency care, surgery, maternity, oncology,
+          and specialist outpatient services, currently home to 100+ specialists across a wide range of service lines. Explore how we are structured below.
+        </p>
+      </div>
+      <ol class="timeline" role="list">
+        {
+          milestones.map((m) => (
+            <li>
+              <span class="timeline__year">{m.year}</span>
+              <p>{m.text}</p>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+    <div class="container">
+      <div class="grid onward" style="--grid-min: 280px">
+        {onward.map((o) => <FeatureCard {...o} cta="Explore" />)}
+      </div>
+    </div>
+  </section>
+
+  <CtaBand eyebrow="Leadership" title="The people steering Arwyp forward" text="Decades of combined experience in hospital administration, clinical governance and healthcare operations.">
+    <a class="btn btn--accent btn--lg" href={url('/about/management/')}>Meet the Management Team <Icon name="arrow-right" /></a>
+  </CtaBand>
+</SiteLayout>
+
+<style>
+  .two-col {
+    display: grid;
+    grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+    gap: clamp(2rem, 1rem + 4vw, 5rem);
+    align-items: center;
+  }
+
+  .two-col--top {
+    align-items: start;
+  }
+
+  .accred {
+    display: grid;
+    gap: var(--sp-3);
+    justify-items: start;
+    padding: var(--sp-8);
+    border-radius: var(--radius-xl);
+    background: var(--teal-50);
+    box-shadow: inset 0 0 0 1px var(--teal-100);
+  }
+
+  .accred__icon {
+    display: grid;
+    place-items: center;
+    width: 3.5rem;
+    height: 3.5rem;
+    margin-bottom: var(--sp-2);
+    border-radius: 50%;
+    background: var(--navy-800);
+    color: var(--teal-400);
+  }
+
+  .accred p {
+    color: var(--ink-2);
+  }
+
+  .mv {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--sp-6);
+  }
+
+  .mv article {
+    display: grid;
+    gap: var(--sp-3);
+    align-content: start;
+    padding: var(--sp-10);
+    border-radius: var(--radius-xl);
+    background: rgb(255 255 255 / 0.04);
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.1);
+  }
+
+  .mv__icon {
+    display: grid;
+    place-items: center;
+    width: 3rem;
+    height: 3rem;
+    margin-bottom: var(--sp-2);
+    border-radius: var(--radius-md);
+    background: rgb(0 216 206 / 0.14);
+    color: var(--teal-400);
+  }
+
+  .mv__text {
+    font-size: var(--fs-xl);
+    line-height: 1.5;
+    font-weight: 500;
+    color: #fff;
+  }
+
+  .timeline {
+    position: relative;
+    display: grid;
+    gap: var(--sp-5);
+    margin: 0;
+    padding-left: var(--sp-8);
+  }
+
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 7px;
+    top: 8px;
+    bottom: 8px;
+    width: 2px;
+    background: linear-gradient(var(--teal-500), var(--line-2));
+  }
+
+  .timeline li {
+    position: relative;
+  }
+
+  .timeline li::before {
+    content: '';
+    position: absolute;
+    left: calc(-1 * var(--sp-8) + 1px);
+    top: 5px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--surface);
+    box-shadow:
+      inset 0 0 0 3px var(--teal-600),
+      0 0 0 4px var(--sand-50);
+  }
+
+  .timeline__year {
+    font-weight: 800;
+    color: var(--navy-900);
+    letter-spacing: -0.01em;
+  }
+
+  .timeline p {
+    color: var(--ink-2);
+    font-size: var(--fs-sm);
+  }
+
+  .onward {
+    margin-top: var(--sp-16);
+  }
+
+  @media (max-width: 900px) {
+    .two-col,
+    .mv {
+      grid-template-columns: 1fr;
+    }
+    .mv article {
+      padding: var(--sp-6);
+    }
+  }
+</style>
