@@ -6,3 +6,5 @@ document.addEventListener('submit', (event) => {
   form.querySelector<HTMLElement>('.form-success')?.focus();
   form.dispatchEvent(new CustomEvent('demo:sent', { bubbles: true }));
 });
+
+export {};

@@ -77,3 +77,5 @@ function init(root: HTMLElement) {
 }
 
 document.querySelectorAll<HTMLElement>('[data-filter]').forEach(init);
+
+export {};

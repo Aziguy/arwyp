@@ -66,3 +66,5 @@ const header = document.querySelector<HTMLElement>('[data-header]');
 const onScroll = () => header?.toggleAttribute('data-scrolled', scrollY > 8);
 addEventListener('scroll', onScroll, { passive: true });
 onScroll();
+
+export {};
