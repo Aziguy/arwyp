@@ -1,0 +1,44 @@
+---
+import SiteLayout from '@/layouts/SiteLayout.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { url } from '@/lib/paths';
+---
+
+<SiteLayout title="Page not found">
+  <section class="nf">
+    <div class="container-narrow nf__inner">
+      <p class="nf__code">404</p>
+      <h1>This page has been <span class="serif">discharged.</span></h1>
+      <p class="lead">The page you are looking for has moved or no longer exists.</p>
+      <div class="cluster">
+        <a class="btn btn--accent" href={url('/')}><Icon name="house" /> Back to home</a>
+        <a class="btn btn--outline" href={url('/specialists/')}><Icon name="search" /> Find a Specialist</a>
+      </div>
+    </div>
+  </section>
+</SiteLayout>
+
+<style>
+  .nf {
+    padding-block: clamp(4rem, 2rem + 8vw, 9rem);
+    background: var(--sand-50);
+    text-align: center;
+  }
+
+  .nf__inner {
+    display: grid;
+    gap: var(--sp-5);
+    justify-items: center;
+  }
+
+  .nf__code {
+    font-size: clamp(5rem, 3rem + 8vw, 9rem);
+    font-weight: 800;
+    letter-spacing: -0.05em;
+    line-height: 1;
+    background: linear-gradient(135deg, var(--teal-500), var(--navy-800));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+</style>

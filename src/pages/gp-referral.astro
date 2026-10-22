@@ -1,0 +1,204 @@
+---
+import SiteLayout from '@/layouts/SiteLayout.astro';
+import PageHero from '@/components/ui/PageHero.astro';
+import QuoteGate from '@/components/ui/QuoteGate.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { specialists } from '@/data/specialists';
+import { disciplines } from '@/data/disciplines';
+
+const steps = [
+  { icon: 'send', title: 'Refer online', text: 'Choose a specialist and attach notes, results and imaging.' },
+  { icon: 'radar', title: 'Track status', text: 'See when the referral is received, booked and seen.' },
+  { icon: 'file-text', title: 'Receive feedback', text: 'Get the consultation letter and discharge summary.' },
+];
+
+const tracked = [
+  { ref: 'GPR-3381', patient: 'T. Mokoena', to: specialists[12].name, status: 'Seen', tone: 'green' },
+  { ref: 'GPR-3394', patient: 'L. Botha', to: specialists[40].name, status: 'Booked', tone: 'teal' },
+  { ref: 'GPR-3402', patient: 'S. Pillay', to: specialists[77].name, status: 'Received', tone: 'amber' },
+];
+---
+
+<SiteLayout title="GP Referral Portal" description="Refer patients to Arwyp specialists online and track every referral.">
+  <QuoteGate fallbackHref="/departments/" fallbackLabel="Specialised departments">
+    <PageHero
+      tone="dark"
+      eyebrow="GP Referral Portal"
+      title="Refer, track and receive feedback, <span class='serif'>online.</span>"
+      subtitle="GPs refer patients directly to Arwyp specialists, track referral status and receive case feedback, strengthening specialist and GP relationships."
+      crumbs={[{ label: 'Services', href: '/services/' }, { label: 'GP Referral Portal' }]}
+    >
+      <span slot="actions" class="tag-b" data-label="Quote B module"></span>
+    </PageHero>
+
+    <section class="section">
+      <div class="container">
+        <ol class="steps" role="list">
+          {
+            steps.map((s, i) => (
+              <li>
+                <span class="steps__n">{i + 1}</span>
+                <Icon name={s.icon} size={22} />
+                <strong>{s.title}</strong>
+                <span>{s.text}</span>
+              </li>
+            ))
+          }
+        </ol>
+      </div>
+    </section>
+
+    <section class="section section--tint">
+      <div class="container gp">
+        <form class="form gp__form" data-demo-form>
+          <h2>New referral</h2>
+          <div class="form-row">
+            <div class="field"><label for="gp-name">Referring GP</label><input id="gp-name" class="input" value="Dr K. Naidoo" /></div>
+            <div class="field"><label for="gp-pr">Practice number</label><input id="gp-pr" class="input" value="0451239" /></div>
+          </div>
+          <div class="form-row">
+            <div class="field"><label for="gp-pt">Patient name</label><input id="gp-pt" class="input" required /></div>
+            <div class="field"><label for="gp-id">Patient ID</label><input id="gp-id" class="input" required /></div>
+          </div>
+          <div class="form-row">
+            <div class="field">
+              <label for="gp-disc">Discipline</label>
+              <select id="gp-disc" class="select">{disciplines.map((d) => <option>{d.name}</option>)}</select>
+            </div>
+            <div class="field">
+              <label for="gp-urg">Urgency</label>
+              <select id="gp-urg" class="select"><option>Routine</option><option>Soon (within 7 days)</option><option>Urgent (48 hours)</option></select>
+            </div>
+          </div>
+          <div class="field"><label for="gp-notes">Clinical notes</label><textarea id="gp-notes" class="textarea" placeholder="History, findings and reason for referral"></textarea></div>
+          <div class="field"><label for="gp-files">Attachments</label><input id="gp-files" class="input" type="file" multiple /></div>
+          <label class="check consent"><input type="checkbox" required /><span>Patient consent obtained for sharing health information (POPIA).</span></label>
+          <button class="btn btn--accent" type="submit"><Icon name="send" /> Send referral</button>
+          <p class="form-success" tabindex="-1"><Icon name="circle-check" /> Demo: referral GPR-3410 sent. The rooms will confirm the booking.</p>
+        </form>
+
+        <div class="gp__track">
+          <h2>My referrals</h2>
+          <ul role="list">
+            {
+              tracked.map((t) => (
+                <li>
+                  <span>
+                    <strong>{t.patient}</strong>
+                    <small>
+                      {t.ref} &middot; {t.to}
+                    </small>
+                  </span>
+                  <span class={`badge badge--${t.tone} badge--dot`}>{t.status}</span>
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+      </div>
+    </section>
+  </QuoteGate>
+</SiteLayout>
+
+<style>
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--sp-5);
+    margin: 0;
+  }
+
+  .steps li {
+    position: relative;
+    display: grid;
+    gap: var(--sp-2);
+    padding: var(--sp-6);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 0 0 1px var(--line);
+    font-size: var(--fs-sm);
+    color: var(--ink-2);
+  }
+
+  .steps li > :global(svg) {
+    color: var(--teal-700);
+  }
+
+  .steps strong {
+    font-size: var(--fs-lg);
+    color: var(--navy-900);
+  }
+
+  .steps__n {
+    position: absolute;
+    top: var(--sp-5);
+    right: var(--sp-5);
+    font-size: var(--fs-2xl);
+    font-weight: 800;
+    color: var(--line-2);
+  }
+
+  .gp {
+    display: grid;
+    grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+    gap: var(--sp-8);
+    align-items: start;
+  }
+
+  .gp h2 {
+    font-size: var(--fs-xl);
+  }
+
+  .gp__form {
+    padding: var(--sp-8);
+    border-radius: var(--radius-xl);
+    background: var(--surface);
+    box-shadow: var(--shadow-md), 0 0 0 1px var(--line);
+  }
+
+  .gp__form .btn {
+    justify-self: start;
+  }
+
+  .gp__track {
+    display: grid;
+    gap: var(--sp-4);
+  }
+
+  .gp__track ul {
+    display: grid;
+    gap: var(--sp-2);
+    margin: 0;
+  }
+
+  .gp__track li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--sp-3);
+    padding: var(--sp-4);
+    border-radius: var(--radius-md);
+    background: var(--surface);
+    box-shadow: 0 0 0 1px var(--line);
+    line-height: 1.4;
+  }
+
+  .gp__track strong {
+    display: block;
+    font-size: var(--fs-sm);
+  }
+
+  .gp__track small {
+    font-size: var(--fs-xs);
+    color: var(--ink-3);
+  }
+
+  @media (max-width: 900px) {
+    .steps,
+    .gp {
+      grid-template-columns: 1fr;
+    }
+    .gp__form {
+      padding: var(--sp-5);
+    }
+  }
+</style>

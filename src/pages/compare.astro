@@ -1,0 +1,317 @@
+---
+import SiteLayout from '@/layouts/SiteLayout.astro';
+import PageHero from '@/components/ui/PageHero.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { featureMatrix, quotes, quoteBHighlights } from '@/config/quotes';
+import { url } from '@/lib/paths';
+
+const pages = [
+  'Home',
+  'About Us',
+  'Management Team',
+  'Investor Information',
+  'Our Services',
+  'Patient Information',
+  'Find a Specialist',
+  'Specialised Departments',
+  'Medical Tourism & Travel Clinic',
+  'Media / News',
+  'Careers',
+  'Contact Us',
+  'Training Institute',
+];
+---
+
+<SiteLayout title="Quote A vs Quote B" description="Preview both proposals side by side.">
+  <PageHero
+    eyebrow="Template guide"
+    title="Quote A and Quote B, <span class='serif'>side by side</span>"
+    subtitle="Both quotes include every page in the AMC skeleton. The difference is what happens after a patient finds the right specialist. Switch at any time with the toggle at the bottom left."
+    crumbs={[{ label: 'Compare quotes' }]}
+  />
+
+  <section class="section">
+    <div class="container">
+      <div class="qcards">
+        {
+          Object.values(quotes).map((q) => (
+            <article class={`qcard qcard--${q.id}`}>
+              <p class="qcard__ref">{q.ref}</p>
+              <h2>{q.name}</h2>
+              <p class="qcard__title">{q.title}</p>
+              <p class="qcard__sum">{q.summary}</p>
+              <dl>
+                <div>
+                  <dt>Delivery</dt>
+                  <dd>{q.delivery}</dd>
+                </div>
+                <div>
+                  <dt>Back-office</dt>
+                  <dd>{q.backend}</dd>
+                </div>
+              </dl>
+              <button type="button" class:list={['btn btn--block', q.id === 'b' ? 'btn--accent' : 'btn--outline']} data-set-quote={q.id}>
+                Preview {q.name}
+              </button>
+            </article>
+          ))
+        }
+      </div>
+
+      <div class="matrix-wrap">
+        <table class="matrix">
+          <caption class="sr-only">Feature comparison between Quote A and Quote B</caption>
+          <thead>
+            <tr>
+              <th scope="col">Feature</th>
+              <th scope="col">Quote A</th>
+              <th scope="col">Quote B</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              featureMatrix.map((row) => (
+                <tr>
+                  <th scope="row">{row.label}</th>
+                  {[row.a, row.b].map((v) => (
+                    <td>
+                      {v === true ? (
+                        <Icon name="circle-check" label="Included" class="yes" />
+                      ) : v === false ? (
+                        <Icon name="minus" label="Not included" class="no" />
+                      ) : (
+                        <span>{v}</span>
+                      )}
+                    </td>
+                  ))}
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--tint">
+    <div class="container two">
+      <div>
+        <p class="eyebrow">Both quotes</p>
+        <h2 class="two__h">The 13 landing pages</h2>
+        <ol class="pages">
+          {pages.map((p) => <li>{p}</li>)}
+        </ol>
+      </div>
+      <div>
+        <p class="eyebrow">Quote B adds</p>
+        <h2 class="two__h">Working systems to explore</h2>
+        <ul class="sys" role="list">
+          {
+            quoteBHighlights.map((h) => (
+              <li>
+                <a href={url(h.href)}>
+                  <Icon name={h.icon} /> {h.label} <Icon name="arrow-right" size={16} />
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </div>
+  </section>
+</SiteLayout>
+
+<style>
+  .qcards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--sp-6);
+    margin-bottom: var(--sp-12);
+  }
+
+  .qcard {
+    display: grid;
+    gap: var(--sp-3);
+    align-content: start;
+    padding: var(--sp-8);
+    border-radius: var(--radius-xl);
+    box-shadow: 0 0 0 1px var(--line);
+  }
+
+  .qcard--b {
+    background:
+      radial-gradient(60% 80% at 100% 0%, rgb(0 216 206 / 0.2), transparent 60%),
+      var(--navy-900);
+    color: rgb(255 255 255 / 0.78);
+    box-shadow: none;
+  }
+
+  .qcard--b h2 {
+    color: #fff;
+  }
+
+  .qcard__ref {
+    font-size: var(--fs-xs);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+
+  .qcard--b .qcard__ref {
+    color: rgb(255 255 255 / 0.5);
+  }
+
+  .qcard__title {
+    font-weight: 700;
+    color: var(--teal-700);
+  }
+
+  .qcard--b .qcard__title {
+    color: var(--teal-400);
+  }
+
+  .qcard__sum {
+    font-size: var(--fs-sm);
+  }
+
+  .qcard dl {
+    display: grid;
+    gap: var(--sp-3);
+    margin: var(--sp-2) 0 var(--sp-3);
+    padding-top: var(--sp-4);
+    border-top: 1px solid var(--line);
+    font-size: var(--fs-sm);
+  }
+
+  .qcard--b dl {
+    border-top-color: rgb(255 255 255 / 0.12);
+  }
+
+  .qcard dt {
+    font-size: var(--fs-xs);
+    color: var(--ink-3);
+  }
+
+  .qcard--b dt {
+    color: rgb(255 255 255 / 0.5);
+  }
+
+  .qcard dd {
+    margin: 0;
+    font-weight: 650;
+  }
+
+  .qcard--b dd {
+    color: #fff;
+  }
+
+  .matrix-wrap {
+    overflow-x: auto;
+    border-radius: var(--radius-lg);
+    box-shadow: 0 0 0 1px var(--line);
+  }
+
+  .matrix {
+    width: 100%;
+    min-width: 560px;
+    font-size: var(--fs-sm);
+  }
+
+  .matrix th,
+  .matrix td {
+    padding: var(--sp-4) var(--sp-5);
+    text-align: left;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .matrix thead th {
+    background: var(--surface-2);
+    font-size: var(--fs-xs);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+
+  .matrix tbody th {
+    font-weight: 600;
+    color: var(--navy-900);
+  }
+
+  .matrix td {
+    width: 26%;
+    color: var(--ink-2);
+  }
+
+  .matrix tbody tr:last-child > * {
+    border-bottom: 0;
+  }
+
+  .matrix :global(.yes) {
+    color: var(--green-600);
+  }
+
+  .matrix :global(.no) {
+    color: var(--line-2);
+  }
+
+  .two {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--sp-10);
+  }
+
+  .two__h {
+    margin: var(--sp-2) 0 var(--sp-5);
+    font-size: var(--fs-2xl);
+  }
+
+  .pages {
+    columns: 2;
+    column-gap: var(--sp-8);
+    padding-left: 1.25rem;
+    color: var(--ink-2);
+  }
+
+  .pages li {
+    padding: 0.3rem 0;
+  }
+
+  .sys {
+    display: grid;
+    gap: var(--sp-2);
+    margin: 0;
+  }
+
+  .sys a {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3);
+    padding: var(--sp-4);
+    border-radius: var(--radius-md);
+    background: var(--surface);
+    box-shadow: 0 0 0 1px var(--line);
+    font-weight: 650;
+    color: var(--navy-900);
+    text-decoration: none;
+  }
+
+  .sys a :global(svg:first-child) {
+    color: var(--teal-700);
+  }
+
+  .sys a :global(svg:last-child) {
+    margin-left: auto;
+    color: var(--ink-3);
+  }
+
+  .sys a:hover {
+    box-shadow: var(--shadow-sm), 0 0 0 1px var(--line-2);
+  }
+
+  @media (max-width: 860px) {
+    .qcards,
+    .two {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
