@@ -12,6 +12,7 @@
 .field {
   display: grid;
   gap: 0.4rem;
+  align-content: start;
 }
 
 .field > label,

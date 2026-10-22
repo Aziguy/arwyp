@@ -1,0 +1,301 @@
+---
+import SiteLayout from '@/layouts/SiteLayout.astro';
+import PageHero from '@/components/ui/PageHero.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { site } from '@/config/site';
+import { url } from '@/lib/paths';
+
+const routes = [
+  { id: 'emergency', icon: 'siren', title: 'Emergency', text: '24/7 trauma and casualty', value: site.emergency.display, href: site.emergency.href, tone: 'red' },
+  { id: 'bookings', icon: 'calendar-check', title: 'Bookings & admissions', text: 'Pre-admission and ward queries', value: 'admissions@arwyp.example', href: 'mailto:admissions@arwyp.example' },
+  { id: 'billing', icon: 'receipt', title: 'Billing & accounts', text: 'Invoices, medical aid and payments', value: 'accounts@arwyp.example', href: 'mailto:accounts@arwyp.example' },
+  { id: 'feedback', icon: 'message-square-heart', title: 'Feedback & compliments', text: 'Patient experience office', value: 'feedback@arwyp.example', href: 'mailto:feedback@arwyp.example' },
+  { id: 'general', icon: 'mail', title: 'General enquiries', text: 'Anything else', value: site.email, href: `mailto:${site.email}` },
+  { id: 'media', icon: 'newspaper', title: 'Media & partnerships', text: 'Press and marketing', value: 'media@arwyp.example', href: 'mailto:media@arwyp.example' },
+];
+
+const directions = [
+  { route: 'From the R21 (OR Tambo / Pretoria)', text: 'Take the Rietfontein Road exit, continue towards Kempton Park CBD and turn onto Pine Avenue.' },
+  { route: 'From the N12 / R24', text: 'Exit onto the R25 (Voortrekker Road) north, then follow signs to the CBD and Pine Avenue.' },
+  { route: 'From OR Tambo International', text: 'About 12 minutes via the R21 north. Ideal for medical tourism arrivals.' },
+];
+const { lat, lng } = site.geo;
+const bbox = [lng - 0.012, lat - 0.007, lng + 0.012, lat + 0.007].join('%2C');
+---
+
+<SiteLayout title="Contact Us" description="We are here, however you need to reach us.">
+  <PageHero
+    eyebrow="Contact Us"
+    title="We are here, <span class='serif'>however you need</span> to reach us."
+    subtitle="Whether it's an emergency, a booking, a billing question, or general feedback, here's the fastest way to reach the right team at Arwyp."
+    crumbs={[{ label: 'Contact Us' }]}
+  />
+
+  <section class="section">
+    <div class="container">
+      <ul class="routes" role="list">
+        {
+          routes.map((r) => (
+            <li>
+              <a href={r.href} class:list={['route', r.tone && `route--${r.tone}`]}>
+                <span class="route__icon">
+                  <Icon name={r.icon} />
+                </span>
+                <span class="route__body">
+                  <strong>{r.title}</strong>
+                  <small>{r.text}</small>
+                  <span class="route__value">{r.value}</span>
+                </span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <section class="section section--tint">
+    <div class="container contact">
+      <form class="form cform" data-demo-form>
+        <h2>Send us a message</h2>
+        <div class="form-row">
+          <div class="field"><label for="c-name">Name</label><input id="c-name" class="input" required autocomplete="name" /></div>
+          <div class="field"><label for="c-email">Email</label><input id="c-email" class="input" type="email" required autocomplete="email" /></div>
+        </div>
+        <div class="form-row">
+          <div class="field"><label for="c-phone">Phone</label><input id="c-phone" class="input" type="tel" autocomplete="tel" /></div>
+          <div class="field">
+            <label for="c-subject">Subject</label>
+            <select id="c-subject" class="select" required>
+              {routes.filter((r) => r.id !== 'emergency').map((r) => <option value={r.id}>{r.title}</option>)}
+            </select>
+            <span class="field-hint">Routed directly to the right team.</span>
+          </div>
+        </div>
+        <div class="field"><label for="c-msg">Message</label><textarea id="c-msg" class="textarea" required></textarea></div>
+        <label class="check consent">
+          <input type="checkbox" required />
+          <span>I consent to Arwyp Medical Centre processing my personal information to respond to this enquiry, in line with POPIA. <a href={url("/legal/privacy/")}>Privacy Policy</a></span>
+        </label>
+        <p class="cform__warn"><Icon name="triangle-alert" size={16} /> For medical emergencies, call {site.emergency.display}. This form is not monitored 24/7.</p>
+        <button class="btn btn--accent btn--lg" type="submit"><Icon name="send" /> Submit</button>
+        <p class="form-success" tabindex="-1"><Icon name="circle-check" /> Demo: message routed. A team member will respond within one business day.</p>
+      </form>
+
+      <div class="find">
+        <h2>Find us</h2>
+        <div class="find__map">
+          <iframe
+            title="Map showing Arwyp Medical Centre in Kempton Park"
+            src={`https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${lat}%2C${lng}`}
+            loading="lazy"
+            referrerpolicy="no-referrer"></iframe>
+        </div>
+        <address>
+          <Icon name="map-pin" />
+          <span><strong>{site.name}</strong><br />{site.address.street}, {site.address.area}, {site.address.city}, {site.address.postcode}</span>
+        </address>
+        <div class="find__park">
+          <Icon name="square-parking" />
+          <p><strong>Parking:</strong> secure multi-storey parking on Pine Avenue, open 24 hours. Drop-off zone at the Emergency entrance.</p>
+        </div>
+        <ul class="find__dir" role="list">
+          {
+            directions.map((d) => (
+              <li>
+                <strong>{d.route}</strong>
+                <span>{d.text}</span>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </div>
+  </section>
+</SiteLayout>
+
+<style>
+  .routes {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--sp-4);
+    margin: 0;
+  }
+
+  .route {
+    display: flex;
+    gap: var(--sp-4);
+    height: 100%;
+    padding: var(--sp-5);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 0 0 1px var(--line);
+    color: var(--ink);
+    text-decoration: none;
+    transition:
+      box-shadow var(--dur) var(--ease),
+      transform var(--dur) var(--ease);
+  }
+
+  .route:hover {
+    color: var(--ink);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md), 0 0 0 1px var(--line-2);
+  }
+
+  .route__icon {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 3rem;
+    height: 3rem;
+    border-radius: var(--radius-md);
+    background: var(--teal-50);
+    color: var(--teal-700);
+  }
+
+  .route--red .route__icon {
+    background: var(--red-600);
+    color: #fff;
+  }
+
+  .route--red {
+    box-shadow: 0 0 0 1px #f5c2c2;
+    background: var(--red-50);
+  }
+
+  .route__body {
+    display: grid;
+    gap: 2px;
+    min-width: 0;
+    line-height: 1.4;
+  }
+
+  .route__body strong {
+    color: var(--navy-900);
+  }
+
+  .route__body small {
+    font-size: var(--fs-xs);
+    color: var(--ink-3);
+  }
+
+  .route__value {
+    margin-top: var(--sp-1);
+    font-size: var(--fs-sm);
+    font-weight: 650;
+    color: var(--teal-700);
+    overflow-wrap: anywhere;
+  }
+
+  .route--red .route__value {
+    color: var(--red-700);
+  }
+
+  .contact {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+    gap: clamp(2rem, 1rem + 4vw, 4.5rem);
+    align-items: start;
+  }
+
+  .contact h2 {
+    font-size: var(--fs-2xl);
+  }
+
+  .cform {
+    padding: clamp(1.25rem, 0.5rem + 3vw, 2.5rem);
+    border-radius: var(--radius-xl);
+    background: var(--surface);
+    box-shadow: var(--shadow-md), 0 0 0 1px var(--line);
+  }
+
+  .cform .btn {
+    justify-self: start;
+  }
+
+  .cform__warn {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+    font-size: var(--fs-xs);
+    font-weight: 600;
+    color: var(--red-700);
+  }
+
+  .find {
+    display: grid;
+    gap: var(--sp-5);
+  }
+
+  .find__map {
+    aspect-ratio: 4 / 3;
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    background:
+      radial-gradient(circle at 50% 50%, rgb(201 48 44 / 0.18) 0 18px, transparent 19px),
+      linear-gradient(rgb(40 54 70 / 0.06) 1px, transparent 1px) 0 0 / 28px 28px,
+      linear-gradient(90deg, rgb(40 54 70 / 0.06) 1px, transparent 1px) 0 0 / 28px 28px,
+      var(--surface-3);
+    box-shadow: 0 0 0 1px var(--line);
+  }
+
+  .find__map iframe {
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+
+  address,
+  .find__park {
+    display: flex;
+    gap: var(--sp-3);
+    font-style: normal;
+    font-size: var(--fs-sm);
+    color: var(--ink-2);
+  }
+
+  address :global(svg),
+  .find__park :global(svg) {
+    flex: none;
+    color: var(--teal-700);
+  }
+
+  .find__dir {
+    display: grid;
+    gap: var(--sp-3);
+    margin: 0;
+  }
+
+  .find__dir li {
+    display: grid;
+    gap: 2px;
+    padding: var(--sp-4);
+    border-radius: var(--radius-md);
+    background: var(--surface);
+    box-shadow: 0 0 0 1px var(--line);
+    font-size: var(--fs-sm);
+    color: var(--ink-2);
+  }
+
+  .find__dir strong {
+    color: var(--navy-900);
+  }
+
+  @media (max-width: 1024px) {
+    .routes {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 900px) {
+    .contact {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 560px) {
+    .routes {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

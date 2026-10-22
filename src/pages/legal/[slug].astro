@@ -1,0 +1,121 @@
+---
+import SiteLayout from '@/layouts/SiteLayout.astro';
+import PageHero from '@/components/ui/PageHero.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { legalPages, type LegalPage } from '@/data/legal';
+import { longDate } from '@/lib/format';
+import { url } from '@/lib/paths';
+
+export function getStaticPaths() {
+  return legalPages.map((p) => ({ params: { slug: p.slug }, props: { page: p } }));
+}
+
+interface Props {
+  page: LegalPage;
+}
+
+const { page } = Astro.props;
+---
+
+<SiteLayout title={page.title}>
+  <PageHero eyebrow="Legal" title={page.title} subtitle={`Last updated ${longDate(page.updated)}`} crumbs={[{ label: 'Legal' }, { label: page.title }]} />
+  <section class="section">
+    <div class="container legal">
+      <nav class="legal__nav" aria-label="Legal pages">
+        {
+          legalPages.map((p) => (
+            <a href={url(`/legal/${p.slug}/`)} aria-current={p.slug === page.slug ? 'page' : undefined}>
+              {p.title}
+            </a>
+          ))
+        }
+      </nav>
+      <article class="legal__body">
+        <p class="legal__draft"><Icon name="info" size={16} /> Template text. Final legal content to be supplied and approved by Arwyp.</p>
+        {
+          page.sections.map((s, i) => (
+            <section>
+              <h2>
+                {i + 1}. {s.heading}
+              </h2>
+              <p>{s.body}</p>
+            </section>
+          ))
+        }
+      </article>
+    </div>
+  </section>
+</SiteLayout>
+
+<style>
+  .legal {
+    display: grid;
+    grid-template-columns: 240px minmax(0, 1fr);
+    gap: clamp(2rem, 1rem + 4vw, 4.5rem);
+    align-items: start;
+  }
+
+  .legal__nav {
+    position: sticky;
+    top: calc(var(--header-h) + var(--sp-6));
+    display: grid;
+    gap: 2px;
+  }
+
+  .legal__nav a {
+    padding: 0.6rem var(--sp-3);
+    border-radius: var(--radius-md);
+    color: var(--ink-2);
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .legal__nav a:hover {
+    background: var(--surface-2);
+  }
+
+  .legal__nav a[aria-current='page'] {
+    background: var(--navy-800);
+    color: #fff;
+  }
+
+  .legal__body {
+    display: grid;
+    gap: var(--sp-8);
+    max-width: 760px;
+  }
+
+  .legal__body h2 {
+    margin-bottom: var(--sp-3);
+    font-size: var(--fs-xl);
+  }
+
+  .legal__body p {
+    color: var(--ink-2);
+    line-height: 1.8;
+  }
+
+  .legal__draft {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-2);
+    justify-self: start;
+    padding: 0.4rem 0.8rem;
+    border-radius: var(--radius-pill);
+    background: var(--surface-3);
+    font-size: var(--fs-xs) !important;
+    font-weight: 600;
+  }
+
+  @media (max-width: 860px) {
+    .legal {
+      grid-template-columns: 1fr;
+    }
+    .legal__nav {
+      position: static;
+      display: flex;
+      flex-wrap: wrap;
+    }
+  }
+</style>
