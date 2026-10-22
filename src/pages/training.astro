@@ -1,0 +1,331 @@
+---
+import SiteLayout from '@/layouts/SiteLayout.astro';
+import PageHero from '@/components/ui/PageHero.astro';
+import SectionHeader from '@/components/ui/SectionHeader.astro';
+import FeatureCard from '@/components/ui/FeatureCard.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { programmes } from '@/data/training';
+
+const why = [
+  { icon: 'hospital', title: 'A real hospital', text: 'Learn inside a real, accredited private hospital, not just a simulated setting.' },
+  { icon: 'badge-check', title: 'Accredited programmes', text: 'Accredited healthcare training programmes recognised nationally.' },
+  { icon: 'microscope', title: 'Specialist exposure', text: "Direct exposure to Arwyp's specialist departments and experienced staff." },
+  { icon: 'route', title: 'A clear pathway', text: 'From training into potential employment opportunities at Arwyp.' },
+];
+---
+
+<SiteLayout title="Arwyp Training Institute" description="Where the next generation of caregivers begins.">
+  <PageHero
+    tone="dark"
+    eyebrow="Arwyp Training Institute"
+    title="Where the next generation <span class='serif'>of caregivers</span> begins."
+    subtitle="The Arwyp Training Institute prepares students for real careers in healthcare, with hands-on learning inside a working hospital environment."
+    crumbs={[{ label: 'Training Institute' }]}
+  >
+    <div slot="actions" class="cluster">
+      <a class="btn btn--accent" href="#programmes"><Icon name="graduation-cap" /> Programmes on offer</a>
+      <a class="btn btn--outline-light only-b" href="#elearning"><Icon name="monitor-play" /> E-learning portal</a>
+    </div>
+  </PageHero>
+
+  <section class="section">
+    <div class="container">
+      <SectionHeader eyebrow="Why train with us" title="Hands-on learning, real outcomes" />
+      <div class="grid" style="--grid-min: 240px">
+        {why.map((w) => <FeatureCard {...w} variant="tint" />)}
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--tint" id="programmes">
+    <div class="container">
+      <SectionHeader eyebrow="Programmes on offer" title="Accredited courses" intro="Course layout, entry requirements and the documents you need to apply." />
+      <div class="progs">
+        {
+          programmes.map((p) => (
+            <article class="prog">
+              <header class="prog__head">
+                <div class="cluster" style="--cluster: var(--sp-2)">
+                  <span class="badge badge--navy">{p.nqf}</span>
+                  <span class="badge badge--teal">{p.accreditation}</span>
+                  {p.cpd && <span class="badge badge--amber">{p.cpd} CPD points</span>}
+                </div>
+                <h3>{p.name}</h3>
+                <p>{p.summary}</p>
+              </header>
+              <dl class="prog__facts">
+                <div>
+                  <dt>Duration</dt>
+                  <dd>{p.duration}</dd>
+                </div>
+                <div>
+                  <dt>Next intake</dt>
+                  <dd>{p.intake}</dd>
+                </div>
+                <div>
+                  <dt>Mode</dt>
+                  <dd>{p.mode}</dd>
+                </div>
+              </dl>
+              <details class="faq">
+                <summary>
+                  Course layout <Icon name="plus" size={18} />
+                </summary>
+                <ul class="list-check prog__list">
+                  {p.modules.map((m) => (
+                    <li>{m}</li>
+                  ))}
+                </ul>
+              </details>
+              <details class="faq">
+                <summary>
+                  Requirements & documents <Icon name="plus" size={18} />
+                </summary>
+                <div class="prog__req">
+                  <ul class="list-check">
+                    {p.requirements.map((r) => (
+                      <li>{r}</li>
+                    ))}
+                  </ul>
+                  <ul class="prog__docs" role="list">
+                    {p.documents.map((d) => (
+                      <li>
+                        <Icon name="file-text" size={14} /> {d}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </details>
+              <footer class="prog__foot">
+                <a class="btn only-a" href={`mailto:training@arwyp.example?subject=${encodeURIComponent(p.name)}`}>
+                  Apply <Icon name="arrow-right" />
+                </a>
+                <a class="btn btn--outline only-a" href="#">
+                  <Icon name="file-down" /> Application form
+                </a>
+                <button type="button" class="btn btn--accent only-b">Register & pay online</button>
+                <span class="only-b prog__note">Card, Instant EFT or employer invoice</span>
+              </footer>
+            </article>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="section only-b" id="elearning">
+    <div class="container elearn">
+      <div class="stack" style="--stack: var(--sp-5)">
+        <span class="tag-b" data-label="Training Institute Portal"></span>
+        <h2>A complete e‑learning system for <span class="serif">healthcare professionals</span></h2>
+        <p class="lead">Course catalogue, CPD point tracking, online registration and payment, certificate downloads and instructor portals.</p>
+        <ul class="list-check">
+          <li>Self-paced modules with video, quizzes and assessments</li>
+          <li>Automatic CPD logging and HPCSA-ready certificates</li>
+          <li>Instructor dashboards for marking and attendance</li>
+        </ul>
+      </div>
+      <div class="lms" aria-label="E-learning preview">
+        <div class="lms__head">
+          <strong>My learning</strong>
+          <span class="badge badge--green badge--dot">18 / 30 CPD points</span>
+        </div>
+        {
+          [
+            { name: 'BLS & ACLS Certification', pct: 75 },
+            { name: 'Infection Prevention & Control', pct: 40 },
+            { name: 'POPIA for Healthcare Workers', pct: 100 },
+          ].map((c) => (
+            <div class="lms__course">
+              <div class="lms__row">
+                <span>{c.name}</span>
+                <span class="tabular">{c.pct}%</span>
+              </div>
+              <span class="lms__bar">
+                <span style={`width:${c.pct}%`} />
+              </span>
+              {c.pct === 100 && (
+                <a href="#" class="link-arrow">
+                  <Icon name="award" /> Download certificate
+                </a>
+              )}
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+</SiteLayout>
+
+<style>
+  .progs {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--sp-6);
+  }
+
+  .prog {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-4);
+    padding: var(--sp-6);
+    border-radius: var(--radius-xl);
+    background: var(--surface);
+    box-shadow: 0 0 0 1px var(--line);
+  }
+
+  .prog__head {
+    display: grid;
+    gap: var(--sp-3);
+  }
+
+  .prog__head p {
+    font-size: var(--fs-sm);
+    color: var(--ink-2);
+  }
+
+  .prog__facts {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    margin: 0;
+    border-radius: var(--radius-md);
+    background: var(--surface-2);
+  }
+
+  .prog__facts div {
+    padding: var(--sp-3) var(--sp-4);
+  }
+
+  .prog__facts div + div {
+    border-left: 1px solid var(--line);
+  }
+
+  .prog__facts dt {
+    font-size: var(--fs-xs);
+    color: var(--ink-3);
+  }
+
+  .prog__facts dd {
+    margin: 0;
+    font-size: var(--fs-sm);
+    font-weight: 650;
+    color: var(--navy-900);
+  }
+
+  .prog .faq + .faq {
+    margin-top: 0;
+  }
+
+  .prog__list,
+  .prog__req {
+    padding: 0 var(--sp-5) var(--sp-5);
+    font-size: var(--fs-sm);
+  }
+
+  .prog__req {
+    display: grid;
+    gap: var(--sp-4);
+  }
+
+  .prog__docs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-2);
+    margin: 0;
+  }
+
+  .prog__docs li {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-1);
+    padding: 0.25rem 0.6rem;
+    border-radius: var(--radius-sm);
+    background: var(--surface-2);
+    font-size: var(--fs-xs);
+    font-weight: 600;
+  }
+
+  .prog__foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sp-3);
+    margin-top: auto;
+    padding-top: var(--sp-2);
+  }
+
+  .prog__note {
+    font-size: var(--fs-xs);
+    color: var(--ink-3);
+  }
+
+  .elearn {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: clamp(2rem, 1rem + 4vw, 5rem);
+    align-items: center;
+  }
+
+  .elearn > .stack {
+    justify-items: start;
+  }
+
+  .lms {
+    display: grid;
+    gap: var(--sp-5);
+    padding: var(--sp-6);
+    border-radius: var(--radius-xl);
+    background: var(--surface);
+    box-shadow: var(--shadow-lg), 0 0 0 1px var(--line);
+  }
+
+  .lms__head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--sp-3);
+  }
+
+  .lms__course {
+    display: grid;
+    gap: var(--sp-2);
+  }
+
+  .lms__row {
+    display: flex;
+    justify-content: space-between;
+    font-size: var(--fs-sm);
+    font-weight: 600;
+  }
+
+  .lms__bar {
+    height: 8px;
+    border-radius: 4px;
+    background: var(--teal-50);
+    overflow: hidden;
+  }
+
+  .lms__bar span {
+    display: block;
+    height: 100%;
+    border-radius: 4px;
+    background: var(--teal-600);
+  }
+
+  @media (max-width: 960px) {
+    .progs,
+    .elearn {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .prog__facts {
+      grid-template-columns: 1fr;
+    }
+    .prog__facts div + div {
+      border-left: 0;
+      border-top: 1px solid var(--line);
+    }
+  }
+</style>
