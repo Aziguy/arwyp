@@ -1,4 +1,5 @@
 import { openRecord } from './app';
+import { renderPager } from './listing/pager';
 
 function init(root: HTMLElement) {
   if (root.dataset.ready) return;
@@ -6,13 +7,13 @@ function init(root: HTMLElement) {
 
   const body = root.querySelector('tbody')!;
   const rows = [...body.querySelectorAll<HTMLTableRowElement>('tr[data-row]')];
-  const size = Number(root.dataset.pageSize) || 10;
+  let size = Number(root.dataset.pageSize) || 10;
   const search = root.querySelector<HTMLInputElement>('[data-table-search]');
   const filter = root.querySelector<HTMLSelectElement>('[data-table-filter]');
   const countEl = root.querySelector('[data-table-count]')!;
-  const label = root.querySelector('[data-page-label]')!;
   const empty = root.querySelector<HTMLElement>('[data-table-empty]')!;
-  const [prev, next] = root.querySelectorAll<HTMLButtonElement>('[data-page]');
+  const pager = root.querySelector<HTMLElement>('[data-table-pager]')!;
+  const sizer = root.querySelector<HTMLSelectElement>('[data-table-size]');
   let page = 0;
 
   const matches = () => {
@@ -32,15 +33,18 @@ function init(root: HTMLElement) {
     countEl.textContent = visible.length
       ? `Showing ${start + 1}-${Math.min(start + size, visible.length)} of ${visible.length}`
       : '0 records';
-    label.textContent = `${page + 1} / ${pages}`;
-    prev.disabled = page === 0;
-    next.disabled = page >= pages - 1;
+    renderPager(pager, page + 1, pages);
   };
 
   search?.addEventListener('input', () => ((page = 0), render()));
   filter?.addEventListener('change', () => ((page = 0), render()));
-  prev.addEventListener('click', () => ((page -= 1), render()));
-  next.addEventListener('click', () => ((page += 1), render()));
+  sizer?.addEventListener('change', () => ((size = Number(sizer.value)), (page = 0), render()));
+  pager.addEventListener('click', (e) => {
+    const btn = (e.target as Element).closest<HTMLButtonElement>('[data-goto]');
+    if (!btn || btn.disabled) return;
+    page = Number(btn.dataset.goto) - 1;
+    render();
+  });
 
   root.querySelectorAll<HTMLButtonElement>('[data-sort-col]').forEach((btn) => {
     btn.addEventListener('click', () => {
@@ -57,6 +61,7 @@ function init(root: HTMLElement) {
         return dir === 'ascending' ? cmp : -cmp;
       });
       body.append(...rows);
+      page = 0;
       render();
     });
   });

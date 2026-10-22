@@ -158,11 +158,13 @@ const titleCol = titleKey ?? columns[0].key;
 
   <footer class="dt__foot">
     <p class="tabular" data-table-count>{rows.length} records</p>
-    <div class="dt__pager">
-      <button type="button" class="icon-btn" data-page="-1" aria-label="Previous page"><Icon name="chevron-left" size={18} /></button>
-      <span class="tabular" data-page-label></span>
-      <button type="button" class="icon-btn" data-page="1" aria-label="Next page"><Icon name="chevron-right" size={18} /></button>
-    </div>
+    <label class="dt__size">
+      <span>Rows</span>
+      <select class="select select--sm" data-table-size>
+        {[10, 25, 50].map((n) => <option value={n} selected={n === pageSize}>{n}</option>)}
+      </select>
+    </label>
+    <nav class="pager pager--sm" data-table-pager aria-label="Table pagination" hidden></nav>
   </footer>
 </div>
 
@@ -354,20 +356,21 @@ const titleCol = titleKey ?? columns[0].key;
     color: var(--ink-3);
   }
 
-  .dt__pager {
+  .dt__foot > p {
+    flex: 1;
+  }
+
+  .dt__size {
     display: flex;
     align-items: center;
     gap: var(--sp-2);
+    font-weight: 600;
   }
 
-  .dt__pager .icon-btn {
-    width: 2rem;
-    height: 2rem;
-  }
-
-  .dt__pager .icon-btn:disabled {
-    opacity: 0.35;
-    pointer-events: none;
+  .dt__size .select {
+    width: auto;
+    min-height: 2rem;
+    padding-block: 0.2rem;
   }
 
   @media (max-width: 760px) {
