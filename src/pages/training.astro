@@ -5,6 +5,7 @@ import SectionHeader from '@/components/ui/SectionHeader.astro';
 import FeatureCard from '@/components/ui/FeatureCard.astro';
 import Icon from '@/components/ui/Icon.astro';
 import { programmes } from '@/data/training';
+import { courseListSchema } from '@/lib/schema';
 
 const why = [
   { icon: 'hospital', title: 'A real hospital', text: 'Learn inside a real, accredited private hospital, not just a simulated setting.' },
@@ -14,7 +15,11 @@ const why = [
 ];
 ---
 
-<SiteLayout title="Arwyp Training Institute" description="Where the next generation of caregivers begins.">
+<SiteLayout
+  title="Arwyp Training Institute"
+  description="Accredited nursing, pharmacy and ancillary healthcare programmes plus CPD courses, taught inside a working private hospital in Kempton Park. Requirements, intakes and applications."
+  schema={courseListSchema(programmes)}
+>
   <PageHero
     tone="dark"
     eyebrow="Arwyp Training Institute"

@@ -6,6 +6,7 @@ import Icon from '@/components/ui/Icon.astro';
 import CtaBand from '@/components/ui/CtaBand.astro';
 import { departments, departmentSpecialists, technologies } from '@/data/departments';
 import { url } from '@/lib/paths';
+import { itemListSchema } from '@/lib/schema';
 
 const pillars = [
   { icon: 'stethoscope', label: 'Specialist doctors' },
@@ -17,7 +18,11 @@ const pillars = [
 ];
 ---
 
-<SiteLayout title="Specialised Departments" description="Deep expertise, department by department.">
+<SiteLayout
+  title="Specialised Departments"
+  description="Bariatric, cardiothoracic, neurosurgery, vascular, IVF, ENT, orthopaedic and paediatric surgery departments at Arwyp Medical Centre, with Hybrid Theatre and O-Arm imaging."
+  schema={itemListSchema('Specialised departments', departments.map((d) => `/departments/${d.slug}/`))}
+>
   <PageHero
     eyebrow="Specialised Departments"
     title="Deep expertise, <span class='serif'>department by department.</span>"

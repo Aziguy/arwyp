@@ -34,3 +34,6 @@ export function initials(name: string): string {
     .join('')
     .toUpperCase();
 }
+
+export const surnameKey = (lastName: string) => lastName.replace(/^(van der|van|du|de)\s+/i, '');
+export const surnameInitial = (lastName: string) => surnameKey(lastName)[0].toUpperCase();

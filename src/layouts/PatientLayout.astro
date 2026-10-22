@@ -3,6 +3,7 @@ import SiteLayout from './SiteLayout.astro';
 import PageHero from '@/components/ui/PageHero.astro';
 import PatientNav from '@/components/sections/PatientNav.astro';
 import { patientTopics } from '@/data/patients';
+import { medicalPageSchema } from '@/lib/schema';
 
 interface Props {
   slug: string;
@@ -15,7 +16,11 @@ const { slug, title, subtitle, eyebrow = 'Patient Information' } = Astro.props;
 const topic = patientTopics.find((t) => t.slug === slug);
 ---
 
-<SiteLayout title={topic?.title ?? title} description={subtitle}>
+<SiteLayout
+  title={topic?.title ?? title}
+  description={subtitle}
+  schema={medicalPageSchema({ title: topic?.title ?? title, description: subtitle, path: `/patients/${slug}/` })}
+>
   <PageHero eyebrow={eyebrow} title={title} subtitle={subtitle} crumbs={[{ label: 'Patient Information', href: '/patients/' }, { label: topic?.title ?? title }]} />
   <section class="section">
     <div class="container pl">

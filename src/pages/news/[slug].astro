@@ -7,6 +7,7 @@ import NewsCard from '@/components/sections/NewsCard.astro';
 import { articles, type Article } from '@/data/news';
 import { longDate } from '@/lib/format';
 import { url } from '@/lib/paths';
+import { articleSchema } from '@/lib/schema';
 
 export function getStaticPaths() {
   return articles.map((a) => ({ params: { slug: a.slug }, props: { article: a } }));
@@ -18,10 +19,9 @@ interface Props {
 
 const { article: a } = Astro.props;
 const related = articles.filter((x) => x.slug !== a.slug && x.category === a.category).concat(articles.filter((x) => x.category !== a.category)).slice(0, 3);
-const schema = { '@context': 'https://schema.org', '@type': 'NewsArticle', headline: a.title, datePublished: a.date, author: { '@type': 'Organization', name: a.author } };
 ---
 
-<SiteLayout title={a.title} description={a.excerpt} schema={schema}>
+<SiteLayout title={a.title} description={a.excerpt} type="article" published={a.date} modified={a.date} schema={articleSchema(a)}>
   <article>
     <header class="ah">
       <div class="container-narrow">

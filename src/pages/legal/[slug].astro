@@ -17,8 +17,8 @@ interface Props {
 const { page } = Astro.props;
 ---
 
-<SiteLayout title={page.title}>
-  <PageHero eyebrow="Legal" title={page.title} subtitle={`Last updated ${longDate(page.updated)}`} crumbs={[{ label: 'Legal' }, { label: page.title }]} />
+<SiteLayout title={page.title} description={`${page.title} of Arwyp Medical Centre (Pty) Ltd: ${page.sections.map((s) => s.heading.toLowerCase()).join(', ')}.`}>
+  <PageHero eyebrow="Legal" title={page.title} subtitle={`Last updated ${longDate(page.updated)}`} crumbs={[{ label: page.title }]} />
   <section class="section">
     <div class="container legal">
       <nav class="legal__nav" aria-label="Legal pages">

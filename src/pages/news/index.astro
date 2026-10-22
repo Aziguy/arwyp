@@ -6,12 +6,18 @@ import EmptyResults from '@/components/ui/EmptyResults.astro';
 import Icon from '@/components/ui/Icon.astro';
 import Visual from '@/components/ui/Visual.astro';
 import { articles, articleCategories } from '@/data/news';
+import ResultsBar from '@/components/listing/ResultsBar.astro';
+import Pager from '@/components/listing/Pager.astro';
 import { url } from '@/lib/paths';
+import { itemListSchema } from '@/lib/schema';
 
-const [featured, ...rest] = articles;
 ---
 
-<SiteLayout title="Media & News" description="News, insights, and a look inside Arwyp.">
+<SiteLayout
+  title="Media & News"
+  description="Health insights, hospital news and community stories from Arwyp Medical Centre, plus a 3D tour of our maternity ward in Kempton Park."
+  schema={itemListSchema('Latest news and health insights', articles.map((a) => `/news/${a.slug}/`))}
+>
   <PageHero
     eyebrow="Media & News"
     title="News, insights, and a <span class='serif'>look inside</span> Arwyp."
@@ -19,12 +25,12 @@ const [featured, ...rest] = articles;
     crumbs={[{ label: 'Media & News' }]}
   />
 
-  <section class="section" data-filter>
+  <section class="section" data-listing data-page-size="6">
     <div class="container">
       <div class="filterbar">
         <div>
           <h2 class="filterbar__title">Latest News & Health Insights</h2>
-          <p class="muted"><span data-count>{articles.length}</span> articles</p>
+          <p class="muted">Health advice, hospital news and stories from our community.</p>
         </div>
         <label class="search-field">
           <Icon name="search" size={18} />
@@ -43,19 +49,26 @@ const [featured, ...rest] = articles;
         }
       </div>
 
-      <div class="feed">
-        <div class="feed__featured" data-item data-category={featured.category} data-text={`${featured.title} ${featured.excerpt}`}>
-          <NewsCard article={featured} featured />
-        </div>
+      <ResultsBar
+        total={articles.length}
+        noun="articles"
+        sorts={[
+          { value: 'date:desc', label: 'Newest first' },
+          { value: 'date:asc', label: 'Oldest first' },
+          { value: 'title:asc', label: 'Title A-Z' },
+        ]}
+      />
+      <div class="feed" data-items>
         {
-          rest.map((a) => (
-            <div data-item data-category={a.category} data-text={`${a.title} ${a.excerpt}`}>
+          articles.map((a) => (
+            <div data-item data-category={a.category} data-sort-date={a.date} data-sort-title={a.title} data-text={`${a.title} ${a.excerpt} ${a.author}`}>
               <NewsCard article={a} />
             </div>
           ))
         }
       </div>
       <EmptyResults text="No articles match your search." />
+      <Pager label="Articles pagination" />
     </div>
   </section>
 
@@ -79,7 +92,7 @@ const [featured, ...rest] = articles;
 </SiteLayout>
 
 <script>
-  import '@/scripts/filter';
+  import '@/scripts/listing';
 </script>
 
 <style>
@@ -89,9 +102,17 @@ const [featured, ...rest] = articles;
     gap: var(--sp-6);
   }
 
-  .feed__featured {
+  .feed > [data-lead] {
     grid-column: span 2;
     grid-row: span 2;
+  }
+
+  .feed > [data-lead] :global(.visual) {
+    aspect-ratio: 16 / 10;
+  }
+
+  .feed > [data-lead] :global(h3) {
+    font-size: var(--fs-xl);
   }
 
   .tour {
@@ -134,7 +155,7 @@ const [featured, ...rest] = articles;
     .feed {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
-    .feed__featured {
+    .feed > [data-lead] {
       grid-row: auto;
     }
   }
@@ -149,7 +170,7 @@ const [featured, ...rest] = articles;
     .feed {
       grid-template-columns: 1fr;
     }
-    .feed__featured {
+    .feed > [data-lead] {
       grid-column: auto;
     }
   }

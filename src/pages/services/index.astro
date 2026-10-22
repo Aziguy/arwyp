@@ -5,7 +5,10 @@ import FeatureCard from '@/components/ui/FeatureCard.astro';
 import Icon from '@/components/ui/Icon.astro';
 import EmptyResults from '@/components/ui/EmptyResults.astro';
 import { services, serviceCategories } from '@/data/services';
+import ResultsBar from '@/components/listing/ResultsBar.astro';
+import Pager from '@/components/listing/Pager.astro';
 import { url } from '@/lib/paths';
+import { medicalPageSchema } from '@/lib/schema';
 
 const prep = [
   { icon: 'clipboard-check', title: 'Pre-Admission', text: 'What to bring, and forms to complete in advance.', href: '/patients/pre-admission/' },
@@ -14,7 +17,11 @@ const prep = [
 ];
 ---
 
-<SiteLayout title="Our Services" description="Comprehensive care, all in one place.">
+<SiteLayout
+  title="Our Services"
+  description="Emergency, ICU, orthopaedics, cardiology, maternity, oncology, radiology, pathology and pharmacy: comprehensive private hospital care under one roof in Kempton Park."
+  schema={medicalPageSchema({ title: 'Our Services', description: 'Services and facilities at Arwyp Medical Centre.', path: '/services/' })}
+>
   <PageHero
     eyebrow="Our Services"
     title="Comprehensive care, <span class='serif'>all in one place.</span>"
@@ -27,12 +34,12 @@ const prep = [
     </div>
   </PageHero>
 
-  <section class="section" data-filter>
+  <section class="section" data-listing data-page-size="12">
     <div class="container">
       <div class="filterbar">
         <div>
           <h2 class="filterbar__title">Browse our specialised care</h2>
-          <p class="muted"><span data-count>{services.length}</span> services and facilities</p>
+          <p class="muted">Browse by department or condition.</p>
         </div>
         <label class="search-field">
           <Icon name="search" size={18} />
@@ -52,10 +59,11 @@ const prep = [
         }
       </div>
 
-      <div class="grid" style="--grid-min: 270px">
+      <ResultsBar total={services.length} noun="services and facilities" sorts={[{ value: 'name:asc', label: 'Name A-Z' }, { value: 'name:desc', label: 'Name Z-A' }]} />
+      <div class="grid" style="--grid-min: 270px" data-items>
         {
           services.map((s) => (
-            <div data-item data-category={s.category} data-text={`${s.name} ${s.text} ${s.conditions.join(' ')}`}>
+            <div data-item data-category={s.category} data-sort-name={s.name} data-text={`${s.name} ${s.text} ${s.conditions.join(' ')}`}>
               <FeatureCard icon={s.icon} title={s.name} text={s.text} href={s.href} cta={s.href?.startsWith('/departments') ? 'View department' : 'Learn more'}>
                 <span class="badge svc__cat">{s.category}</span>
               </FeatureCard>
@@ -64,6 +72,7 @@ const prep = [
         }
       </div>
       <EmptyResults />
+      <Pager label="Services pagination" />
     </div>
   </section>
 
@@ -84,7 +93,7 @@ const prep = [
 </SiteLayout>
 
 <script>
-  import '@/scripts/filter';
+  import '@/scripts/listing';
 </script>
 
 <style>

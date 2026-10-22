@@ -6,6 +6,7 @@ import Icon from '@/components/ui/Icon.astro';
 import SpecialistCard from '@/components/specialists/SpecialistCard.astro';
 import { departments, departmentSpecialists, type Department } from '@/data/departments';
 import { url } from '@/lib/paths';
+import { clinicSchema } from '@/lib/schema';
 
 export function getStaticPaths() {
   return departments.map((d) => ({ params: { slug: d.slug }, props: { department: d } }));
@@ -21,7 +22,7 @@ const [lead, ...others] = team;
 const others3 = departments.filter((x) => x.slug !== d.slug).slice(0, 4);
 ---
 
-<SiteLayout title={d.name} description={d.tagline}>
+<SiteLayout title={`${d.name} in Kempton Park`} description={`${d.tagline} ${d.summary}`} schema={clinicSchema(d)}>
   <PageHero
     tone="dark"
     eyebrow="Specialised Department"

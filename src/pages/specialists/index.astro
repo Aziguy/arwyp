@@ -6,14 +6,29 @@ import EmptyResults from '@/components/ui/EmptyResults.astro';
 import SpecialistCard from '@/components/specialists/SpecialistCard.astro';
 import { disciplines } from '@/data/disciplines';
 import { specialists } from '@/data/specialists';
+import ResultsBar from '@/components/listing/ResultsBar.astro';
+import Pager from '@/components/listing/Pager.astro';
+import { slugify, surnameInitial } from '@/lib/format';
 import { url } from '@/lib/paths';
+import { itemListSchema, medicalPageSchema } from '@/lib/schema';
 
 const letters = [...new Set(disciplines.map((d) => d.letter))];
 const countFor = (slug: string) => specialists.filter((s) => s.disciplineSlug === slug).length;
+const alphabet = [...'ABCDEFGHIJKLMNOPQRSTUVWXYZ'];
+const surnameLetters = new Set(specialists.map((s) => surnameInitial(s.lastName)));
+const languages = [...new Set(specialists.flatMap((s) => s.languages))].sort();
+const aids = [...new Set(specialists.flatMap((s) => s.medicalAids))].sort();
 ---
 
-<SiteLayout title="Find a Specialist" description="The right specialist, faster. Search 100+ specialists by name or discipline.">
-  <div data-filter>
+<SiteLayout
+  title="Find a Specialist in Kempton Park"
+  description="Search 100+ specialists at Arwyp Medical Centre by name or discipline, from cardiology and orthopaedics to neurosurgery. Rooms, practice numbers and booking details."
+  schema={[
+    medicalPageSchema({ title: 'Find a Specialist', description: 'Directory of specialists practising at Arwyp Medical Centre.', path: '/specialists/' }),
+    itemListSchema('Specialists at Arwyp Medical Centre', specialists.map((s) => `/specialists/${s.slug}/`)),
+  ]}
+>
+  <div data-listing data-page-size="12">
     <section class="fs-hero">
       <div class="container fs-hero__inner">
         <Breadcrumbs items={[{ label: 'Find a Specialist' }]} tone="dark" />
@@ -49,14 +64,62 @@ const countFor = (slug: string) => specialists.filter((s) => s.disciplineSlug ==
         <div class="filterbar">
           <div>
             <h2 class="filterbar__title" id="results-title">Specialists</h2>
-            <p class="muted"><span data-count>{specialists.length}</span> specialists found</p>
+            <p class="muted">Filter by surname, language or availability.</p>
           </div>
           <button type="button" class="btn btn--ghost btn--sm" data-reset><Icon name="rotate-ccw" /> Reset</button>
         </div>
-        <div class="grid" style="--grid-min: 290px">
+
+        <div class="az-filter" role="toolbar" aria-label="Filter by surname">
+          <button type="button" data-facet="letter" data-value="" data-label="All">All</button>
+          {
+            alphabet.map((l) => (
+              <button type="button" data-facet="letter" data-value={l} data-label={`Surname ${l}`} disabled={!surnameLetters.has(l)}>
+                {l}
+              </button>
+            ))
+          }
+        </div>
+
+        <div class="facets">
+          <div class="field">
+            <label for="f-lang">Language</label>
+            <select id="f-lang" class="select" data-facet-select="language">
+              <option value="">Any language</option>
+              {languages.map((l) => <option value={l}>{l}</option>)}
+            </select>
+          </div>
+          <div class="field only-b">
+            <label for="f-aid">Medical aid</label>
+            <select id="f-aid" class="select" data-facet-select="aid">
+              <option value="">Any medical aid</option>
+              {aids.map((a) => <option value={slugify(a)}>{a}</option>)}
+            </select>
+          </div>
+          <div class="field">
+            <span class="field-label">Availability</span>
+            <label class="toggle">
+              <input type="checkbox" value="yes" data-facet-check="accepting" data-label="Accepting new patients" />
+              Accepting new patients
+            </label>
+          </div>
+        </div>
+
+        <ResultsBar
+          total={specialists.length}
+          noun="specialists"
+          sorts={[
+            { value: 'name:asc', label: 'Surname A-Z' },
+            { value: 'name:desc', label: 'Surname Z-A' },
+            { value: 'discipline:asc', label: 'Discipline' },
+            { value: 'rating:desc', label: 'Highest rated', quote: 'b' },
+            { value: 'next:asc', label: 'Soonest availability', quote: 'b' },
+          ]}
+        />
+        <div class="grid" style="--grid-min: 290px" data-items>
           {specialists.map((s) => <SpecialistCard specialist={s} />)}
         </div>
         <EmptyResults text="No specialist matches your search." />
+        <Pager label="Specialists pagination" />
       </div>
     </section>
   </div>
@@ -117,7 +180,7 @@ const countFor = (slug: string) => specialists.filter((s) => s.disciplineSlug ==
 </SiteLayout>
 
 <script>
-  import '@/scripts/filter';
+  import '@/scripts/listing';
 </script>
 
 <style>

@@ -35,7 +35,13 @@ const reviews = [
 ];
 ---
 
-<SiteLayout title={`${s.name}, ${s.discipline}`} description={`${s.name}, ${s.discipline} at Arwyp Medical Centre, Kempton Park.`} schema={[physicianSchema({ ...s, specialty: s.discipline }), faqSchema(faq)]}>
+<SiteLayout
+  title={`${s.name}, ${s.discipline} in Kempton Park`}
+  description={`${s.name} is a ${s.discipline.toLowerCase()} specialist at Arwyp Medical Centre, Kempton Park, with a special interest in ${s.subSpecialty.toLowerCase()}. Rooms, practice number and booking.`}
+  type="profile"
+  schema={physicianSchema(s)}
+  schemaB={faqSchema(faq)}
+>
   <section class="ph">
     <div class="container">
       <Breadcrumbs items={[{ label: 'Find a Specialist', href: '/specialists/' }, { label: s.name }]} />

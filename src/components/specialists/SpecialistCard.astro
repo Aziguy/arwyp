@@ -2,7 +2,7 @@
 import Avatar from '@/components/ui/Avatar.astro';
 import Icon from '@/components/ui/Icon.astro';
 import type { Specialist } from '@/data/specialists';
-import { shortDate } from '@/lib/format';
+import { shortDate, slugify, surnameInitial, surnameKey } from '@/lib/format';
 import { url } from '@/lib/paths';
 
 interface Props {
@@ -18,7 +18,14 @@ const href = url(`/specialists/${s.slug}/`);
   class:list={['spc', { 'spc--compact': compact }]}
   data-item
   data-discipline={s.disciplineSlug}
-  data-letter={s.lastName.replace(/^(van der |du )/i, '')[0].toUpperCase()}
+  data-letter={surnameInitial(s.lastName)}
+  data-language={s.languages.join('|')}
+  data-aid={s.medicalAids.map(slugify).join('|')}
+  data-accepting={s.accepting ? 'yes' : 'no'}
+  data-sort-name={`${surnameKey(s.lastName)} ${s.firstName}`}
+  data-sort-discipline={s.discipline}
+  data-sort-rating={s.rating}
+  data-sort-next={s.accepting ? s.nextAvailable : '9999'}
   data-text={`${s.name} ${s.discipline} ${s.subSpecialty}`}
 >
   <a class="spc__main" href={href}>
