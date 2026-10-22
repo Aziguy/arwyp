@@ -1,0 +1,156 @@
+---
+import SiteLayout from '@/layouts/SiteLayout.astro';
+import PageHero from '@/components/ui/PageHero.astro';
+import NewsCard from '@/components/sections/NewsCard.astro';
+import EmptyResults from '@/components/ui/EmptyResults.astro';
+import Icon from '@/components/ui/Icon.astro';
+import Visual from '@/components/ui/Visual.astro';
+import { articles, articleCategories } from '@/data/news';
+import { url } from '@/lib/paths';
+
+const [featured, ...rest] = articles;
+---
+
+<SiteLayout title="Media & News" description="News, insights, and a look inside Arwyp.">
+  <PageHero
+    eyebrow="Media & News"
+    title="News, insights, and a <span class='serif'>look inside</span> Arwyp."
+    subtitle="Health advice worth reading, hospital news worth knowing, and a virtual walk-through of our facilities, all in one place."
+    crumbs={[{ label: 'Media & News' }]}
+  />
+
+  <section class="section" data-filter>
+    <div class="container">
+      <div class="filterbar">
+        <div>
+          <h2 class="filterbar__title">Latest News & Health Insights</h2>
+          <p class="muted"><span data-count>{articles.length}</span> articles</p>
+        </div>
+        <label class="search-field">
+          <Icon name="search" size={18} />
+          <span class="sr-only">Search articles</span>
+          <input class="input" type="search" placeholder="Search articles" data-search />
+        </label>
+      </div>
+      <div class="chips" role="toolbar" aria-label="Filter by category">
+        <button type="button" class="chip" data-facet="category" data-value="">All</button>
+        {
+          articleCategories.map((c) => (
+            <button type="button" class="chip" data-facet="category" data-value={c}>
+              {c}
+            </button>
+          ))
+        }
+      </div>
+
+      <div class="feed">
+        <div class="feed__featured" data-item data-category={featured.category} data-text={`${featured.title} ${featured.excerpt}`}>
+          <NewsCard article={featured} featured />
+        </div>
+        {
+          rest.map((a) => (
+            <div data-item data-category={a.category} data-text={`${a.title} ${a.excerpt}`}>
+              <NewsCard article={a} />
+            </div>
+          ))
+        }
+      </div>
+      <EmptyResults text="No articles match your search." />
+    </div>
+  </section>
+
+  <section class="section section--dark">
+    <div class="container tour">
+      <a class="tour__media" href={url('/news/3d-tour/')} aria-label="Watch the 3D maternity tour">
+        <Visual icon="box" tone="navy" ratio="16 / 9" label="3D maternity tour" />
+        <span class="tour__play"><Icon name="play" size={28} /></span>
+      </a>
+      <div class="stack" style="--stack: var(--sp-5)">
+        <p class="eyebrow">Video</p>
+        <h2>Take a 3D Tour of Our <span class="serif">Maternity Ward</span></h2>
+        <p class="lead">
+          Bringing a baby into the world is daunting enough without wondering what the ward will look like. Walk through our maternity facilities from wherever you
+          are, before you ever set foot inside: a calm, informed way to prepare for the big day.
+        </p>
+        <a class="btn btn--accent" href={url('/news/3d-tour/')}><Icon name="play" /> Start the tour</a>
+      </div>
+    </div>
+  </section>
+</SiteLayout>
+
+<script>
+  import '@/scripts/filter';
+</script>
+
+<style>
+  .feed {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--sp-6);
+  }
+
+  .feed__featured {
+    grid-column: span 2;
+    grid-row: span 2;
+  }
+
+  .tour {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+    gap: clamp(2rem, 1rem + 4vw, 5rem);
+    align-items: center;
+  }
+
+  .tour .lead {
+    color: rgb(255 255 255 / 0.75);
+  }
+
+  .tour__media {
+    position: relative;
+    display: block;
+    border-radius: var(--radius-xl);
+  }
+
+  .tour__play {
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    display: grid;
+    place-items: center;
+    width: 5rem;
+    height: 5rem;
+    border-radius: 50%;
+    background: var(--teal-400);
+    color: var(--navy-950);
+    box-shadow: 0 0 0 12px rgb(0 216 206 / 0.2);
+    transition: transform var(--dur) var(--ease);
+  }
+
+  .tour__media:hover .tour__play {
+    transform: scale(1.06);
+  }
+
+  @media (max-width: 1024px) {
+    .feed {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .feed__featured {
+      grid-row: auto;
+    }
+  }
+
+  @media (max-width: 860px) {
+    .tour {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .feed {
+      grid-template-columns: 1fr;
+    }
+    .feed__featured {
+      grid-column: auto;
+    }
+  }
+</style>

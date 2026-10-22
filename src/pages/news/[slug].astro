@@ -1,0 +1,159 @@
+---
+import SiteLayout from '@/layouts/SiteLayout.astro';
+import Breadcrumbs from '@/components/ui/Breadcrumbs.astro';
+import Visual from '@/components/ui/Visual.astro';
+import Icon from '@/components/ui/Icon.astro';
+import NewsCard from '@/components/sections/NewsCard.astro';
+import { articles, type Article } from '@/data/news';
+import { longDate } from '@/lib/format';
+import { url } from '@/lib/paths';
+
+export function getStaticPaths() {
+  return articles.map((a) => ({ params: { slug: a.slug }, props: { article: a } }));
+}
+
+interface Props {
+  article: Article;
+}
+
+const { article: a } = Astro.props;
+const related = articles.filter((x) => x.slug !== a.slug && x.category === a.category).concat(articles.filter((x) => x.category !== a.category)).slice(0, 3);
+const schema = { '@context': 'https://schema.org', '@type': 'NewsArticle', headline: a.title, datePublished: a.date, author: { '@type': 'Organization', name: a.author } };
+---
+
+<SiteLayout title={a.title} description={a.excerpt} schema={schema}>
+  <article>
+    <header class="ah">
+      <div class="container-narrow">
+        <Breadcrumbs items={[{ label: 'Media & News', href: '/news/' }, { label: a.category }]} />
+        <span class="badge badge--teal">{a.category}</span>
+        <h1>{a.title}</h1>
+        <p class="ah__excerpt">{a.excerpt}</p>
+        <p class="ah__meta">
+          <span><Icon name="user-round" size={16} /> {a.author}</span>
+          <span><Icon name="calendar" size={16} /> <time datetime={a.date}>{longDate(a.date)}</time></span>
+          <span><Icon name="clock" size={16} /> {a.readTime} min read</span>
+        </p>
+      </div>
+    </header>
+
+    <div class="container-narrow">
+      <Visual icon={a.icon} tone={a.tone} ratio="21 / 9" label="Article image supplied by Arwyp" class="ah__media" />
+      <div class="prose">
+        {a.body.map((p) => <p>{p}</p>)}
+      </div>
+      <footer class="share">
+        <span>Share</span>
+        <a href="https://www.facebook.com/" aria-label="Share on Facebook" target="_blank" rel="noopener"><Icon name="facebook" size={18} /></a>
+        <a href="https://www.linkedin.com/" aria-label="Share on LinkedIn" target="_blank" rel="noopener"><Icon name="linkedin" size={18} /></a>
+        <a href="https://wa.me/" aria-label="Share on WhatsApp" target="_blank" rel="noopener"><Icon name="message-circle" size={18} /></a>
+        <a href={url('/news/')} class="link-arrow share__back"><Icon name="arrow-left" /> All articles</a>
+      </footer>
+    </div>
+  </article>
+
+  <section class="section section--tint">
+    <div class="container">
+      <h2 class="rel__h">Related reading</h2>
+      <div class="grid" style="--grid-min: 280px">
+        {related.map((r) => <NewsCard article={r} />)}
+      </div>
+    </div>
+  </section>
+</SiteLayout>
+
+<style>
+  .ah {
+    padding-block: var(--sp-10) var(--sp-8);
+  }
+
+  .ah .container-narrow {
+    display: grid;
+    gap: var(--sp-4);
+    justify-items: start;
+  }
+
+  .ah h1 {
+    font-size: clamp(2rem, 1.4rem + 2.4vw, 3.25rem);
+  }
+
+  .ah__excerpt {
+    font-size: var(--fs-xl);
+    line-height: 1.55;
+    color: var(--ink-2);
+  }
+
+  .ah__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-5);
+    font-size: var(--fs-sm);
+    color: var(--ink-3);
+  }
+
+  .ah__meta span {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-2);
+  }
+
+  .container-narrow :global(.ah__media) {
+    margin-bottom: var(--sp-10);
+  }
+
+  .prose {
+    display: grid;
+    gap: var(--sp-5);
+    font-size: var(--fs-lg);
+    line-height: 1.8;
+    color: var(--ink-2);
+  }
+
+  .prose p:first-child::first-letter {
+    float: left;
+    margin: 0.1em 0.12em 0 0;
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-weight: 600;
+    font-size: 4.2em;
+    line-height: 0.8;
+    color: var(--teal-700);
+  }
+
+  .share {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sp-2);
+    margin-block: var(--sp-10) var(--sp-16);
+    padding-top: var(--sp-6);
+    border-top: 1px solid var(--line);
+    font-size: var(--fs-sm);
+    font-weight: 650;
+    color: var(--ink-3);
+  }
+
+  .share > a:not(.link-arrow) {
+    display: grid;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    box-shadow: 0 0 0 1px var(--line-2);
+    color: var(--navy-800);
+  }
+
+  .share > a:not(.link-arrow):hover {
+    background: var(--navy-800);
+    color: #fff;
+  }
+
+  .share__back {
+    margin-left: auto;
+  }
+
+  .rel__h {
+    margin-bottom: var(--sp-8);
+    font-size: var(--fs-2xl);
+  }
+</style>

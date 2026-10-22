@@ -1,0 +1,175 @@
+---
+import SiteLayout from '@/layouts/SiteLayout.astro';
+import PageHero from '@/components/ui/PageHero.astro';
+import Icon from '@/components/ui/Icon.astro';
+import Visual from '@/components/ui/Visual.astro';
+
+const areas = [
+  { id: 'icu', label: 'ICU', icon: 'activity', tone: 'navy', text: 'Adult intensive care with one-to-one nursing and central monitoring.' },
+  { id: 'theatres', label: 'Theatres', icon: 'scissors', tone: 'teal', text: 'Hybrid Theatre, cardiac theatres and the O-Arm imaging suite.' },
+  { id: 'maternity', label: 'Maternity', icon: 'baby', tone: 'sky', text: 'Private birthing rooms, partner area and neonatal ICU.' },
+  { id: 'emergency', label: 'Emergency', icon: 'siren', tone: 'rose', text: 'Triage, resuscitation bays and the 24/7 trauma unit.' },
+  { id: 'wards', label: 'Wards', icon: 'bed-double', tone: 'sand', text: 'General, paediatric and private wards with family lounges.' },
+] as const;
+---
+
+<SiteLayout title="3D Maternity Tour" description="Walk through our maternity facilities before you ever set foot inside.">
+  <PageHero
+    eyebrow="Media & News"
+    title="Take a 3D Tour of Our <span class='serif'>Maternity Ward</span>"
+    subtitle="Bringing a baby into the world is daunting enough without wondering what the ward will look like. Walk through our maternity facilities from wherever you are."
+    crumbs={[{ label: 'Media & News', href: '/news/' }, { label: '3D Tour' }]}
+  />
+
+  <section class="section">
+    <div class="container">
+      <div class="player">
+        <Visual icon="box" tone="navy" ratio="16 / 9" label="3D tour video supplied by Arwyp" />
+        <button type="button" class="player__btn" aria-label="Play video"><Icon name="play" size={32} /></button>
+        <div class="player__bar" aria-hidden="true">
+          <Icon name="play" size={16} />
+          <span class="player__track"><span></span></span>
+          <span class="player__time">00:00 / 03:42</span>
+          <Icon name="maximize" size={16} />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--tint only-b" id="virtual-tour">
+    <div class="container" data-tour>
+      <div class="vt__head">
+        <span class="tag-b" data-label="360° Virtual Hospital Tour"></span>
+        <h2>Explore the whole hospital in 360&deg;</h2>
+        <p class="lead">An interactive walkthrough of ICU, theatres, maternity, emergency and wards, to reduce anxiety and build confidence before admission.</p>
+      </div>
+      <div class="vt__tabs" role="tablist" aria-label="Hospital areas">
+        {
+          areas.map((a, i) => (
+            <button type="button" role="tab" class="chip" aria-pressed={i === 0 ? 'true' : 'false'} data-tour-tab={a.id}>
+              <Icon name={a.icon} size={16} /> {a.label}
+            </button>
+          ))
+        }
+      </div>
+      {
+        areas.map((a, i) => (
+          <div class="vt__scene" data-tour-scene={a.id} hidden={i !== 0}>
+            <Visual icon={a.icon} tone={a.tone} ratio="21 / 9" label={`360° ${a.label} panorama`} />
+            <div class="vt__hint">
+              <Icon name="move-3d" size={18} /> Drag to look around. {a.text}
+            </div>
+          </div>
+        ))
+      }
+    </div>
+  </section>
+</SiteLayout>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-tour]').forEach((root) => {
+    root.querySelectorAll<HTMLButtonElement>('[data-tour-tab]').forEach((tab) =>
+      tab.addEventListener('click', () => {
+        root.querySelectorAll('[data-tour-tab]').forEach((t) => t.setAttribute('aria-pressed', String(t === tab)));
+        root.querySelectorAll<HTMLElement>('[data-tour-scene]').forEach((s) => (s.hidden = s.dataset.tourScene !== tab.dataset.tourTab));
+      }),
+    );
+  });
+</script>
+
+<style>
+  .player {
+    position: relative;
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    box-shadow: var(--shadow-lg);
+  }
+
+  .player__btn {
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    display: grid;
+    place-items: center;
+    width: 6rem;
+    height: 6rem;
+    border-radius: 50%;
+    background: var(--teal-400);
+    color: var(--navy-950);
+    box-shadow: 0 0 0 14px rgb(0 216 206 / 0.2);
+  }
+
+  .player__bar {
+    position: absolute;
+    left: var(--sp-4);
+    right: var(--sp-4);
+    bottom: var(--sp-4);
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3);
+    padding: var(--sp-3) var(--sp-4);
+    border-radius: var(--radius-pill);
+    background: rgb(0 0 0 / 0.45);
+    backdrop-filter: blur(8px);
+    color: #fff;
+    font-size: var(--fs-xs);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .player__track {
+    flex: 1;
+    height: 4px;
+    border-radius: 2px;
+    background: rgb(255 255 255 / 0.25);
+  }
+
+  .player__track span {
+    display: block;
+    width: 18%;
+    height: 100%;
+    border-radius: 2px;
+    background: var(--teal-400);
+  }
+
+  .vt__head {
+    display: grid;
+    gap: var(--sp-3);
+    justify-items: start;
+    max-width: 720px;
+    margin-bottom: var(--sp-6);
+  }
+
+  .vt__tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-2);
+    margin-bottom: var(--sp-5);
+  }
+
+  .vt__scene {
+    display: grid;
+    gap: var(--sp-3);
+  }
+
+  .vt__scene[hidden] {
+    display: none;
+  }
+
+  .vt__hint {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+    font-size: var(--fs-sm);
+    color: var(--ink-2);
+  }
+
+  @media (max-width: 520px) {
+    .player__bar {
+      display: none;
+    }
+    .player__btn {
+      width: 4rem;
+      height: 4rem;
+    }
+  }
+</style>
