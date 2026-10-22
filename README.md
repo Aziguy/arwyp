@@ -38,10 +38,12 @@ The [comparison page](https://aziguy.github.io/arwyp/compare/) shows both scopes
 | `/specialists/`, `/specialists/[slug]/` | Find a Specialist, specialist profiles |
 | `/medical-tourism/` | Medical Tourism & Travel Clinic |
 | `/news/`, `/news/[slug]/`, `/news/3d-tour/` | Media & News |
-| `/careers/`, `/training/`, `/contact/` | Careers, Training Institute, Contact Us |
+| `/careers/`, `/careers/[ref]/` | Careers, one page per vacancy |
+| `/training/`, `/contact/` | Training Institute, Contact Us |
 | `/gp-referral/` | GP Referral Portal (Quote B) |
 | `/legal/[slug]/` | Privacy, Terms, POPIA, PAIA, Cookies |
 | `/compare/` | Quote A vs Quote B |
+| `/sitemap.xml`, `/robots.txt`, `/llms.txt` | Generated at build time |
 
 ### Back-office and portals
 
@@ -57,11 +59,42 @@ The [comparison page](https://aziguy.github.io/arwyp/compare/) shows both scopes
 
 Sign-in screens accept any input: they are demonstrations, not authentication.
 
+## Listings: filters, sorting and pagination
+
+The specialists directory, news, careers and services share one listing engine (`src/scripts/listing/`):
+
+- Facets as chips, selects or toggles, combined with free-text search (accent-insensitive)
+- Sorting (for example surname, discipline, closing date; rating and soonest availability in Quote B)
+- Numbered pagination with a compact mobile pager and a live "Showing x-y of z" summary
+- Removable active-filter chips and a single "Clear all"
+- State kept in the URL (`?discipline=cardiology&letter=M&sort=name:asc&page=2`), so every result set is shareable and survives reloads
+
+All items are rendered in the HTML, so the content stays crawlable without JavaScript. Back-office tables add column sorting, a rows-per-page selector (10, 25, 50) and the same numbered pager.
+
+Markup contract: a `[data-listing]` root with an optional `data-page-size`, items marked `[data-item]` carrying `data-<facet>` values (pipe separated) and `data-sort-<key>` values, and controls marked `data-facet`, `data-facet-select`, `data-facet-check`, `data-search` and `data-sort`.
+
+## SEO
+
+- Unique title and meta description per page (descriptions capped at 160 characters), canonical URL, `hreflang` en-ZA
+- Open Graph and Twitter cards with a 1200 x 630 share image (`public/og/default.png`)
+- JSON-LD: `Hospital` / `MedicalOrganization` (address, geo, opening hours, emergency contact), `WebSite` with `SearchAction`, `BreadcrumbList` on every page with a breadcrumb, `Physician` per specialist, `MedicalClinic` per department, `NewsArticle`, `JobPosting` per vacancy, `Course` list, `MedicalWebPage` and `ItemList` for directories
+- Quote B-only structured data (specialist FAQ) is emitted only while Quote B content is shown
+- `sitemap.xml` with priorities and last-modified dates, `robots.txt` and an `llms.txt` summary for AI assistants, all generated from `src/lib/routes.ts`
+- Back-office, portals, offline and 404 pages are always `noindex`
+
+**Indexing is disabled for this demo.** Every page carries `noindex` and `robots.txt` disallows crawling. For the production site, build with:
+
+```bash
+PUBLIC_SEO_INDEX=true npm run build
+```
+
+This switches public pages to `index, follow` and opens `robots.txt`, keeping `/admin/`, `/doctor/`, `/portal/` and `/offline/` disallowed. On GitHub Pages the project lives under `/arwyp/`, so search engines read `robots.txt` only once the site is served from a domain root.
+
 ## Tech stack
 
 - [Astro 6](https://astro.build) static output, zero client framework
 - TypeScript, scoped component styles and a small global design system (CSS custom properties)
-- Vanilla client scripts (navigation, filters, booking flow, charts, data tables)
+- Vanilla client scripts (navigation, listing engine, booking flow, charts, data tables)
 - [Lucide](https://lucide.dev) icons inlined at build time, self-hosted Plus Jakarta Sans and Cormorant Garamond
 - PWA: web manifest and service worker, enabled in Quote B mode only
 - GitHub Actions deployment to GitHub Pages
@@ -70,16 +103,16 @@ Sign-in screens accept any input: they are demonstrations, not authentication.
 
 ```
 src/
-  config/       site settings, navigation, quote definitions and feature matrix
+  config/       site settings, navigation, SEO flags, quote definitions and feature matrix
   data/         fictitious content (specialists, departments, news, vacancies...)
   data/app/     fictitious back-office records
-  lib/          helpers (base-aware URLs, formatting, seeded random, JSON-LD)
+  lib/          helpers (base-aware URLs, formatting, seeded random, JSON-LD, route registry)
   styles/       tokens, reset, base, utilities, shared components
   layouts/      Base, Site, Patient and App layouts
-  components/   ui/, site/, sections/, specialists/, app/
-  scripts/      client modules (quote switch, PWA, navigation, filters, forms)
+  components/   ui/, site/, seo/, listing/, sections/, specialists/, app/
+  scripts/      client modules (quote switch, PWA, navigation, listing/, tables, forms)
   pages/        file-based routes
-public/         favicon, PWA icons, manifest, service worker, robots.txt
+public/         favicon, PWA icons, share image, manifest, service worker
 ```
 
 Quote-specific UI relies on two utility classes driven by `html[data-quote]`: `.only-a` and `.only-b`. Whole Quote B modules are wrapped in `QuoteGate`, which shows an explanatory panel in Quote A mode.
