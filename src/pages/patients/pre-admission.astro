@@ -1,0 +1,172 @@
+---
+import PatientLayout from '@/layouts/PatientLayout.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { admissionChecklist } from '@/data/patients';
+import { specialists } from '@/data/specialists';
+
+const aids = ['Discovery Health', 'Bonitas', 'Momentum Health', 'Medshield', 'Bestmed', 'GEMS', 'Fedhealth', 'Polmed', 'Private / self-pay'];
+---
+
+<PatientLayout
+  slug="pre-admission"
+  title="Getting ready <span class='serif'>for your stay</span>"
+  subtitle="Complete your pre-admission before you arrive to save time at check-in. You will be asked to sign an admission contract on arrival at the hospital."
+>
+  <section class="bring">
+    <h2>What to bring</h2>
+    <ul class="bring__list" role="list">
+      {
+        admissionChecklist.map((item) => (
+          <li>
+            <Icon name="file-check" size={18} /> {item}
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <section id="form" class="pa">
+    <header class="pa__head">
+      <h2>Pre-Admission Form</h2>
+      <p class="muted only-a">Your details are sent securely to our admissions team, who will confirm by phone or email.</p>
+      <p class="muted only-b">Saved to your patient portal. Medical aid eligibility is verified in real time. <span class="tag-b"></span></p>
+    </header>
+
+    <form class="form" data-demo-form>
+      <fieldset class="pa__group">
+        <legend>Patient details</legend>
+        <div class="form-row">
+          <div class="field"><label for="pa-first">First name</label><input id="pa-first" class="input" required autocomplete="given-name" /></div>
+          <div class="field"><label for="pa-last">Surname</label><input id="pa-last" class="input" required autocomplete="family-name" /></div>
+        </div>
+        <div class="form-row">
+          <div class="field"><label for="pa-id">ID / passport number</label><input id="pa-id" class="input" required inputmode="numeric" /></div>
+          <div class="field"><label for="pa-dob">Date of birth</label><input id="pa-dob" class="input" type="date" required /></div>
+        </div>
+        <div class="form-row">
+          <div class="field"><label for="pa-phone">Mobile</label><input id="pa-phone" class="input" type="tel" required placeholder="+27" /></div>
+          <div class="field"><label for="pa-email">Email</label><input id="pa-email" class="input" type="email" required /></div>
+        </div>
+      </fieldset>
+
+      <fieldset class="pa__group">
+        <legend>Admission</legend>
+        <div class="form-row">
+          <div class="field">
+            <label for="pa-doc">Admitting doctor</label>
+            <select id="pa-doc" class="select" required>
+              <option value="">Select a specialist</option>
+              {specialists.map((s) => <option>{s.name} ({s.discipline})</option>)}
+            </select>
+          </div>
+          <div class="field"><label for="pa-date">Admission date</label><input id="pa-date" class="input" type="date" required /></div>
+        </div>
+        <div class="field"><label for="pa-proc">Procedure (if known)</label><input id="pa-proc" class="input" placeholder="e.g. knee arthroscopy" /></div>
+      </fieldset>
+
+      <fieldset class="pa__group">
+        <legend>Medical aid</legend>
+        <div class="form-row">
+          <div class="field">
+            <label for="pa-aid">Scheme</label>
+            <select id="pa-aid" class="select" required>
+              {aids.map((a) => <option>{a}</option>)}
+            </select>
+          </div>
+          <div class="field"><label for="pa-num">Membership number</label><input id="pa-num" class="input" /></div>
+        </div>
+        <div class="form-row">
+          <div class="field"><label for="pa-main">Main member ID</label><input id="pa-main" class="input" /></div>
+          <div class="field"><label for="pa-auth">Authorisation number</label><input id="pa-auth" class="input" /></div>
+        </div>
+        <div class="field">
+          <label for="pa-docs">Upload documents</label>
+          <input id="pa-docs" class="input" type="file" multiple accept=".pdf,.jpg,.png" />
+          <span class="field-hint">Medical aid card, ID, referral letter. PDF, JPG or PNG, max 10 MB each.</span>
+        </div>
+      </fieldset>
+
+      <label class="check consent">
+        <input type="checkbox" required />
+        <span>
+          I consent to Arwyp Medical Centre processing my personal and health information for admission purposes, in line with the Protection of Personal
+          Information Act (POPIA). I understand I will sign an admission contract on arrival.
+        </span>
+      </label>
+      <button type="submit" class="btn btn--accent btn--lg"><Icon name="send" /> Submit pre-admission</button>
+      <p class="form-success" tabindex="-1">
+        <Icon name="circle-check" />
+        <span>Demo: pre-admission received. Reference <strong>PA-2026-10418</strong>. Our admissions team will contact you within one business day.</span>
+      </p>
+    </form>
+  </section>
+</PatientLayout>
+
+<style>
+  .bring__list {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--sp-3);
+    margin: var(--sp-5) 0 0;
+  }
+
+  .bring__list li {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3);
+    padding: var(--sp-4);
+    border-radius: var(--radius-md);
+    background: var(--surface-2);
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    color: var(--navy-900);
+  }
+
+  .bring__list :global(svg) {
+    flex: none;
+    color: var(--teal-700);
+  }
+
+  .pa {
+    padding: clamp(1.25rem, 0.5rem + 3vw, 2.5rem);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-md), 0 0 0 1px var(--line);
+  }
+
+  .pa__head {
+    display: grid;
+    gap: var(--sp-2);
+    margin-bottom: var(--sp-6);
+  }
+
+  .pa__group {
+    display: grid;
+    gap: var(--sp-4);
+    margin: 0;
+    padding: 0 0 var(--sp-6);
+    border: 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .pa__group legend {
+    margin-bottom: var(--sp-4);
+    font-weight: 700;
+    color: var(--navy-900);
+  }
+
+  .form .btn {
+    justify-self: start;
+  }
+
+  @media (max-width: 860px) {
+    .bring__list {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .bring__list {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

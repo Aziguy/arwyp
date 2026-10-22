@@ -1,0 +1,169 @@
+---
+import PatientLayout from '@/layouts/PatientLayout.astro';
+import Icon from '@/components/ui/Icon.astro';
+import Visual from '@/components/ui/Visual.astro';
+import { url } from '@/lib/paths';
+---
+
+<PatientLayout
+  slug="maternity"
+  title="Maternity <span class='serif'>Unit</span>"
+  subtitle="Bringing a new life into the world is a special journey, and our Maternity Unit is designed to make every step as comfortable, safe, and memorable as possible."
+>
+  <section class="mat">
+    <div class="stack" style="--stack: var(--sp-4)">
+      <p class="lead">
+        From pregnancy through delivery and postnatal care, our experienced multidisciplinary team provides compassionate, personalised support for both mother
+        and baby.
+      </p>
+      <p>
+        To ensure your little one gets the best possible start, our Baby Clinic (Babyshooze) offers newborn immunisations, clinic card registration, and ongoing
+        guidance for new parents. We also proudly offer Doula Services, providing continuous emotional, physical, and informational support before, during, and
+        after childbirth.
+      </p>
+      <div class="cluster">
+        <a class="btn btn--outline" href="#"><Icon name="file-down" /> What to bring (brochure)</a>
+        <a class="btn btn--ghost" href={url('/news/3d-tour/')}><Icon name="box" /> 3D maternity tour</a>
+      </div>
+    </div>
+    <Visual icon="baby" tone="sky" ratio="4 / 3" label="Maternity ward photography" />
+  </section>
+
+  <section class="sub" id="babyshooze">
+    <header>
+      <span class="sub__icon"><Icon name="syringe" size={22} /></span>
+      <div>
+        <p class="eyebrow">Sub category</p>
+        <h2>Babyshooze: Baby Clinic</h2>
+      </div>
+    </header>
+    <p>
+      Welcoming a new baby is one of life's most precious moments, and we are here to support you every step of the way. Our Baby Clinic provides essential
+      newborn immunisations, clinic card registration, and expert guidance to help give your baby the healthiest start in life.
+    </p>
+    <p>
+      A dedicated Babyshooze clinic sister is available Monday to Friday to administer your baby's first vaccinations, including BCG (Tuberculosis) and OPV
+      (Polio). Parents can also receive advice on newborn care, immunisation schedules, and early childhood health.
+    </p>
+    <dl class="info">
+      <div><dt><Icon name="clock" size={16} /> Clinic hours</dt><dd>Monday to Friday, 09h00 - 13h00<br /><small>Closed weekends and public holidays</small></dd></div>
+      <div><dt><Icon name="receipt" size={16} /> Baby Clinic fee</dt><dd>R150<br /><small>Includes your baby's clinic card</small></dd></div>
+      <div><dt><Icon name="phone" size={16} /> Contact</dt><dd>011 922 1000 (ext. 4551)</dd></div>
+    </dl>
+  </section>
+
+  <section class="sub" id="doula">
+    <header>
+      <span class="sub__icon"><Icon name="heart-handshake" size={22} /></span>
+      <div>
+        <p class="eyebrow">Sub category</p>
+        <h2>Doula Services by Womb</h2>
+      </div>
+    </header>
+    <p>
+      Birth support that stays with you, not just the schedule. Through our partnership with Womb, expecting mothers can access professional doula support:
+      continuous, personalised care before, during, and after labour, alongside our clinical maternity team.
+    </p>
+    <ul class="list-check">
+      <li>Emotional and physical support throughout labour and delivery</li>
+      <li>A calm, informed presence alongside your medical team</li>
+      <li>Antenatal and postnatal support options</li>
+    </ul>
+    <p class="quote">
+      A doula doesn't replace your medical team but works alongside them, focused entirely on you and how you are coping, so your midwife and obstetrician can
+      focus on the clinical side of your birth.
+    </p>
+    <dl class="info">
+      <div><dt><Icon name="clock" size={16} /> Operating</dt><dd>08h00 - 17h00, Monday to Friday</dd></div>
+      <div><dt><Icon name="user-round" size={16} /> Contact</dt><dd>Womb Doula Coordinator<br /><small>082 000 4801</small></dd></div>
+    </dl>
+  </section>
+</PatientLayout>
+
+<style>
+  .mat {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+    gap: var(--sp-8);
+    align-items: center;
+    color: var(--ink-2);
+  }
+
+  .sub {
+    display: grid;
+    gap: var(--sp-4);
+    padding: clamp(1.25rem, 0.5rem + 3vw, 2.5rem);
+    border-radius: var(--radius-xl);
+    background: var(--surface-2);
+    color: var(--ink-2);
+  }
+
+  .sub header {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-4);
+    margin-bottom: var(--sp-2);
+  }
+
+  .sub__icon {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 3rem;
+    height: 3rem;
+    border-radius: var(--radius-md);
+    background: var(--navy-800);
+    color: var(--teal-400);
+  }
+
+  .quote {
+    padding-left: var(--sp-5);
+    border-left: 3px solid var(--teal-500);
+    font-style: italic;
+  }
+
+  .info {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--sp-3);
+    margin: var(--sp-2) 0 0;
+  }
+
+  .info div {
+    padding: var(--sp-4);
+    border-radius: var(--radius-md);
+    background: var(--surface);
+    box-shadow: 0 0 0 1px var(--line);
+  }
+
+  .info dt {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+    font-size: var(--fs-xs);
+    font-weight: 700;
+    color: var(--ink-3);
+  }
+
+  .info dt :global(svg) {
+    color: var(--teal-700);
+  }
+
+  .info dd {
+    margin: var(--sp-1) 0 0;
+    font-weight: 650;
+    color: var(--navy-900);
+    font-size: var(--fs-sm);
+  }
+
+  .info small {
+    font-weight: 500;
+    color: var(--ink-3);
+  }
+
+  @media (max-width: 1100px) {
+    .mat {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

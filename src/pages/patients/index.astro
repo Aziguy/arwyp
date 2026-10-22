@@ -1,0 +1,170 @@
+---
+import SiteLayout from '@/layouts/SiteLayout.astro';
+import PageHero from '@/components/ui/PageHero.astro';
+import SectionHeader from '@/components/ui/SectionHeader.astro';
+import FeatureCard from '@/components/ui/FeatureCard.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { patientTopics, admissionChecklist, visitingHours } from '@/data/patients';
+import { url } from '@/lib/paths';
+
+const summaries: Record<string, string[]> = {
+  'visiting-hours': visitingHours.map((v) => `${v.ward}: ${v.hours}`),
+  'pre-admission': admissionChecklist.slice(0, 4),
+  'rights-charter': ['Access to healthcare, including emergency care', 'Confidentiality and privacy', 'Informed consent', 'The right to complain'],
+  amenities: ['Coffee Shop: 06h00 - 21h00', 'Gift Shop: 08h00 - 20h00', 'Retail Pharmacy: 06h00 - 22h00'],
+  maternity: ['Maternity Unit', 'Babyshooze Baby Clinic', 'Doula Services by Womb'],
+  experience: ['Two-minute survey', 'Anonymous option', 'Read by our patient experience team'],
+};
+---
+
+<SiteLayout title="Patient Information" description="Everything you need for a smoother stay.">
+  <PageHero
+    eyebrow="Patient Information"
+    title="Everything you need for a <span class='serif'>smoother stay.</span>"
+    subtitle="Whether you are a patient, a visiting family member, or preparing for admission, this is your one-stop guide to Arwyp, from visiting hours to the small comforts that make a hospital stay feel a little easier."
+    crumbs={[{ label: 'Patient Information' }]}
+  >
+    <div slot="actions" class="cluster">
+      <a class="btn btn--accent" href={url('/patients/pre-admission/')}><Icon name="clipboard-check" /> Start Your Pre-Admission</a>
+      <a class="btn btn--outline" href={url('/patients/visiting-hours/')}><Icon name="clock" /> Visiting Hours</a>
+    </div>
+  </PageHero>
+
+  <section class="section">
+    <div class="container hub">
+      <div>
+        <SectionHeader eyebrow="Your guide" title="Find what you need" />
+        <div class="hub__list">
+          {
+            patientTopics.map((t, i) => (
+              <details class="faq" open={i === 0}>
+                <summary>
+                  <span class="hub__sum">
+                    <span class="hub__icon">
+                      <Icon name={t.icon} size={20} />
+                    </span>
+                    {t.title}
+                  </span>
+                  <Icon name="plus" size={18} />
+                </summary>
+                <div class="hub__body">
+                  <p>{t.text}</p>
+                  <ul class="list-check">
+                    {summaries[t.slug].map((s) => (
+                      <li>{s}</li>
+                    ))}
+                  </ul>
+                  <a class="link-arrow" href={url(`/patients/${t.slug}/`)}>
+                    Read more <Icon name="arrow-right" />
+                  </a>
+                </div>
+              </details>
+            ))
+          }
+        </div>
+      </div>
+      <aside class="hub__aside">
+        <div class="ready">
+          <p class="eyebrow">Getting ready for your stay</p>
+          <h2>Pre-admission in minutes</h2>
+          <ul class="list-check">
+            <li>Pre-Admission Form: complete before you arrive to save time at check-in</li>
+            <li>What to bring: medical aid card, ID, main member ID, doctor's referral letter, proof of medical aid, and authorisation</li>
+            <li>You will be asked to sign an admission contract on arrival at the hospital</li>
+          </ul>
+          <a class="btn btn--accent btn--block" href={url('/patients/pre-admission/')}>Start Your Pre-Admission <Icon name="arrow-right" /></a>
+        </div>
+        <div class="only-b">
+          <FeatureCard icon="smartphone" title="Manage it all in the patient portal" text="Appointments, results, invoices and secure messages, installable on your phone." href="/portal/" cta="Open portal" quote="b" />
+        </div>
+      </aside>
+    </div>
+  </section>
+</SiteLayout>
+
+<style>
+  .hub {
+    display: grid;
+    grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+    gap: clamp(2rem, 1rem + 4vw, 4.5rem);
+    align-items: start;
+  }
+
+  .hub__sum {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3);
+  }
+
+  .hub__icon {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: var(--radius-md);
+    background: var(--teal-50);
+    color: var(--teal-700);
+  }
+
+  .hub__body {
+    display: grid;
+    gap: var(--sp-4);
+    padding: 0 var(--sp-5) var(--sp-5) calc(var(--sp-5) + 2.5rem + var(--sp-3));
+    color: var(--ink-2);
+    font-size: var(--fs-sm);
+  }
+
+  .hub__body p {
+    padding: 0;
+  }
+
+  .hub__aside {
+    position: sticky;
+    top: calc(var(--header-h) + var(--sp-6));
+    display: grid;
+    gap: var(--sp-5);
+  }
+
+  .ready {
+    display: grid;
+    gap: var(--sp-4);
+    padding: var(--sp-8);
+    border-radius: var(--radius-xl);
+    background: var(--navy-900);
+    color: rgb(255 255 255 / 0.8);
+    font-size: var(--fs-sm);
+  }
+
+  .ready h2 {
+    color: #fff;
+    font-size: var(--fs-xl);
+  }
+
+  .ready .eyebrow {
+    color: var(--teal-400);
+  }
+
+  .ready .list-check li::before {
+    background-color: rgb(0 216 206 / 0.14);
+    box-shadow: inset 0 0 0 1px rgb(0 216 206 / 0.3);
+  }
+
+  @media (max-width: 960px) {
+    .hub {
+      grid-template-columns: 1fr;
+    }
+    .hub__aside {
+      position: static;
+    }
+  }
+
+  @media (max-width: 520px) {
+    .hub__body {
+      padding-left: var(--sp-5);
+    }
+    .ready {
+      padding: var(--sp-6);
+    }
+  }
+</style>

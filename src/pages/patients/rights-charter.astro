@@ -1,0 +1,128 @@
+---
+import PatientLayout from '@/layouts/PatientLayout.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { rightsCharter } from '@/data/patients';
+import { url } from '@/lib/paths';
+---
+
+<PatientLayout
+  slug="rights-charter"
+  title="Patients' Rights <span class='serif'>Charter</span>"
+  subtitle="Every patient at Arwyp has rights, and shared responsibilities, aligned with the National Patients' Rights Charter of South Africa."
+>
+  <p class="draft"><Icon name="info" size={16} /> Placeholder content: final charter text to be supplied by Arwyp.</p>
+
+  <section>
+    <h2>Your rights</h2>
+    <ol class="rights" role="list">
+      {
+        rightsCharter.rights.map((r, i) => (
+          <li>
+            <span>{String(i + 1).padStart(2, '0')}</span>
+            {r}
+          </li>
+        ))
+      }
+    </ol>
+  </section>
+
+  <section>
+    <h2>Your responsibilities</h2>
+    <ul class="list-check resp">
+      {rightsCharter.responsibilities.map((r) => <li>{r}</li>)}
+    </ul>
+  </section>
+
+  <section class="complain">
+    <Icon name="message-square-warning" size={26} />
+    <div>
+      <h2>Raising a concern</h2>
+      <p>Speak to the unit manager first. If unresolved, contact our Patient Experience office or complete the Patient Experience Survey.</p>
+    </div>
+    <a class="btn btn--outline" href={url('/patients/experience/')}>Give feedback</a>
+  </section>
+</PatientLayout>
+
+<style>
+  .draft {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-2);
+    justify-self: start;
+    padding: 0.4rem 0.8rem;
+    border-radius: var(--radius-pill);
+    background: var(--surface-3);
+    font-size: var(--fs-xs);
+    font-weight: 600;
+    color: var(--ink-2);
+  }
+
+  .rights {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--sp-3);
+    margin: var(--sp-5) 0 0;
+  }
+
+  .rights li {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-4);
+    padding: var(--sp-4);
+    border-radius: var(--radius-md);
+    box-shadow: 0 0 0 1px var(--line);
+    font-weight: 600;
+    font-size: var(--fs-sm);
+    color: var(--navy-900);
+  }
+
+  .rights span {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 50%;
+    background: var(--navy-800);
+    color: var(--teal-400);
+    font-size: var(--fs-xs);
+    font-weight: 800;
+  }
+
+  .resp {
+    margin-top: var(--sp-5);
+  }
+
+  .complain {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sp-5);
+    padding: var(--sp-6);
+    border-radius: var(--radius-lg);
+    background: var(--teal-50);
+  }
+
+  .complain > :global(svg) {
+    color: var(--teal-700);
+  }
+
+  .complain div {
+    flex: 1 1 280px;
+  }
+
+  :global(.pl__content) .complain h2 {
+    font-size: var(--fs-lg);
+  }
+
+  .complain p {
+    font-size: var(--fs-sm);
+    color: var(--ink-2);
+  }
+
+  @media (max-width: 640px) {
+    .rights {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

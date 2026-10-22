@@ -1,0 +1,154 @@
+---
+import PatientLayout from '@/layouts/PatientLayout.astro';
+import Icon from '@/components/ui/Icon.astro';
+import Visual from '@/components/ui/Visual.astro';
+import { amenities } from '@/data/patients';
+
+const tones = ['sand', 'rose', 'teal'] as const;
+---
+
+<PatientLayout
+  slug="amenities"
+  title="Coffee Shop, Gift Shop <span class='serif'>& Pharmacy</span>"
+  subtitle="Good hospital stays are made up of small comforts too. Our on-site amenities mean visitors and patients don't have to leave the building for the everyday essentials or a thoughtful gesture."
+>
+  {
+    amenities.map((a, i) => (
+      <article class="am" id={a.id}>
+        <Visual icon={a.icon} tone={tones[i]} ratio="16 / 9" label={`${a.brand} photography`} />
+        <div class="am__body">
+          <p class="eyebrow">{a.brand}</p>
+          <h2>{a.name}</h2>
+          <p>{a.text}</p>
+          <ul class="am__items" role="list">
+            {a.items.map((it) => (
+              <li>{it}</li>
+            ))}
+          </ul>
+          <div class="am__grid">
+            <div>
+              <p class="am__label">
+                <Icon name="clock" size={16} /> Operating hours
+              </p>
+              {a.hours.map((h) => (
+                <p>{h}</p>
+              ))}
+            </div>
+            <div>
+              <p class="am__label">
+                <Icon name="user-round" size={16} /> Contact: {a.contact.person}
+              </p>
+              <p>
+                <a href={`mailto:${a.contact.email}`}>{a.contact.email}</a>
+              </p>
+              <p>{a.contact.phone}</p>
+            </div>
+          </div>
+          <p class="am__pay">
+            <Icon name="landmark" size={16} />
+            <span class="only-a">Payments via EFT immediate payment. Items will only be sent once money is reflected in the bank. Banking details are provided with your order.</span>
+            <span class="only-b">Pay online with card, Instant EFT or SnapScan. Ward delivery is confirmed by SMS.</span>
+          </p>
+          <div class="cluster">
+            <a class="btn btn--outline only-a" href={`mailto:${a.contact.email}`}>
+              <Icon name="mail" /> {a.cta}
+            </a>
+            <button type="button" class="btn btn--accent only-b">
+              <Icon name="shopping-bag" /> {a.cta} online
+            </button>
+            {a.id === 'gift-shop' && (
+              <a class="btn btn--ghost" href="https://www.instagram.com/" target="_blank" rel="noopener">
+                <Icon name="instagram" /> Instagram
+              </a>
+            )}
+          </div>
+        </div>
+      </article>
+    ))
+  }
+</PatientLayout>
+
+<style>
+  .am {
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    gap: var(--sp-8);
+    align-items: start;
+    padding-bottom: var(--sp-12);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .am:last-child {
+    border-bottom: 0;
+    padding-bottom: 0;
+  }
+
+  .am__body {
+    display: grid;
+    gap: var(--sp-4);
+    color: var(--ink-2);
+  }
+
+  .am__items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-2);
+    margin: 0;
+  }
+
+  .am__items li {
+    padding: 0.3rem 0.75rem;
+    border-radius: var(--radius-pill);
+    background: var(--surface-2);
+    font-size: var(--fs-xs);
+    font-weight: 600;
+    color: var(--navy-900);
+  }
+
+  .am__grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--sp-5);
+    padding: var(--sp-5);
+    border-radius: var(--radius-md);
+    box-shadow: 0 0 0 1px var(--line);
+    font-size: var(--fs-sm);
+  }
+
+  .am__label {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+    margin-bottom: var(--sp-1);
+    font-weight: 700;
+    color: var(--navy-900);
+  }
+
+  .am__label :global(svg) {
+    color: var(--teal-700);
+  }
+
+  .am__pay {
+    display: flex;
+    gap: var(--sp-2);
+    font-size: var(--fs-xs);
+    color: var(--ink-3);
+  }
+
+  .am__pay :global(svg) {
+    flex: none;
+    margin-top: 2px;
+  }
+
+  @media (max-width: 1100px) {
+    .am {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 520px) {
+    .am__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

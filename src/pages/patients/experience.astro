@@ -1,0 +1,174 @@
+---
+import PatientLayout from '@/layouts/PatientLayout.astro';
+import Icon from '@/components/ui/Icon.astro';
+
+const areas = ['Admissions', 'Nursing care', 'Doctors', 'Cleanliness', 'Food', 'Discharge'];
+---
+
+<PatientLayout
+  slug="experience"
+  title="Patient Experience <span class='serif'>Survey</span>"
+  subtitle="Tell us how we did. Every response is read by our Patient Experience team and shared with the unit that cared for you."
+>
+  <form class="survey form" data-demo-form>
+    <div class="form-row">
+      <div class="field">
+        <label for="sv-ward">Ward or department</label>
+        <select id="sv-ward" class="select">
+          <option>General Wards</option>
+          <option>Maternity Unit</option>
+          <option>ICU / High Care</option>
+          <option>Paediatric Ward</option>
+          <option>Emergency Department</option>
+          <option>Day Surgery</option>
+        </select>
+      </div>
+      <div class="field"><label for="sv-date">Date of discharge</label><input id="sv-date" type="date" class="input" /></div>
+    </div>
+
+    <fieldset class="rate">
+      <legend class="field-label">How would you rate each area?</legend>
+      {
+        areas.map((a) => (
+          <div class="rate__row">
+            <span>{a}</span>
+            <div class="rate__stars" role="radiogroup" aria-label={a}>
+              {[1, 2, 3, 4, 5].map((n) => (
+                <label>
+                  <input type="radio" name={a} value={n} class="sr-only" />
+                  <Icon name="star" size={22} />
+                  <span class="sr-only">{n} stars</span>
+                </label>
+              ))}
+            </div>
+          </div>
+        ))
+      }
+    </fieldset>
+
+    <div class="field">
+      <label for="sv-nps">How likely are you to recommend Arwyp to friends or family?</label>
+      <div class="nps" id="sv-nps">
+        {
+          Array.from({ length: 11 }, (_, n) => (
+            <label>
+              <input type="radio" name="nps" value={n} class="sr-only" />
+              <span>{n}</span>
+            </label>
+          ))
+        }
+      </div>
+    </div>
+
+    <div class="field"><label for="sv-msg">Anything else you'd like to share?</label><textarea id="sv-msg" class="textarea"></textarea></div>
+    <label class="check"><input type="checkbox" /> <span>Submit anonymously</span></label>
+    <button class="btn btn--accent btn--lg" type="submit"><Icon name="send" /> Submit feedback</button>
+    <p class="form-success" tabindex="-1"><Icon name="circle-check" /> Thank you. Your feedback has been shared with our Patient Experience team.</p>
+  </form>
+</PatientLayout>
+
+<script>
+  document.querySelectorAll<HTMLElement>('.rate__stars').forEach((group) => {
+    const labels = [...group.querySelectorAll('label')];
+    group.addEventListener('change', (e) => {
+      const value = Number((e.target as HTMLInputElement).value);
+      labels.forEach((l, i) => l.toggleAttribute('data-on', i < value));
+    });
+  });
+</script>
+
+<style>
+  .survey {
+    padding: clamp(1.25rem, 0.5rem + 3vw, 2.5rem);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-md), 0 0 0 1px var(--line);
+  }
+
+  .survey .btn {
+    justify-self: start;
+  }
+
+  .rate {
+    display: grid;
+    gap: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  .rate legend {
+    margin-bottom: var(--sp-3);
+  }
+
+  .rate__row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--sp-4);
+    padding: var(--sp-3) 0;
+    border-bottom: 1px solid var(--line);
+    font-size: var(--fs-sm);
+    font-weight: 600;
+  }
+
+  .rate__stars {
+    display: flex;
+    gap: 2px;
+  }
+
+  .rate__stars label {
+    display: grid;
+    place-items: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: var(--radius-sm);
+    color: var(--line-2);
+    cursor: pointer;
+  }
+
+  .rate__stars label:hover,
+  .rate__stars label[data-on] {
+    color: var(--amber-500);
+  }
+
+  .rate__stars label[data-on] :global(svg) {
+    fill: currentColor;
+  }
+
+  .rate__stars label:has(:focus-visible),
+  .nps label:has(:focus-visible) {
+    box-shadow: var(--ring);
+  }
+
+  .nps {
+    display: grid;
+    grid-template-columns: repeat(11, minmax(0, 1fr));
+    gap: 4px;
+  }
+
+  .nps span {
+    display: grid;
+    place-items: center;
+    height: 2.75rem;
+    border-radius: var(--radius-sm);
+    box-shadow: 0 0 0 1px var(--line-2);
+    font-weight: 700;
+    font-size: var(--fs-sm);
+    cursor: pointer;
+    transition: background-color var(--dur) var(--ease);
+  }
+
+  .nps span:hover {
+    background: var(--surface-2);
+  }
+
+  .nps input:checked + span {
+    background: var(--navy-800);
+    color: #fff;
+    box-shadow: none;
+  }
+
+  .nps label {
+    border-radius: var(--radius-sm);
+  }
+</style>

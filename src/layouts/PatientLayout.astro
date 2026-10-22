@@ -1,0 +1,54 @@
+---
+import SiteLayout from './SiteLayout.astro';
+import PageHero from '@/components/ui/PageHero.astro';
+import PatientNav from '@/components/sections/PatientNav.astro';
+import { patientTopics } from '@/data/patients';
+
+interface Props {
+  slug: string;
+  title: string;
+  subtitle: string;
+  eyebrow?: string;
+}
+
+const { slug, title, subtitle, eyebrow = 'Patient Information' } = Astro.props;
+const topic = patientTopics.find((t) => t.slug === slug);
+---
+
+<SiteLayout title={topic?.title ?? title} description={subtitle}>
+  <PageHero eyebrow={eyebrow} title={title} subtitle={subtitle} crumbs={[{ label: 'Patient Information', href: '/patients/' }, { label: topic?.title ?? title }]} />
+  <section class="section">
+    <div class="container pl">
+      <aside><PatientNav current={slug} /></aside>
+      <div class="pl__content">
+        <slot />
+      </div>
+    </div>
+  </section>
+  <slot name="after" />
+</SiteLayout>
+
+<style>
+  .pl {
+    display: grid;
+    grid-template-columns: 280px minmax(0, 1fr);
+    gap: clamp(2rem, 1rem + 3vw, 4rem);
+    align-items: start;
+  }
+
+  .pl__content {
+    display: grid;
+    gap: var(--sp-12);
+    min-width: 0;
+  }
+
+  .pl__content :global(h2) {
+    font-size: var(--fs-2xl);
+  }
+
+  @media (max-width: 960px) {
+    .pl {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

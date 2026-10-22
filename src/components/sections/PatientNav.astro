@@ -1,0 +1,113 @@
+---
+import Icon from '@/components/ui/Icon.astro';
+import { patientTopics } from '@/data/patients';
+import { url } from '@/lib/paths';
+
+interface Props {
+  current?: string;
+}
+
+const { current } = Astro.props;
+---
+
+<nav class="pnav" aria-label="Patient information">
+  <p class="pnav__title">Patient information</p>
+  <ul role="list">
+    <li>
+      <a href={url('/patients/')} aria-current={!current ? 'page' : undefined}><Icon name="layout-grid" size={18} /> Overview</a>
+    </li>
+    {
+      patientTopics.map((t) => (
+        <li>
+          <a href={url(`/patients/${t.slug}/`)} aria-current={current === t.slug ? 'page' : undefined}>
+            <Icon name={t.icon} size={18} /> {t.title}
+          </a>
+        </li>
+      ))
+    }
+    <li class="only-b">
+      <a href={url('/portal/')}><Icon name="smartphone" size={18} /> Patient portal <span class="tag-b"></span></a>
+    </li>
+  </ul>
+</nav>
+
+<style>
+  .pnav {
+    position: sticky;
+    top: calc(var(--header-h) + var(--sp-6));
+    padding: var(--sp-4);
+    border-radius: var(--radius-lg);
+    background: var(--surface-2);
+  }
+
+  .pnav__title {
+    padding: var(--sp-2) var(--sp-3) var(--sp-3);
+    font-size: var(--fs-xs);
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+
+  ul {
+    display: grid;
+    gap: 2px;
+    margin: 0;
+  }
+
+  a {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3);
+    padding: 0.6rem var(--sp-3);
+    border-radius: var(--radius-md);
+    color: var(--ink-2);
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    text-decoration: none;
+    line-height: 1.35;
+    transition: background-color var(--dur) var(--ease);
+  }
+
+  a :global(svg) {
+    flex: none;
+    color: var(--ink-3);
+  }
+
+  a:hover {
+    background: var(--surface);
+    color: var(--navy-900);
+  }
+
+  a[aria-current='page'] {
+    background: var(--surface);
+    color: var(--navy-900);
+    box-shadow: var(--shadow-xs), 0 0 0 1px var(--line);
+  }
+
+  a[aria-current='page'] :global(svg) {
+    color: var(--teal-700);
+  }
+
+  @media (max-width: 960px) {
+    .pnav {
+      position: static;
+      padding: 0;
+      background: none;
+    }
+    .pnav__title {
+      display: none;
+    }
+    ul {
+      display: flex;
+      gap: var(--sp-2);
+      overflow-x: auto;
+      padding-bottom: var(--sp-2);
+      scrollbar-width: none;
+    }
+    a {
+      white-space: nowrap;
+      box-shadow: 0 0 0 1px var(--line);
+    }
+  }
+</style>

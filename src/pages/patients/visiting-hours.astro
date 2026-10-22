@@ -1,0 +1,128 @@
+---
+import PatientLayout from '@/layouts/PatientLayout.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { visitingHours } from '@/data/patients';
+import { site } from '@/config/site';
+---
+
+<PatientLayout
+  slug="visiting-hours"
+  title="Visiting <span class='serif'>Hours</span>"
+  subtitle="We know that having loved ones nearby is part of healing. Our visiting hours are designed to give patients enough rest while still making space for the people who matter to them."
+>
+  <div class="notice">
+    <Icon name="shield-alert" size={22} />
+    <p>
+      To ensure the safety and well-being of our patients, visiting hours are strictly regulated. Due to infection control measures, <strong
+        >children under the age of 12 are not permitted in the wards.</strong
+      >
+    </p>
+  </div>
+
+  <div class="wards">
+    {
+      visitingHours.map((v) => (
+        <article class="ward">
+          <h2>{v.ward}</h2>
+          <p class="ward__hours">
+            <Icon name="clock" size={18} /> {v.hours}
+          </p>
+          <p class="ward__vis">
+            <Icon name="users" size={18} /> {v.visitors}
+          </p>
+          {v.note && (
+            <p class="ward__note">
+              <Icon name="moon" size={16} /> {v.note}
+            </p>
+          )}
+        </article>
+      ))
+    }
+  </div>
+
+  <p class="call">
+    <Icon name="phone" size={18} /> Always call the hospital or ward if you are unsure, especially outside standard hours:
+    <a href={site.phone.href}>{site.phone.display}</a>
+  </p>
+</PatientLayout>
+
+<style>
+  .notice {
+    display: flex;
+    gap: var(--sp-4);
+    padding: var(--sp-5) var(--sp-6);
+    border-radius: var(--radius-lg);
+    background: var(--amber-50);
+    color: #5c3f00;
+  }
+
+  .notice :global(svg) {
+    flex: none;
+    color: #a26d00;
+  }
+
+  .wards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--sp-5);
+  }
+
+  .ward {
+    display: grid;
+    gap: var(--sp-3);
+    align-content: start;
+    padding: var(--sp-6);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 0 0 1px var(--line);
+  }
+
+  :global(.pl__content) .ward h2 {
+    font-size: var(--fs-lg);
+  }
+
+  .ward p {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+    font-size: var(--fs-sm);
+    color: var(--ink-2);
+  }
+
+  .ward :global(svg) {
+    flex: none;
+    color: var(--teal-700);
+  }
+
+  .ward__hours {
+    font-size: var(--fs-xl) !important;
+    font-weight: 800;
+    color: var(--navy-900) !important;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .ward__note {
+    padding: var(--sp-2) var(--sp-3);
+    border-radius: var(--radius-sm);
+    background: var(--teal-50);
+    color: var(--teal-800) !important;
+    font-weight: 600;
+  }
+
+  .call {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sp-2);
+    color: var(--ink-2);
+  }
+
+  .call a {
+    font-weight: 700;
+  }
+
+  @media (max-width: 640px) {
+    .wards {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
