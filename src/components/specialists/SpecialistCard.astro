@@ -1,0 +1,186 @@
+---
+import Avatar from '@/components/ui/Avatar.astro';
+import Icon from '@/components/ui/Icon.astro';
+import type { Specialist } from '@/data/specialists';
+import { shortDate } from '@/lib/format';
+import { url } from '@/lib/paths';
+
+interface Props {
+  specialist: Specialist;
+  compact?: boolean;
+}
+
+const { specialist: s, compact = false } = Astro.props;
+const href = url(`/specialists/${s.slug}/`);
+---
+
+<article
+  class:list={['spc', { 'spc--compact': compact }]}
+  data-item
+  data-discipline={s.disciplineSlug}
+  data-letter={s.lastName.replace(/^(van der |du )/i, '')[0].toUpperCase()}
+  data-text={`${s.name} ${s.discipline} ${s.subSpecialty}`}
+>
+  <a class="spc__main" href={href}>
+    <Avatar name={s.name} size={compact ? 48 : 60} shape="rounded" />
+    <span class="spc__id">
+      <strong class="spc__name">{s.name}</strong>
+      <span class="spc__disc">{s.discipline}</span>
+      {!compact && <span class="spc__sub">{s.subSpecialty}</span>}
+    </span>
+  </a>
+
+  {
+    !compact && (
+      <dl class="spc__meta">
+        <div>
+          <dt>
+            <Icon name="map-pin" size={14} />
+            <span class="sr-only">Rooms</span>
+          </dt>
+          <dd>{s.rooms}</dd>
+        </div>
+        <div>
+          <dt>
+            <Icon name="id-card" size={14} />
+            <span class="sr-only">Practice number</span>
+          </dt>
+          <dd>Pr. No. {s.practiceNumber}</dd>
+        </div>
+      </dl>
+    )
+  }
+
+  <div class="spc__foot">
+    <a class="only-a spc__phone" href={`tel:+27119221000`}>
+      <Icon name="phone" size={15} /> {s.phone}
+    </a>
+    <span class="only-b spc__avail">
+      <span class="spc__rating"><Icon name="star" size={14} /> {s.rating.toFixed(1)}</span>
+      {s.accepting ? <span>Next: {shortDate(s.nextAvailable)}</span> : <span class="muted">Waitlist</span>}
+    </span>
+    <a class="only-b btn btn--accent btn--sm" href={`${href}#book`}>Book</a>
+  </div>
+</article>
+
+<style>
+  .spc {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-4);
+    height: 100%;
+    padding: var(--sp-5);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    box-shadow: 0 0 0 1px var(--line);
+    transition: box-shadow var(--dur) var(--ease);
+  }
+
+  .spc:hover {
+    box-shadow: var(--shadow-md), 0 0 0 1px var(--line-2);
+  }
+
+  .spc__main {
+    display: flex;
+    gap: var(--sp-4);
+    align-items: center;
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .spc__main:hover .spc__name {
+    color: var(--teal-700);
+  }
+
+  .spc__id {
+    display: grid;
+    gap: 1px;
+    min-width: 0;
+    line-height: 1.35;
+  }
+
+  .spc__name {
+    font-size: var(--fs-md);
+    color: var(--navy-900);
+    transition: color var(--dur) var(--ease);
+  }
+
+  .spc__disc {
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    color: var(--teal-700);
+  }
+
+  .spc__sub {
+    font-size: var(--fs-xs);
+    color: var(--ink-3);
+  }
+
+  .spc__meta {
+    display: grid;
+    gap: var(--sp-2);
+    margin: 0;
+    padding-top: var(--sp-4);
+    border-top: 1px solid var(--line);
+    font-size: var(--fs-xs);
+    color: var(--ink-2);
+  }
+
+  .spc__meta div {
+    display: flex;
+    gap: var(--sp-2);
+    align-items: center;
+  }
+
+  .spc__meta dt {
+    color: var(--ink-3);
+  }
+
+  .spc__meta dd {
+    margin: 0;
+  }
+
+  .spc__foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sp-3);
+    margin-top: auto;
+  }
+
+  .spc__phone {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-2);
+    font-size: var(--fs-xs);
+    font-weight: 650;
+    text-decoration: none;
+  }
+
+  .spc__avail {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-1) var(--sp-3);
+    align-items: center;
+    font-size: var(--fs-xs);
+    font-weight: 600;
+    color: var(--ink-2);
+  }
+
+  .spc__rating {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    color: var(--navy-900);
+  }
+
+  .spc__rating :global(svg) {
+    color: var(--amber-500);
+    fill: currentColor;
+  }
+
+  .spc--compact {
+    padding: var(--sp-4);
+    gap: var(--sp-3);
+  }
+</style>

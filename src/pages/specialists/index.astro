@@ -1,0 +1,282 @@
+---
+import SiteLayout from '@/layouts/SiteLayout.astro';
+import Breadcrumbs from '@/components/ui/Breadcrumbs.astro';
+import Icon from '@/components/ui/Icon.astro';
+import EmptyResults from '@/components/ui/EmptyResults.astro';
+import SpecialistCard from '@/components/specialists/SpecialistCard.astro';
+import { disciplines } from '@/data/disciplines';
+import { specialists } from '@/data/specialists';
+import { url } from '@/lib/paths';
+
+const letters = [...new Set(disciplines.map((d) => d.letter))];
+const countFor = (slug: string) => specialists.filter((s) => s.disciplineSlug === slug).length;
+---
+
+<SiteLayout title="Find a Specialist" description="The right specialist, faster. Search 100+ specialists by name or discipline.">
+  <div data-filter>
+    <section class="fs-hero">
+      <div class="container fs-hero__inner">
+        <Breadcrumbs items={[{ label: 'Find a Specialist' }]} tone="dark" />
+        <p class="eyebrow">Find a Specialist</p>
+        <h1>The right specialist, <span class="serif">faster.</span></h1>
+        <p class="fs-hero__sub">
+          We have a wide range of medical professionals ready to assist you. Search by name, or browse by discipline, to find a specialist practising at Arwyp
+          Medical Centre.
+        </p>
+        <div class="fs-search">
+          <label class="search-field search-field--lg">
+            <Icon name="search" size={20} />
+            <span class="sr-only">Search by doctor name or speciality</span>
+            <input class="input" type="search" name="q" placeholder="Search by doctor name or speciality..." data-search autocomplete="off" />
+          </label>
+          <label class="fs-select">
+            <span class="sr-only">Discipline</span>
+            <select class="select" data-facet-select="discipline" name="discipline">
+              <option value="">All disciplines</option>
+              {disciplines.map((d) => <option value={d.slug}>{d.name}</option>)}
+            </select>
+          </label>
+        </div>
+        <p class="fs-hero__hint">
+          <span class="only-a">Each profile lists the rooms' direct booking number.</span>
+          <span class="only-b"><Icon name="calendar-check" size={16} /> Book and pay online, 24/7, with real-time availability.</span>
+        </p>
+      </div>
+    </section>
+
+    <section class="section" id="results" aria-labelledby="results-title">
+      <div class="container">
+        <div class="filterbar">
+          <div>
+            <h2 class="filterbar__title" id="results-title">Specialists</h2>
+            <p class="muted"><span data-count>{specialists.length}</span> specialists found</p>
+          </div>
+          <button type="button" class="btn btn--ghost btn--sm" data-reset><Icon name="rotate-ccw" /> Reset</button>
+        </div>
+        <div class="grid" style="--grid-min: 290px">
+          {specialists.map((s) => <SpecialistCard specialist={s} />)}
+        </div>
+        <EmptyResults text="No specialist matches your search." />
+      </div>
+    </section>
+  </div>
+
+  <section class="section section--tint" aria-labelledby="browse-title">
+    <div class="container">
+      <div class="filterbar">
+        <div>
+          <p class="eyebrow">A to Z</p>
+          <h2 class="filterbar__title" id="browse-title">Browse by discipline</h2>
+        </div>
+        <nav class="az" aria-label="Jump to letter">
+          {letters.map((l) => <a href={`#letter-${l}`}>{l}</a>)}
+        </nav>
+      </div>
+      <div class="disc">
+        {
+          letters.map((l) => (
+            <div class="disc__group" id={`letter-${l}`}>
+              <p class="disc__letter">{l}</p>
+              <ul role="list">
+                {disciplines
+                  .filter((d) => d.letter === l)
+                  .map((d) => (
+                    <li>
+                      <a href={url(`/specialists/?discipline=${d.slug}#results`)}>
+                        {d.name}
+                        <span>{countFor(d.slug)}</span>
+                      </a>
+                    </li>
+                  ))}
+              </ul>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container profile-spec">
+      <div class="stack" style="--stack: var(--sp-4)">
+        <p class="eyebrow">Specialist profiles</p>
+        <h2>Each specialist's profile includes</h2>
+      </div>
+      <ul class="list-check">
+        <li>Full name and qualifications</li>
+        <li>Speciality and sub-speciality</li>
+        <li>Practice number</li>
+        <li>Consulting rooms location within Arwyp</li>
+        <li>Direct booking contact number</li>
+        <li>Short bio</li>
+        <li class="only-b">Real-time booking calendar and online payment <span class="tag-b"></span></li>
+        <li class="only-b">Dedicated SEO page, reviews and FAQ <span class="tag-b"></span></li>
+      </ul>
+    </div>
+  </section>
+</SiteLayout>
+
+<script>
+  import '@/scripts/filter';
+</script>
+
+<style>
+  .fs-hero {
+    position: relative;
+    overflow: hidden;
+    padding-block: clamp(3rem, 2rem + 4vw, 5.5rem);
+    background:
+      radial-gradient(50% 90% at 90% 0%, rgb(0 216 206 / 0.22), transparent 60%),
+      radial-gradient(50% 70% at 0% 100%, rgb(0 74 94 / 0.6), transparent 70%),
+      var(--navy-900);
+    color: rgb(255 255 255 / 0.78);
+  }
+
+  .fs-hero__inner {
+    display: grid;
+    gap: var(--sp-5);
+    justify-items: start;
+  }
+
+  .fs-hero h1 {
+    color: #fff;
+    font-size: clamp(2.25rem, 1.5rem + 3vw, 3.75rem);
+  }
+
+  .fs-hero .eyebrow {
+    color: var(--teal-400);
+  }
+
+  .fs-hero__sub {
+    max-width: 640px;
+    font-size: var(--fs-lg);
+  }
+
+  .fs-search {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 280px;
+    gap: var(--sp-3);
+    width: 100%;
+    max-width: 900px;
+    margin-top: var(--sp-3);
+  }
+
+  .fs-search .search-field {
+    flex: none;
+  }
+
+  .fs-select .select {
+    min-height: 3.5rem;
+    border-radius: var(--radius-pill);
+    border-color: transparent;
+    padding-left: 1.25rem;
+  }
+
+  .fs-hero__hint {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+    font-size: var(--fs-sm);
+  }
+
+  .fs-hero__hint span {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-2);
+  }
+
+  .fs-hero__hint :global(svg) {
+    color: var(--teal-400);
+  }
+
+  .az {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  .az a {
+    display: grid;
+    place-items: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    box-shadow: 0 0 0 1px var(--line);
+    font-weight: 700;
+    font-size: var(--fs-sm);
+    color: var(--navy-800);
+    text-decoration: none;
+  }
+
+  .az a:hover {
+    background: var(--navy-800);
+    color: #fff;
+  }
+
+  .disc {
+    columns: 4 220px;
+    column-gap: var(--sp-8);
+  }
+
+  .disc__group {
+    break-inside: avoid;
+    margin-bottom: var(--sp-6);
+  }
+
+  .disc__letter {
+    margin-bottom: var(--sp-2);
+    padding-bottom: var(--sp-2);
+    border-bottom: 2px solid var(--teal-500);
+    font-size: var(--fs-xl);
+    font-weight: 800;
+    color: var(--navy-900);
+  }
+
+  .disc ul {
+    display: grid;
+    margin: 0;
+  }
+
+  .disc a {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--sp-3);
+    padding: 0.45rem 0;
+    border-bottom: 1px solid var(--line);
+    color: var(--ink-2);
+    font-size: var(--fs-sm);
+    font-weight: 550;
+    text-decoration: none;
+  }
+
+  .disc a:hover {
+    color: var(--teal-700);
+  }
+
+  .disc a span {
+    color: var(--ink-3);
+    font-size: var(--fs-xs);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .profile-spec {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+    gap: var(--sp-10);
+    align-items: start;
+  }
+
+  .profile-spec .list-check {
+    grid-template-columns: 1fr 1fr;
+    column-gap: var(--sp-8);
+  }
+
+  @media (max-width: 760px) {
+    .fs-search,
+    .profile-spec,
+    .profile-spec .list-check {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

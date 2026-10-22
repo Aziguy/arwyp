@@ -1,0 +1,451 @@
+---
+import Icon from '@/components/ui/Icon.astro';
+import type { Specialist } from '@/data/specialists';
+import { money } from '@/lib/format';
+import { hash, seeded } from '@/lib/random';
+
+interface Props {
+  specialist: Specialist;
+}
+
+const { specialist: s } = Astro.props;
+const rng = seeded(hash(s.slug));
+const start = new Date('2026-10-23T00:00:00Z');
+const times = ['08:00', '08:30', '09:00', '09:30', '10:30', '11:00', '11:30', '13:30', '14:00', '14:30', '15:30', '16:00'];
+const days = Array.from({ length: 10 }, (_, i) => {
+  const d = new Date(start);
+  d.setUTCDate(d.getUTCDate() + i);
+  const weekend = [0, 6].includes(d.getUTCDay());
+  return {
+    iso: d.toISOString().slice(0, 10),
+    dow: d.toLocaleDateString('en-ZA', { weekday: 'short', timeZone: 'UTC' }),
+    day: d.getUTCDate(),
+    month: d.toLocaleDateString('en-ZA', { month: 'short', timeZone: 'UTC' }),
+    slots: weekend ? [] : times.filter(() => rng.next() > 0.55),
+  };
+});
+const deposit = Math.round(s.fee * 0.3);
+---
+
+<section class="bw" id="book" data-booking data-fee={s.fee} aria-labelledby="bw-title">
+  <header class="bw__head">
+    <div>
+      <span class="tag-b" data-label="Online booking"></span>
+      <h2 id="bw-title">Book with {s.name}</h2>
+    </div>
+    <ol class="bw__steps" role="list">
+      <li data-step-dot="1" aria-current="step">Time</li>
+      <li data-step-dot="2">Details</li>
+      <li data-step-dot="3">Payment</li>
+    </ol>
+  </header>
+
+  <div class="bw__panel" data-step="1">
+    <div class="bw__days" role="tablist" aria-label="Choose a day">
+      {
+        days.map((d, i) => (
+          <button
+            type="button"
+            role="tab"
+            class="bw__day"
+            data-day={d.iso}
+            aria-selected={i === days.findIndex((x) => x.slots.length) ? 'true' : 'false'}
+            disabled={!d.slots.length}
+          >
+            <span>{d.dow}</span>
+            <strong>{d.day}</strong>
+            <span>{d.month}</span>
+          </button>
+        ))
+      }
+    </div>
+    {
+      days.map((d, i) => (
+        <div class="bw__slots" data-slots={d.iso} hidden={i !== days.findIndex((x) => x.slots.length)}>
+          {d.slots.map((t) => (
+            <button type="button" class="bw__slot" data-slot={`${d.dow} ${d.day} ${d.month}, ${t}`}>
+              {t}
+            </button>
+          ))}
+        </div>
+      ))
+    }
+    <p class="bw__note"><Icon name="radio" size={14} /> Live availability synced with the rooms' calendar</p>
+  </div>
+
+  <form class="bw__panel" data-step="2" hidden>
+    <p class="bw__chosen"><Icon name="calendar-check" size={16} /> <span data-chosen></span></p>
+    <fieldset class="bw__toggle">
+      <legend class="field-label">Patient</legend>
+      <label><input type="radio" name="ptype" value="new" checked /> New patient</label>
+      <label><input type="radio" name="ptype" value="returning" /> Returning patient</label>
+    </fieldset>
+    <div class="form-row">
+      <div class="field"><label for="bw-name">Full name</label><input id="bw-name" class="input" required autocomplete="name" /></div>
+      <div class="field"><label for="bw-phone">Mobile</label><input id="bw-phone" class="input" type="tel" required autocomplete="tel" placeholder="+27" /></div>
+    </div>
+    <div class="field">
+      <label for="bw-aid">Payment method</label>
+      <select id="bw-aid" class="select">
+        {s.medicalAids.map((a) => <option>{a}</option>)}
+        <option>Private / self-pay</option>
+      </select>
+      <span class="field-hint">Real-time eligibility is checked with your scheme before you pay.</span>
+    </div>
+    <label class="check consent">
+      <input type="checkbox" required />
+      <span>I consent to Arwyp processing my personal information to manage this booking, in line with POPIA.</span>
+    </label>
+    <div class="bw__actions">
+      <button type="button" class="btn btn--ghost" data-back>Back</button>
+      <button type="submit" class="btn btn--accent">Continue to payment <Icon name="arrow-right" /></button>
+    </div>
+  </form>
+
+  <div class="bw__panel" data-step="3" hidden>
+    <dl class="bw__summary">
+      <div><dt>Consultation</dt><dd>{money(s.fee)}</dd></div>
+      <div><dt>Deposit due now</dt><dd>{money(deposit)}</dd></div>
+      <div><dt>Balance</dt><dd>Claimed from medical aid</dd></div>
+    </dl>
+    <div class="bw__gateways">
+      <button type="button" class="bw__gw" data-pay="PayFast"><Icon name="credit-card" /> Pay with PayFast</button>
+      <button type="button" class="bw__gw" data-pay="Peach Payments"><Icon name="wallet" /> Pay with Peach Payments</button>
+    </div>
+    <p class="bw__note"><Icon name="lock" size={14} /> Secure checkout. You will receive a receipt, SMS confirmation and a 24-hour reminder.</p>
+    <button type="button" class="btn btn--ghost" data-back>Back</button>
+  </div>
+
+  <div class="bw__panel bw__done" data-step="4" hidden>
+    <span class="bw__doneicon"><Icon name="circle-check" size={32} /></span>
+    <h3>Booking confirmed</h3>
+    <p><span data-chosen></span> with {s.name}</p>
+    <p class="muted">Paid via <span data-gateway></span>. Reference <strong>AMC-B-{s.practiceNumber.slice(-4)}</strong></p>
+    <div class="cluster">
+      <a class="btn btn--outline btn--sm" href="#" data-ics><Icon name="calendar-plus" /> Add to calendar</a>
+      <button type="button" class="btn btn--ghost btn--sm" data-restart>Book another</button>
+    </div>
+  </div>
+</section>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-booking]').forEach((root) => {
+    const panels = root.querySelectorAll<HTMLElement>('[data-step]');
+    const dots = root.querySelectorAll<HTMLElement>('[data-step-dot]');
+    let chosen = '';
+
+    const show = (step: number) => {
+      panels.forEach((p) => (p.hidden = Number(p.dataset.step) !== step));
+      dots.forEach((d) => {
+        const n = Number(d.dataset.stepDot);
+        d.toggleAttribute('data-done', n < step);
+        if (n === Math.min(step, 3)) d.setAttribute('aria-current', 'step');
+        else d.removeAttribute('aria-current');
+      });
+    };
+
+    root.querySelectorAll<HTMLButtonElement>('[data-day]').forEach((btn) =>
+      btn.addEventListener('click', () => {
+        root.querySelectorAll('[data-day]').forEach((b) => b.setAttribute('aria-selected', String(b === btn)));
+        root.querySelectorAll<HTMLElement>('[data-slots]').forEach((s) => (s.hidden = s.dataset.slots !== btn.dataset.day));
+      }),
+    );
+
+    root.querySelectorAll<HTMLButtonElement>('[data-slot]').forEach((btn) =>
+      btn.addEventListener('click', () => {
+        chosen = btn.dataset.slot!;
+        root.querySelectorAll('[data-chosen]').forEach((el) => (el.textContent = chosen));
+        show(2);
+      }),
+    );
+
+    root.querySelector('form')?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      show(3);
+    });
+
+    root.querySelectorAll<HTMLButtonElement>('[data-pay]').forEach((btn) =>
+      btn.addEventListener('click', () => {
+        root.querySelectorAll('[data-gateway]').forEach((el) => (el.textContent = btn.dataset.pay!));
+        show(4);
+      }),
+    );
+
+    root.querySelectorAll('[data-back]').forEach((btn) =>
+      btn.addEventListener('click', () => show(Number(btn.closest<HTMLElement>('[data-step]')!.dataset.step) - 1)),
+    );
+    root.querySelector('[data-restart]')?.addEventListener('click', () => show(1));
+    root.querySelector('[data-ics]')?.addEventListener('click', (e) => e.preventDefault());
+  });
+</script>
+
+<style>
+  .bw {
+    display: grid;
+    gap: var(--sp-5);
+    padding: var(--sp-6);
+    border-radius: var(--radius-xl);
+    background: var(--surface);
+    box-shadow: var(--shadow-md), 0 0 0 1px var(--line);
+  }
+
+  .bw__head {
+    display: grid;
+    gap: var(--sp-4);
+  }
+
+  .bw__head h2 {
+    margin-top: var(--sp-2);
+    font-size: var(--fs-xl);
+  }
+
+  .bw__steps {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--sp-2);
+    margin: 0;
+    counter-reset: step;
+  }
+
+  .bw__steps li {
+    counter-increment: step;
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+    padding-top: var(--sp-2);
+    border-top: 3px solid var(--line);
+    font-size: var(--fs-xs);
+    font-weight: 650;
+    color: var(--ink-3);
+  }
+
+  .bw__steps li::before {
+    content: counter(step);
+    display: grid;
+    place-items: center;
+    width: 1.25rem;
+    height: 1.25rem;
+    border-radius: 50%;
+    background: var(--surface-3);
+    font-size: 0.6875rem;
+  }
+
+  .bw__steps li[aria-current],
+  .bw__steps li[data-done] {
+    border-top-color: var(--teal-500);
+    color: var(--navy-900);
+  }
+
+  .bw__steps li[aria-current]::before,
+  .bw__steps li[data-done]::before {
+    background: var(--navy-800);
+    color: #fff;
+  }
+
+  .bw__panel {
+    display: grid;
+    gap: var(--sp-4);
+  }
+
+  .bw__panel[hidden] {
+    display: none;
+  }
+
+  .bw__days {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(58px, 1fr);
+    gap: var(--sp-2);
+    overflow-x: auto;
+    padding-bottom: 2px;
+    scrollbar-width: thin;
+  }
+
+  .bw__day {
+    display: grid;
+    justify-items: center;
+    gap: 1px;
+    padding: var(--sp-2) var(--sp-1);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--line);
+    font-size: 0.6875rem;
+    color: var(--ink-3);
+    line-height: 1.3;
+  }
+
+  .bw__day strong {
+    font-size: var(--fs-lg);
+    color: var(--navy-900);
+  }
+
+  .bw__day:hover:not(:disabled) {
+    border-color: var(--navy-600);
+  }
+
+  .bw__day[aria-selected='true'] {
+    background: var(--navy-800);
+    border-color: var(--navy-800);
+    color: rgb(255 255 255 / 0.7);
+  }
+
+  .bw__day[aria-selected='true'] strong {
+    color: #fff;
+  }
+
+  .bw__day:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  .bw__slots {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(76px, 1fr));
+    gap: var(--sp-2);
+  }
+
+  .bw__slots[hidden] {
+    display: none;
+  }
+
+  .bw__slot {
+    min-height: 2.5rem;
+    border-radius: var(--radius-md);
+    background: var(--teal-50);
+    box-shadow: inset 0 0 0 1px var(--teal-100);
+    color: var(--teal-800);
+    font-weight: 700;
+    font-size: var(--fs-sm);
+    font-variant-numeric: tabular-nums;
+    transition: background-color var(--dur) var(--ease);
+  }
+
+  .bw__slot:hover {
+    background: var(--teal-400);
+    color: var(--navy-950);
+  }
+
+  .bw__note {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+    font-size: var(--fs-xs);
+    color: var(--ink-3);
+  }
+
+  .bw__chosen {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+    padding: var(--sp-3) var(--sp-4);
+    border-radius: var(--radius-md);
+    background: var(--teal-50);
+    color: var(--teal-800);
+    font-weight: 650;
+    font-size: var(--fs-sm);
+  }
+
+  .bw__toggle {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-2) var(--sp-5);
+    border: 0;
+    padding: 0;
+    margin: 0;
+    font-size: var(--fs-sm);
+  }
+
+  .bw__toggle legend {
+    width: 100%;
+    margin-bottom: var(--sp-2);
+  }
+
+  .bw__toggle label {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-2);
+  }
+
+  .bw__toggle input {
+    accent-color: var(--teal-700);
+  }
+
+  .bw__actions {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--sp-3);
+  }
+
+  .bw__summary {
+    display: grid;
+    margin: 0;
+    border-radius: var(--radius-md);
+    background: var(--surface-2);
+  }
+
+  .bw__summary div {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--sp-4);
+    padding: var(--sp-3) var(--sp-4);
+    font-size: var(--fs-sm);
+  }
+
+  .bw__summary div + div {
+    border-top: 1px solid var(--line);
+  }
+
+  .bw__summary dt {
+    color: var(--ink-2);
+  }
+
+  .bw__summary dd {
+    margin: 0;
+    font-weight: 700;
+    color: var(--navy-900);
+  }
+
+  .bw__gateways {
+    display: grid;
+    gap: var(--sp-2);
+  }
+
+  .bw__gw {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--sp-2);
+    min-height: 3rem;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--line-2);
+    font-weight: 700;
+    color: var(--navy-900);
+    transition:
+      border-color var(--dur) var(--ease),
+      background-color var(--dur) var(--ease);
+  }
+
+  .bw__gw:hover {
+    border-color: var(--teal-600);
+    background: var(--teal-50);
+  }
+
+  .bw__done {
+    justify-items: center;
+    text-align: center;
+    padding-block: var(--sp-4);
+  }
+
+  .bw__doneicon {
+    display: grid;
+    place-items: center;
+    width: 4rem;
+    height: 4rem;
+    border-radius: 50%;
+    background: var(--green-50);
+    color: var(--green-600);
+  }
+
+  .bw__done .cluster {
+    justify-content: center;
+  }
+</style>

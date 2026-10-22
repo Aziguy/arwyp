@@ -1,0 +1,410 @@
+---
+import SiteLayout from '@/layouts/SiteLayout.astro';
+import Breadcrumbs from '@/components/ui/Breadcrumbs.astro';
+import Avatar from '@/components/ui/Avatar.astro';
+import Icon from '@/components/ui/Icon.astro';
+import SpecialistCard from '@/components/specialists/SpecialistCard.astro';
+import BookingWidget from '@/components/specialists/BookingWidget.astro';
+import { specialists, type Specialist } from '@/data/specialists';
+import { departments } from '@/data/departments';
+import { site } from '@/config/site';
+import { money } from '@/lib/format';
+import { url } from '@/lib/paths';
+import { faqSchema, physicianSchema } from '@/lib/schema';
+
+export function getStaticPaths() {
+  return specialists.map((s) => ({ params: { slug: s.slug }, props: { specialist: s } }));
+}
+
+interface Props {
+  specialist: Specialist;
+}
+
+const { specialist: s } = Astro.props;
+const department = departments.find((d) => d.disciplines.includes(s.disciplineSlug));
+const peers = specialists.filter((p) => p.disciplineSlug === s.disciplineSlug && p.slug !== s.slug).slice(0, 3);
+const faq = [
+  { q: `Does ${s.name} accept my medical aid?`, a: `${s.name} accepts ${s.medicalAids.slice(0, 4).join(', ') || 'most major schemes'}. Eligibility is checked online before payment.` },
+  { q: `Where are ${s.title} ${s.lastName}'s rooms?`, a: `${s.rooms}, Arwyp Medical Centre, ${site.address.street}, ${site.address.city}.` },
+  { q: 'Do I need a referral?', a: 'A GP referral is recommended and may be required by your medical scheme for specialist benefits.' },
+];
+const reviews = [
+  { name: 'Thembi K.', text: 'Clear explanations and genuinely caring. The rooms were efficient and on time.', rating: 5 },
+  { name: 'Johan B.', text: 'Booked online in two minutes and received an SMS reminder the day before.', rating: 5 },
+  { name: 'Ayesha P.', text: 'Professional and thorough. Follow-up was easy through the patient portal.', rating: 4 },
+];
+---
+
+<SiteLayout title={`${s.name}, ${s.discipline}`} description={`${s.name}, ${s.discipline} at Arwyp Medical Centre, Kempton Park.`} schema={[physicianSchema({ ...s, specialty: s.discipline }), faqSchema(faq)]}>
+  <section class="ph">
+    <div class="container">
+      <Breadcrumbs items={[{ label: 'Find a Specialist', href: '/specialists/' }, { label: s.name }]} />
+      <div class="ph__card">
+        <Avatar name={s.name} size={128} shape="rounded" />
+        <div class="ph__id">
+          <p class="eyebrow">{s.discipline}</p>
+          <h1>{s.name}</h1>
+          <p class="ph__qual">{s.qualifications}</p>
+          <div class="cluster ph__badges">
+            <span class="badge badge--teal">{s.subSpecialty}</span>
+            {s.accepting ? <span class="badge badge--green badge--dot">Accepting new patients</span> : <span class="badge badge--amber badge--dot">Waitlist</span>}
+            <span class="badge only-b">
+              <Icon name="star" size={12} /> {s.rating.toFixed(1)} ({s.reviews} reviews)
+            </span>
+          </div>
+        </div>
+        <div class="ph__cta">
+          <a class="btn btn--accent btn--lg only-b" href="#book"><Icon name="calendar-check" /> Book online</a>
+          <a class="btn btn--lg only-a" href="tel:+27119221000"><Icon name="phone" /> Call the rooms</a>
+          <span class="ph__phone">{s.phone}</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container sp">
+      <div class="sp__main">
+        <dl class="facts">
+          <div><dt><Icon name="stethoscope" size={16} /> Speciality</dt><dd>{s.discipline}</dd></div>
+          <div><dt><Icon name="microscope" size={16} /> Sub-speciality</dt><dd>{s.subSpecialty}</dd></div>
+          <div><dt><Icon name="id-card" size={16} /> Practice number</dt><dd class="tabular">{s.practiceNumber}</dd></div>
+          <div><dt><Icon name="map-pin" size={16} /> Consulting rooms</dt><dd>{s.rooms}</dd></div>
+          <div><dt><Icon name="phone" size={16} /> Direct booking</dt><dd>{s.phone}</dd></div>
+          <div><dt><Icon name="languages" size={16} /> Languages</dt><dd>{s.languages.join(', ')}</dd></div>
+        </dl>
+
+        <article class="stack" style="--stack: var(--sp-4)">
+          <h2 class="sp__h">About {s.title} {s.lastName}</h2>
+          <p class="lead">{s.bio}</p>
+          {
+            department && (
+              <a class="link-arrow" href={url(`/departments/${department.slug}/`)}>
+                Part of {department.name} <Icon name="arrow-right" />
+              </a>
+            )
+          }
+        </article>
+
+        <article class="only-b stack" style="--stack: var(--sp-4)">
+          <h2 class="sp__h">Medical aid & fees <span class="tag-b"></span></h2>
+          <p class="muted">Consultation from <strong>{money(s.fee)}</strong>. Accepted schemes:</p>
+          <ul class="aids" role="list">
+            {s.medicalAids.map((a) => <li>{a}</li>)}
+          </ul>
+        </article>
+
+        <article class="only-b stack" style="--stack: var(--sp-4)">
+          <h2 class="sp__h">Patient reviews <span class="tag-b"></span></h2>
+          <ul class="reviews" role="list">
+            {
+              reviews.map((r) => (
+                <li>
+                  <span class="reviews__stars" aria-label={`${r.rating} out of 5`}>
+                    {Array.from({ length: r.rating }, () => (
+                      <Icon name="star" size={14} />
+                    ))}
+                  </span>
+                  <p>{r.text}</p>
+                  <small>{r.name}, verified patient</small>
+                </li>
+              ))
+            }
+          </ul>
+        </article>
+
+        <article class="only-b stack" style="--stack: var(--sp-3)">
+          <h2 class="sp__h">Frequently asked questions <span class="tag-b"></span></h2>
+          {
+            faq.map((f) => (
+              <details class="faq">
+                <summary>
+                  {f.q} <Icon name="plus" size={18} />
+                </summary>
+                <p>{f.a}</p>
+              </details>
+            ))
+          }
+        </article>
+      </div>
+
+      <aside class="sp__aside">
+        <div class="only-b"><BookingWidget specialist={s} /></div>
+        <div class="only-a callbox">
+          <span class="callbox__icon"><Icon name="phone-call" size={24} /></span>
+          <h2>Book an appointment</h2>
+          <p>Appointments are booked directly with {s.title} {s.lastName}'s rooms during office hours.</p>
+          <a class="btn btn--block btn--lg" href="tel:+27119221000"><Icon name="phone" /> {s.phone}</a>
+          <a class="btn btn--outline btn--block" href={`mailto:${s.email}`}><Icon name="mail" /> Email the rooms</a>
+        </div>
+        <div class="map">
+          <Icon name="map-pinned" size={28} />
+          <p><strong>{s.rooms}</strong><br />{site.address.street}, {site.address.city}</p>
+          <a class="link-arrow" href={`https://maps.google.com/?q=${site.geo.lat},${site.geo.lng}`} target="_blank" rel="noopener">Get directions <Icon name="arrow-up-right" /></a>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  {
+    peers.length > 0 && (
+      <section class="section section--tint">
+        <div class="container">
+          <h2 class="sp__h peers__h">Other {s.discipline} specialists</h2>
+          <div class="grid" style="--grid-min: 280px">
+            {peers.map((p) => (
+              <SpecialistCard specialist={p} />
+            ))}
+          </div>
+        </div>
+      </section>
+    )
+  }
+</SiteLayout>
+
+<style>
+  .ph {
+    padding-block: var(--sp-8) var(--sp-10);
+    background:
+      radial-gradient(50% 120% at 100% 0%, rgb(0 216 206 / 0.12), transparent 60%),
+      var(--sand-50);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .ph__card {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: var(--sp-8);
+    align-items: center;
+    margin-top: var(--sp-6);
+  }
+
+  .ph__id {
+    display: grid;
+    gap: var(--sp-2);
+  }
+
+  .ph h1 {
+    font-size: clamp(2rem, 1.5rem + 2vw, 3rem);
+  }
+
+  .ph__qual {
+    color: var(--ink-2);
+  }
+
+  .ph__badges {
+    --cluster: var(--sp-2);
+    margin-top: var(--sp-2);
+  }
+
+  .ph__cta {
+    display: grid;
+    gap: var(--sp-2);
+    justify-items: center;
+  }
+
+  .ph__phone {
+    font-size: var(--fs-xs);
+    color: var(--ink-3);
+  }
+
+  .sp {
+    display: grid;
+    grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+    gap: clamp(2rem, 1rem + 4vw, 4.5rem);
+    align-items: start;
+  }
+
+  .sp__main {
+    display: grid;
+    gap: var(--sp-12);
+  }
+
+  .sp__h {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sp-3);
+    font-size: var(--fs-2xl);
+  }
+
+  .facts {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    margin: 0;
+    border-radius: var(--radius-lg);
+    box-shadow: 0 0 0 1px var(--line);
+    overflow: hidden;
+  }
+
+  .facts div {
+    display: grid;
+    gap: 2px;
+    padding: var(--sp-4) var(--sp-5);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .facts div:nth-child(odd) {
+    border-right: 1px solid var(--line);
+  }
+
+  .facts div:nth-last-child(-n + 2) {
+    border-bottom: 0;
+  }
+
+  .facts dt {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+    font-size: var(--fs-xs);
+    font-weight: 600;
+    color: var(--ink-3);
+  }
+
+  .facts dd {
+    margin: 0;
+    font-weight: 600;
+    color: var(--navy-900);
+  }
+
+  .aids {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-2);
+    margin: 0;
+  }
+
+  .aids li {
+    padding: 0.35rem 0.8rem;
+    border-radius: var(--radius-pill);
+    box-shadow: 0 0 0 1px var(--line-2);
+    font-size: var(--fs-sm);
+    font-weight: 600;
+  }
+
+  .reviews {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--sp-4);
+    margin: 0;
+  }
+
+  .reviews li {
+    display: grid;
+    gap: var(--sp-2);
+    align-content: start;
+    padding: var(--sp-5);
+    border-radius: var(--radius-lg);
+    background: var(--surface-2);
+    font-size: var(--fs-sm);
+  }
+
+  .reviews__stars {
+    display: flex;
+    color: var(--amber-500);
+  }
+
+  .reviews__stars :global(svg) {
+    fill: currentColor;
+  }
+
+  .reviews small {
+    color: var(--ink-3);
+  }
+
+  .sp__aside {
+    position: sticky;
+    top: calc(var(--header-h) + var(--sp-6));
+    display: grid;
+    gap: var(--sp-5);
+  }
+
+  .callbox {
+    display: grid;
+    gap: var(--sp-3);
+    padding: var(--sp-8);
+    border-radius: var(--radius-xl);
+    background: var(--surface);
+    box-shadow: var(--shadow-md), 0 0 0 1px var(--line);
+  }
+
+  .callbox h2 {
+    font-size: var(--fs-xl);
+  }
+
+  .callbox p {
+    color: var(--ink-2);
+    font-size: var(--fs-sm);
+    margin-bottom: var(--sp-2);
+  }
+
+  .callbox__icon {
+    display: grid;
+    place-items: center;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    background: var(--teal-50);
+    color: var(--teal-700);
+  }
+
+  .map {
+    display: grid;
+    gap: var(--sp-3);
+    padding: var(--sp-6);
+    border-radius: var(--radius-lg);
+    background:
+      linear-gradient(rgb(40 54 70 / 0.05) 1px, transparent 1px) 0 0 / 24px 24px,
+      linear-gradient(90deg, rgb(40 54 70 / 0.05) 1px, transparent 1px) 0 0 / 24px 24px,
+      var(--surface-2);
+    font-size: var(--fs-sm);
+    color: var(--ink-2);
+  }
+
+  .map > :global(svg) {
+    color: var(--red-600);
+  }
+
+  .peers__h {
+    margin-bottom: var(--sp-8);
+  }
+
+  @media (max-width: 1024px) {
+    .sp {
+      grid-template-columns: 1fr;
+    }
+    .sp__aside {
+      position: static;
+      order: -1;
+    }
+    .reviews {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 760px) {
+    .ph__card {
+      grid-template-columns: auto minmax(0, 1fr);
+      gap: var(--sp-5);
+    }
+    .ph__card > :global(.avatar) {
+      --size: 84px !important;
+    }
+    .ph__cta {
+      grid-column: 1 / -1;
+      justify-items: stretch;
+    }
+  }
+
+  @media (max-width: 560px) {
+    .facts {
+      grid-template-columns: 1fr;
+    }
+    .facts div:nth-child(odd) {
+      border-right: 0;
+    }
+    .facts div:nth-last-child(2) {
+      border-bottom: 1px solid var(--line);
+    }
+  }
+</style>
