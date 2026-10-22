@@ -6,7 +6,10 @@ import FeatureCard from '@/components/ui/FeatureCard.astro';
 import CtaBand from '@/components/ui/CtaBand.astro';
 import EmptyResults from '@/components/ui/EmptyResults.astro';
 import Icon from '@/components/ui/Icon.astro';
-import { vacancies, careerDepartments } from '@/data/careers';
+import ResultsBar from '@/components/listing/ResultsBar.astro';
+import Pager from '@/components/listing/Pager.astro';
+import ApplyDialog from '@/components/sections/ApplyDialog.astro';
+import { vacancies, careerDepartments, vacancySlug } from '@/data/careers';
 import { shortDate } from '@/lib/format';
 import { url } from '@/lib/paths';
 
@@ -19,7 +22,7 @@ const why = [
 const types = ['Full-time', 'Part-time', 'Locum'];
 ---
 
-<SiteLayout title="Careers" description="Build a career that actually helps people.">
+<SiteLayout title="Careers" description="Build a career that actually helps people. Current nursing, clinical, allied health, administration and management vacancies at Arwyp Medical Centre, Kempton Park.">
   <PageHero
     eyebrow="Careers"
     title="Build a career that <span class='serif'>actually helps</span> people."
@@ -40,12 +43,12 @@ const types = ['Full-time', 'Part-time', 'Locum'];
     </div>
   </section>
 
-  <section class="section section--tint" id="openings" data-filter>
+  <section class="section section--tint" id="openings" data-listing data-page-size="6">
     <div class="container">
       <div class="filterbar">
         <div>
           <h2 class="filterbar__title">Current Openings</h2>
-          <p class="muted"><span data-count>{vacancies.length}</span> positions open</p>
+          <p class="muted">Filter by department and employment type.</p>
         </div>
         <label class="search-field">
           <Icon name="search" size={18} />
@@ -56,7 +59,13 @@ const types = ['Full-time', 'Part-time', 'Locum'];
       <div class="cfilters">
         <div class="chips" role="toolbar" aria-label="Filter by department">
           <button type="button" class="chip" data-facet="department" data-value="">All departments</button>
-          {careerDepartments.map((d) => <button type="button" class="chip" data-facet="department" data-value={d}>{d}</button>)}
+          {
+            careerDepartments.map((d) => (
+              <button type="button" class="chip" data-facet="department" data-value={d}>
+                {d} <span class="count">{vacancies.filter((v) => v.department === d).length}</span>
+              </button>
+            ))
+          }
         </div>
         <label>
           <span class="sr-only">Employment type</span>
@@ -67,12 +76,33 @@ const types = ['Full-time', 'Part-time', 'Locum'];
         </label>
       </div>
 
-      <ul class="jobs" role="list">
+      <ResultsBar
+        total={vacancies.length}
+        noun="positions"
+        sorts={[
+          { value: 'closes:asc', label: 'Closing soonest' },
+          { value: 'posted:desc', label: 'Newest first' },
+          { value: 'title:asc', label: 'Title A-Z' },
+        ]}
+      />
+
+      <ul class="jobs" role="list" data-items>
         {
           vacancies.map((v) => (
-            <li class="job" data-item data-department={v.department} data-type={v.type} data-text={`${v.title} ${v.unit} ${v.summary}`}>
+            <li
+              class="job"
+              data-item
+              data-department={v.department}
+              data-type={v.type}
+              data-sort-closes={v.closes}
+              data-sort-posted={v.posted}
+              data-sort-title={v.title}
+              data-text={`${v.title} ${v.unit} ${v.summary} ${v.ref}`}
+            >
               <div class="job__main">
-                <h3>{v.title}</h3>
+                <h3>
+                  <a href={url(`/careers/${vacancySlug(v)}/`)}>{v.title}</a>
+                </h3>
                 <p>{v.summary}</p>
                 <ul class="job__meta" role="list">
                   <li>
@@ -91,6 +121,9 @@ const types = ['Full-time', 'Part-time', 'Locum'];
               </div>
               <div class="job__cta">
                 <span class="job__ref">Ref {v.ref}</span>
+                <a class="btn btn--outline" href={url(`/careers/${vacancySlug(v)}/`)}>
+                  View role
+                </a>
                 <a class="btn only-a" href={`mailto:careers@arwyp.example?subject=${encodeURIComponent(`${v.ref} ${v.title}`)}`}>
                   Apply <Icon name="arrow-right" />
                 </a>
@@ -103,36 +136,11 @@ const types = ['Full-time', 'Part-time', 'Locum'];
         }
       </ul>
       <EmptyResults text="No openings match your filters." />
+      <Pager label="Vacancies pagination" />
     </div>
   </section>
 
-  <dialog class="apply" data-apply-dialog aria-labelledby="apply-title">
-    <form class="form" data-demo-form>
-      <header class="apply__head">
-        <div>
-          <span class="tag-b" data-label="Careers & Recruitment System"></span>
-          <h2 id="apply-title" data-apply-title>Apply online</h2>
-        </div>
-        <button type="button" class="apply__close" data-apply-close aria-label="Close"><Icon name="x" /></button>
-      </header>
-      <div class="form-row">
-        <div class="field"><label for="ap-name">Full name</label><input id="ap-name" class="input" required /></div>
-        <div class="field"><label for="ap-email">Email</label><input id="ap-email" class="input" type="email" required /></div>
-      </div>
-      <div class="form-row">
-        <div class="field"><label for="ap-phone">Mobile</label><input id="ap-phone" class="input" type="tel" required /></div>
-        <div class="field"><label for="ap-reg">Registration (SANC / HPCSA)</label><input id="ap-reg" class="input" /></div>
-      </div>
-      <div class="field">
-        <label for="ap-cv">CV and certificates</label>
-        <input id="ap-cv" class="input" type="file" accept=".pdf,.doc,.docx" multiple required />
-      </div>
-      <div class="field"><label for="ap-cover">Motivation</label><textarea id="ap-cover" class="textarea"></textarea></div>
-      <label class="check consent"><input type="checkbox" required /><span>I consent to Arwyp processing my application data for recruitment purposes (POPIA).</span></label>
-      <button class="btn btn--accent" type="submit"><Icon name="send" /> Submit application</button>
-      <p class="form-success" tabindex="-1"><Icon name="circle-check" /> Demo: application received. You will get status updates by email and SMS.</p>
-    </form>
-  </dialog>
+  <ApplyDialog />
 
   <CtaBand
     eyebrow="Grow your career with us"
@@ -144,19 +152,7 @@ const types = ['Full-time', 'Part-time', 'Locum'];
 </SiteLayout>
 
 <script>
-  import '@/scripts/filter';
-
-  const dialog = document.querySelector<HTMLDialogElement>('[data-apply-dialog]');
-  document.querySelectorAll<HTMLButtonElement>('[data-apply]').forEach((btn) =>
-    btn.addEventListener('click', () => {
-      if (!dialog) return;
-      dialog.querySelector('[data-apply-title]')!.textContent = `${btn.dataset.title} (${btn.dataset.apply})`;
-      dialog.querySelector('form')?.removeAttribute('data-sent');
-      dialog.showModal();
-    }),
-  );
-  dialog?.querySelector('[data-apply-close]')?.addEventListener('click', () => dialog.close());
-  dialog?.addEventListener('click', (e) => e.target === dialog && dialog.close());
+  import '@/scripts/listing';
 </script>
 
 <style>
@@ -205,6 +201,15 @@ const types = ['Full-time', 'Part-time', 'Locum'];
     font-size: var(--fs-lg);
   }
 
+  .job h3 a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .job h3 a:hover {
+    color: var(--teal-700);
+  }
+
   .job__main > p {
     font-size: var(--fs-sm);
     color: var(--ink-2);
@@ -228,61 +233,14 @@ const types = ['Full-time', 'Part-time', 'Locum'];
 
   .job__cta {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
-    gap: var(--sp-4);
+    gap: var(--sp-3);
   }
 
   .job__ref {
     font-size: var(--fs-xs);
     color: var(--ink-3);
     font-variant-numeric: tabular-nums;
-  }
-
-  .apply {
-    width: min(640px, calc(100vw - 2rem));
-    max-height: calc(100dvh - 2rem);
-    padding: var(--sp-8);
-    border: 0;
-    border-radius: var(--radius-xl);
-    box-shadow: var(--shadow-lg);
-  }
-
-  .apply::backdrop {
-    background: rgb(20 28 38 / 0.6);
-    backdrop-filter: blur(4px);
-  }
-
-  .apply__head {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: var(--sp-4);
-  }
-
-  .apply__head h2 {
-    margin-top: var(--sp-2);
-    font-size: var(--fs-xl);
-  }
-
-  .apply__close {
-    display: grid;
-    place-items: center;
-    width: 2.5rem;
-    height: 2.5rem;
-    border-radius: 50%;
-  }
-
-  .apply__close:hover {
-    background: var(--surface-2);
-  }
-
-  .apply .btn[type='submit'] {
-    justify-self: start;
-  }
-
-  @media (max-width: 520px) {
-    .apply {
-      padding: var(--sp-5);
-    }
   }
 </style>

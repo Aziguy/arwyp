@@ -28,3 +28,28 @@ export const vacancies: Vacancy[] = [
   { ref: 'AMC-M-2609', title: 'Unit Manager: Emergency Department', department: 'Management', unit: 'Emergency Department', type: 'Full-time', posted: '2026-10-15', closes: '2026-11-15', summary: 'Lead a 24/7 ED team of nurses and emergency practitioners.' },
   { ref: 'AMC-M-2610', title: 'Quality & Risk Manager', department: 'Management', unit: 'Clinical Governance', type: 'Full-time', posted: '2026-09-25', closes: '2026-10-30', summary: 'Drive COHSASA readiness, incident management and audits.' },
 ];
+
+export const departmentProfiles: Record<CareerDepartment, { responsibilities: string[]; requirements: string[] }> = {
+  Nursing: {
+    responsibilities: ['Deliver safe, patient-centred nursing care', 'Maintain accurate clinical records', 'Collaborate with doctors and allied health teams', 'Uphold infection prevention and control standards'],
+    requirements: ['Current SANC registration', 'Relevant clinical experience', 'BLS certification', 'Willingness to work shifts'],
+  },
+  'Clinical Support': {
+    responsibilities: ['Provide accurate, timely clinical support services', 'Operate and maintain specialised equipment', 'Ensure quality and safety compliance'],
+    requirements: ['HPCSA or SAPC registration where applicable', 'Relevant qualification and experience', 'Attention to detail'],
+  },
+  Administration: {
+    responsibilities: ['Manage patient administration and records', 'Liaise with medical schemes', 'Deliver excellent front-office service'],
+    requirements: ['Matric and a relevant qualification', 'Medical administration experience', 'Strong computer literacy'],
+  },
+  'Allied Health': {
+    responsibilities: ['Assess and treat inpatients and outpatients', 'Develop individual care plans', 'Work within multidisciplinary teams'],
+    requirements: ['HPCSA registration', 'Relevant clinical experience', 'Excellent communication skills'],
+  },
+  Management: {
+    responsibilities: ['Lead and develop a high-performing team', 'Manage budgets, rosters and quality indicators', 'Drive COHSASA readiness and continuous improvement'],
+    requirements: ['Relevant degree and registration', 'At least 5 years of management experience', 'Proven leadership in a hospital environment'],
+  },
+};
+
+export const vacancySlug = (v: Vacancy) => v.ref.toLowerCase();

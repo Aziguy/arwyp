@@ -1,0 +1,212 @@
+---
+import SiteLayout from '@/layouts/SiteLayout.astro';
+import PageHero from '@/components/ui/PageHero.astro';
+import Icon from '@/components/ui/Icon.astro';
+import ApplyDialog from '@/components/sections/ApplyDialog.astro';
+import { vacancies, departmentProfiles, vacancySlug, type Vacancy } from '@/data/careers';
+import { site } from '@/config/site';
+import { longDate } from '@/lib/format';
+import { url } from '@/lib/paths';
+import { jobPostingSchema } from '@/lib/schema';
+
+export function getStaticPaths() {
+  return vacancies.map((v) => ({ params: { slug: vacancySlug(v) }, props: { vacancy: v } }));
+}
+
+interface Props {
+  vacancy: Vacancy;
+}
+
+const { vacancy: v } = Astro.props;
+const profile = departmentProfiles[v.department];
+const description = `${v.summary} Join the ${v.unit} team at ${site.name}, Kempton Park.`;
+const html = `<p>${description}</p><h3>Responsibilities</h3><ul>${profile.responsibilities.map((r) => `<li>${r}</li>`).join('')}</ul><h3>Requirements</h3><ul>${profile.requirements.map((r) => `<li>${r}</li>`).join('')}</ul>`;
+const related = vacancies.filter((x) => x.department === v.department && x.ref !== v.ref).slice(0, 3);
+---
+
+<SiteLayout
+  title={`${v.title}, ${v.type} (${v.ref})`}
+  description={`${v.type} ${v.title} vacancy in the ${v.unit} at ${site.name}, Kempton Park. Apply before ${longDate(v.closes)}.`}
+  schema={jobPostingSchema({ ...v, description: html })}
+>
+  <PageHero eyebrow={`${v.department} · Ref ${v.ref}`} title={v.title} subtitle={description} crumbs={[{ label: 'Careers', href: '/careers/' }, { label: v.title }]}>
+    <ul slot="actions" class="facts" role="list">
+      <li><Icon name="map-pin" size={16} /> {v.unit}</li>
+      <li><Icon name="clock" size={16} /> {v.type}</li>
+      <li><Icon name="calendar-plus" size={16} /> Posted {longDate(v.posted)}</li>
+      <li><Icon name="calendar-x" size={16} /> Closes {longDate(v.closes)}</li>
+    </ul>
+  </PageHero>
+
+  <section class="section">
+    <div class="container role">
+      <article class="role__body">
+        <section>
+          <h2>Responsibilities</h2>
+          <ul class="list-check">{profile.responsibilities.map((r) => <li>{r}</li>)}</ul>
+        </section>
+        <section>
+          <h2>Requirements</h2>
+          <ul class="list-check">{profile.requirements.map((r) => <li>{r}</li>)}</ul>
+        </section>
+        <section>
+          <h2>What we offer</h2>
+          <ul class="list-check">
+            <li>Competitive remuneration and benefits</li>
+            <li>Continuous professional development through the Arwyp Training Institute</li>
+            <li>A supportive, multidisciplinary team in a COHSASA-accredited hospital</li>
+          </ul>
+        </section>
+      </article>
+
+      <aside class="role__aside">
+        <div class="apply-card">
+          <p class="eyebrow">Ref {v.ref}</p>
+          <h2>Interested in this role?</h2>
+          <p>Applications close on <strong>{longDate(v.closes)}</strong>.</p>
+          <a class="btn btn--block btn--lg only-a" href={`mailto:careers@arwyp.example?subject=${encodeURIComponent(`${v.ref} ${v.title}`)}`}>
+            <Icon name="mail" /> Apply by email
+          </a>
+          <button type="button" class="btn btn--accent btn--block btn--lg only-b" data-apply={v.ref} data-title={v.title}>
+            <Icon name="send" /> Apply online
+          </button>
+          <p class="apply-card__note">Only shortlisted candidates will be contacted. Arwyp is an equal opportunity employer.</p>
+        </div>
+        {
+          related.length > 0 && (
+            <div class="related">
+              <h2>More in {v.department}</h2>
+              <ul role="list">
+                {related.map((r) => (
+                  <li>
+                    <a href={url(`/careers/${vacancySlug(r)}/`)}>
+                      <strong>{r.title}</strong>
+                      <small>
+                        {r.type} &middot; {r.unit}
+                      </small>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )
+        }
+        <a class="link-arrow" href={url('/careers/#openings')}><Icon name="arrow-left" /> All openings</a>
+      </aside>
+    </div>
+  </section>
+
+  <ApplyDialog />
+</SiteLayout>
+
+<style>
+  .facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-2);
+    margin: 0;
+  }
+
+  .facts li {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-2);
+    padding: 0.4rem 0.8rem;
+    border-radius: var(--radius-pill);
+    background: var(--surface);
+    box-shadow: 0 0 0 1px var(--line);
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    color: var(--navy-900);
+  }
+
+  .facts :global(svg) {
+    color: var(--teal-700);
+  }
+
+  .role {
+    display: grid;
+    grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+    gap: clamp(2rem, 1rem + 4vw, 4.5rem);
+    align-items: start;
+  }
+
+  .role__body {
+    display: grid;
+    gap: var(--sp-10);
+  }
+
+  .role__body h2 {
+    margin-bottom: var(--sp-4);
+    font-size: var(--fs-2xl);
+  }
+
+  .role__aside {
+    position: sticky;
+    top: calc(var(--header-h) + var(--sp-6));
+    display: grid;
+    gap: var(--sp-6);
+  }
+
+  .apply-card {
+    display: grid;
+    gap: var(--sp-3);
+    padding: var(--sp-8);
+    border-radius: var(--radius-xl);
+    background: var(--surface);
+    box-shadow: var(--shadow-md), 0 0 0 1px var(--line);
+  }
+
+  .apply-card h2 {
+    font-size: var(--fs-xl);
+  }
+
+  .apply-card p {
+    color: var(--ink-2);
+    font-size: var(--fs-sm);
+  }
+
+  .apply-card__note {
+    font-size: var(--fs-xs) !important;
+    color: var(--ink-3) !important;
+  }
+
+  .related h2 {
+    margin-bottom: var(--sp-3);
+    font-size: var(--fs-lg);
+  }
+
+  .related ul {
+    display: grid;
+    gap: var(--sp-2);
+    margin: 0;
+  }
+
+  .related a {
+    display: grid;
+    gap: 2px;
+    padding: var(--sp-4);
+    border-radius: var(--radius-md);
+    box-shadow: 0 0 0 1px var(--line);
+    text-decoration: none;
+    color: var(--navy-900);
+    font-size: var(--fs-sm);
+  }
+
+  .related a:hover {
+    background: var(--surface-2);
+  }
+
+  .related small {
+    color: var(--ink-3);
+  }
+
+  @media (max-width: 900px) {
+    .role {
+      grid-template-columns: 1fr;
+    }
+    .role__aside {
+      position: static;
+    }
+  }
+</style>

@@ -1,0 +1,94 @@
+---
+import Icon from '@/components/ui/Icon.astro';
+---
+
+<dialog class="apply" data-apply-dialog aria-labelledby="apply-title">
+  <form class="form" data-demo-form>
+    <header class="apply__head">
+      <div>
+        <span class="tag-b" data-label="Careers & Recruitment System"></span>
+        <h2 id="apply-title" data-apply-title>Apply online</h2>
+      </div>
+      <button type="button" class="apply__close" data-apply-close aria-label="Close"><Icon name="x" /></button>
+    </header>
+    <div class="form-row">
+      <div class="field"><label for="ap-name">Full name</label><input id="ap-name" class="input" required autocomplete="name" /></div>
+      <div class="field"><label for="ap-email">Email</label><input id="ap-email" class="input" type="email" required autocomplete="email" /></div>
+    </div>
+    <div class="form-row">
+      <div class="field"><label for="ap-phone">Mobile</label><input id="ap-phone" class="input" type="tel" required autocomplete="tel" /></div>
+      <div class="field"><label for="ap-reg">Registration (SANC / HPCSA)</label><input id="ap-reg" class="input" /></div>
+    </div>
+    <div class="field">
+      <label for="ap-cv">CV and certificates</label>
+      <input id="ap-cv" class="input" type="file" accept=".pdf,.doc,.docx" multiple required />
+    </div>
+    <div class="field"><label for="ap-cover">Motivation</label><textarea id="ap-cover" class="textarea"></textarea></div>
+    <label class="check consent"><input type="checkbox" required /><span>I consent to Arwyp processing my application data for recruitment purposes (POPIA).</span></label>
+    <button class="btn btn--accent" type="submit"><Icon name="send" /> Submit application</button>
+    <p class="form-success" tabindex="-1"><Icon name="circle-check" /> Demo: application received. You will get status updates by email and SMS.</p>
+  </form>
+</dialog>
+
+<script>
+  const dialog = document.querySelector<HTMLDialogElement>('[data-apply-dialog]');
+  document.addEventListener('click', (e) => {
+    const btn = (e.target as Element).closest<HTMLElement>('[data-apply]');
+    if (!btn || !dialog) return;
+    dialog.querySelector('[data-apply-title]')!.textContent = `${btn.dataset.title} (${btn.dataset.apply})`;
+    dialog.querySelector('form')?.removeAttribute('data-sent');
+    dialog.showModal();
+  });
+  dialog?.querySelector('[data-apply-close]')?.addEventListener('click', () => dialog.close());
+  dialog?.addEventListener('click', (e) => e.target === dialog && dialog.close());
+</script>
+
+<style>
+  .apply {
+    width: min(640px, calc(100vw - 2rem));
+    max-height: calc(100dvh - 2rem);
+    padding: var(--sp-8);
+    border: 0;
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .apply::backdrop {
+    background: rgb(20 28 38 / 0.6);
+    backdrop-filter: blur(4px);
+  }
+
+  .apply__head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: var(--sp-4);
+  }
+
+  .apply__head h2 {
+    margin-top: var(--sp-2);
+    font-size: var(--fs-xl);
+  }
+
+  .apply__close {
+    display: grid;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+  }
+
+  .apply__close:hover {
+    background: var(--surface-2);
+  }
+
+  .apply .btn[type='submit'] {
+    justify-self: start;
+  }
+
+  @media (max-width: 520px) {
+    .apply {
+      padding: var(--sp-5);
+    }
+  }
+</style>
