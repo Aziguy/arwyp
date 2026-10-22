@@ -1,0 +1,114 @@
+---
+import Icon from '@/components/ui/Icon.astro';
+import Avatar from '@/components/ui/Avatar.astro';
+import { testimonials } from '@/data/people';
+import { longDate } from '@/lib/format';
+---
+
+<div class="tm">
+  {
+    testimonials.map((t, i) => (
+      <figure class:list={['tm__card', { 'tm__card--lead': i === 0 }]}>
+        <Icon name="quote" size={28} class="tm__mark" />
+        <div class="tm__stars" aria-label="Rated 5 out of 5">
+          {Array.from({ length: 5 }, () => (
+            <Icon name="star" size={16} />
+          ))}
+        </div>
+        <blockquote>{t.quote}</blockquote>
+        <figcaption>
+          <Avatar name={t.name} size={40} />
+          <span>
+            <strong>{t.name}</strong>
+            <small>
+              {t.context} &middot; {longDate(t.date)}
+            </small>
+          </span>
+        </figcaption>
+      </figure>
+    ))
+  }
+</div>
+
+<style>
+  .tm {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr 1fr;
+    gap: var(--sp-6);
+  }
+
+  .tm__card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-4);
+    padding: var(--sp-8);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    box-shadow: 0 0 0 1px var(--line);
+  }
+
+  .tm__card--lead {
+    background: var(--navy-800);
+    color: rgb(255 255 255 / 0.85);
+    box-shadow: none;
+  }
+
+  .tm__card :global(.tm__mark) {
+    color: var(--teal-500);
+  }
+
+  .tm__stars {
+    display: flex;
+    gap: 2px;
+    color: var(--amber-500);
+  }
+
+  .tm__stars :global(svg) {
+    fill: currentColor;
+  }
+
+  blockquote {
+    font-size: var(--fs-md);
+    line-height: 1.7;
+    color: var(--ink-2);
+  }
+
+  .tm__card--lead blockquote {
+    font-size: var(--fs-lg);
+    color: #fff;
+  }
+
+  figcaption {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3);
+    margin-top: auto;
+    padding-top: var(--sp-4);
+    border-top: 1px solid var(--line);
+    line-height: 1.35;
+  }
+
+  .tm__card--lead figcaption {
+    border-top-color: rgb(255 255 255 / 0.12);
+  }
+
+  figcaption strong {
+    display: block;
+    font-size: var(--fs-sm);
+  }
+
+  figcaption small {
+    font-size: var(--fs-xs);
+    color: var(--ink-3);
+  }
+
+  .tm__card--lead figcaption small {
+    color: rgb(255 255 255 / 0.6);
+  }
+
+  @media (max-width: 1024px) {
+    .tm {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

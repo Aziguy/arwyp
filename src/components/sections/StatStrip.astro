@@ -1,0 +1,83 @@
+---
+const stats = [
+  { value: '40+', label: 'Years caring for Kempton Park and surrounding communities' },
+  { value: '100+', label: 'Skilled specialists on site' },
+  { value: '28+', label: 'Specialised services' },
+  { value: '24/7', label: 'Emergency department' },
+];
+---
+
+<section class="stats" aria-label="Arwyp in numbers">
+  <div class="container">
+    <dl class="stats__grid">
+      {
+        stats.map((s) => (
+          <div class="stats__item">
+            <dt>{s.label}</dt>
+            <dd>{s.value}</dd>
+          </div>
+        ))
+      }
+    </dl>
+  </div>
+</section>
+
+<style>
+  .stats {
+    position: relative;
+    z-index: 1;
+    margin-top: -2.5rem;
+  }
+
+  .stats__grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    margin: 0;
+    border-radius: var(--radius-xl);
+    background: var(--surface);
+    box-shadow: var(--shadow-md), 0 0 0 1px var(--line);
+    overflow: hidden;
+  }
+
+  .stats__item {
+    display: flex;
+    flex-direction: column-reverse;
+    justify-content: flex-end;
+    gap: var(--sp-2);
+    padding: var(--sp-6) var(--sp-8);
+  }
+
+  .stats__item + .stats__item {
+    border-left: 1px solid var(--line);
+  }
+
+  dd {
+    margin: 0;
+    font-size: clamp(2rem, 1.5rem + 1.6vw, 2.75rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    color: var(--navy-900);
+  }
+
+  dt {
+    font-size: var(--fs-sm);
+    line-height: 1.5;
+    color: var(--ink-2);
+  }
+
+  @media (max-width: 860px) {
+    .stats__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .stats__item:nth-child(3) {
+      border-left: 0;
+    }
+    .stats__item:nth-child(n + 3) {
+      border-top: 1px solid var(--line);
+    }
+    .stats__item {
+      padding: var(--sp-5);
+    }
+  }
+</style>

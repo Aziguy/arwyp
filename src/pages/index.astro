@@ -1,0 +1,155 @@
+---
+import SiteLayout from '@/layouts/SiteLayout.astro';
+import HomeHero from '@/components/sections/home/HomeHero.astro';
+import StatStrip from '@/components/sections/StatStrip.astro';
+import OArmFeature from '@/components/sections/home/OArmFeature.astro';
+import NewsRail from '@/components/sections/home/NewsRail.astro';
+import Testimonials from '@/components/sections/Testimonials.astro';
+import PlatformBand from '@/components/sections/PlatformBand.astro';
+import SectionHeader from '@/components/ui/SectionHeader.astro';
+import FeatureCard from '@/components/ui/FeatureCard.astro';
+import Visual from '@/components/ui/Visual.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { homeServices } from '@/data/services';
+import { site } from '@/config/site';
+import { url } from '@/lib/paths';
+
+const quickTiles = [
+  { icon: 'user-round-search', title: 'Find a Specialist', text: "Search by name or discipline and see who's available.", href: '/specialists/', cta: 'Search the directory' },
+  { icon: 'calendar-clock', title: 'Plan Your Visit', text: 'Visiting hours, what to bring, and pre-admission forms.', href: '/patients/', cta: 'Patient information' },
+  { icon: 'stethoscope', title: 'Explore Our Services', text: 'From orthopaedics to neurology, see our full range of care.', href: '/services/', cta: 'View services' },
+  { icon: 'plane', title: 'Travelling to South Africa?', text: 'Visit our Travel Clinic before you go.', href: '/medical-tourism/', cta: 'Travel Clinic' },
+];
+---
+
+<SiteLayout title={site.name}>
+  <HomeHero />
+  <StatStrip />
+
+  <section class="section" aria-labelledby="about-title">
+    <div class="container intro">
+      <div class="intro__media">
+        <Visual icon="hand-heart" tone="teal" ratio="5 / 4" label="Care team photography" />
+        <div class="intro__badge">
+          <strong>Since {site.founded}</strong>
+          <span>Caring for generations of families</span>
+        </div>
+      </div>
+      <div class="stack intro__copy" style="--stack: var(--sp-5)">
+        <p class="eyebrow">About Arwyp</p>
+        <h2 id="about-title">A hospital <span class="serif">built around you</span></h2>
+        <p class="lead">
+          For over 40 years, Arwyp Medical Centre has proudly cared for generations of families, evolving into one of Gauteng's leading multidisciplinary
+          private hospitals while remaining true to the values that have defined us since 1985. Our commitment has always been simple: to provide exceptional
+          healthcare with compassion, dignity, and respect.
+        </p>
+        <p>
+          Whether you are booking a routine consultation, welcoming a new baby, preparing for surgery, or arriving through our emergency doors, the same
+          standard applies: clear communication, modern facilities, and people who genuinely care how you are doing.
+        </p>
+        <a class="btn" href={url('/about/')}>Learn About Arwyp <Icon name="arrow-right" /></a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--tint" aria-labelledby="help-title">
+    <div class="container">
+      <SectionHeader eyebrow="Quick access" title="How can we help you today?" id="help-title" />
+      <div class="grid" style="--grid-min: 250px">
+        {quickTiles.map((t) => <FeatureCard {...t} />)}
+      </div>
+    </div>
+  </section>
+
+  <PlatformBand />
+
+  <section class="section" aria-labelledby="care-title">
+    <div class="container">
+      <SectionHeader
+        eyebrow="Our services"
+        title="Care across <span class='serif'>every stage</span> of life"
+        intro="From emergencies to elective surgery, our departments work together so your care stays coordinated."
+        id="care-title"
+      >
+        <a class="btn btn--outline" href={url('/services/')}>View All Services <Icon name="arrow-right" /></a>
+      </SectionHeader>
+      <div class="grid services" style="--grid-min: 300px">
+        {homeServices.map((s) => <FeatureCard icon={s.icon} title={s.name} text={s.text} href="/services/" cta="See service" />)}
+      </div>
+    </div>
+  </section>
+
+  <OArmFeature />
+
+  <section class="section section--sand" aria-labelledby="reviews-title">
+    <div class="container">
+      <SectionHeader eyebrow="Patient stories" title="What our patients say" id="reviews-title" />
+      <Testimonials />
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="news-title">
+    <div class="container">
+      <SectionHeader eyebrow="Media & news" title="Latest health insights" id="news-title">
+        <a class="btn btn--outline" href={url('/news/')}>Read More on Media/News <Icon name="arrow-right" /></a>
+      </SectionHeader>
+      <NewsRail />
+    </div>
+  </section>
+</SiteLayout>
+
+<style>
+  .intro {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: clamp(2rem, 1rem + 5vw, 6rem);
+    align-items: center;
+  }
+
+  .intro__media {
+    position: relative;
+  }
+
+  .intro__badge {
+    position: absolute;
+    right: -1.5rem;
+    bottom: -1.5rem;
+    display: grid;
+    gap: 2px;
+    padding: var(--sp-5) var(--sp-6);
+    border-radius: var(--radius-lg);
+    background: var(--teal-400);
+    color: var(--navy-950);
+    box-shadow: var(--shadow-lg);
+    max-width: 220px;
+  }
+
+  .intro__badge strong {
+    font-size: var(--fs-2xl);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+  }
+
+  .intro__badge span {
+    font-size: var(--fs-sm);
+    font-weight: 600;
+  }
+
+  .intro__copy {
+    justify-items: start;
+  }
+
+  .intro__copy .btn {
+    width: max-content;
+  }
+
+  @media (max-width: 900px) {
+    .intro {
+      grid-template-columns: 1fr;
+    }
+    .intro__badge {
+      right: 1rem;
+    }
+  }
+</style>

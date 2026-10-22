@@ -1,0 +1,96 @@
+---
+import Icon from '@/components/ui/Icon.astro';
+import Visual from '@/components/ui/Visual.astro';
+import type { Article } from '@/data/news';
+import { longDate } from '@/lib/format';
+import { url } from '@/lib/paths';
+
+interface Props {
+  article: Article;
+  featured?: boolean;
+}
+
+const { article: a, featured = false } = Astro.props;
+---
+
+<article class:list={['nc', { 'nc--featured': featured }]} data-category={a.category}>
+  <a href={url(`/news/${a.slug}/`)} class="nc__link">
+    <Visual icon={a.icon} tone={a.tone} ratio={featured ? '16 / 10' : '16 / 9'} caption={false} class="nc__media" />
+    <div class="nc__body">
+      <p class="nc__meta">
+        <span class="badge badge--teal">{a.category}</span>
+        <time datetime={a.date}>{longDate(a.date)}</time>
+      </p>
+      <h3>{a.title}</h3>
+      <p class="nc__excerpt">{a.excerpt}</p>
+      <span class="link-arrow">Read more <Icon name="arrow-right" /></span>
+    </div>
+  </a>
+</article>
+
+<style>
+  .nc {
+    height: 100%;
+  }
+
+  .nc__link {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    box-shadow: 0 0 0 1px var(--line);
+    overflow: hidden;
+    color: var(--ink);
+    text-decoration: none;
+    transition:
+      box-shadow var(--dur) var(--ease),
+      transform var(--dur) var(--ease);
+  }
+
+  .nc__link:hover {
+    color: var(--ink);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md), 0 0 0 1px var(--line-2);
+  }
+
+  .nc__link :global(.nc__media) {
+    border-radius: 0;
+  }
+
+  .nc__body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-3);
+    flex: 1;
+    padding: var(--sp-5) var(--sp-6) var(--sp-6);
+  }
+
+  .nc__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sp-3);
+    font-size: var(--fs-xs);
+    color: var(--ink-3);
+  }
+
+  .nc h3 {
+    font-size: var(--fs-lg);
+    line-height: 1.35;
+  }
+
+  .nc--featured h3 {
+    font-size: var(--fs-xl);
+  }
+
+  .nc__excerpt {
+    font-size: var(--fs-sm);
+    color: var(--ink-2);
+    line-height: 1.6;
+  }
+
+  .nc .link-arrow {
+    margin-top: auto;
+  }
+</style>

@@ -1,0 +1,23 @@
+{
+  "name": "Arwyp Medical Centre",
+  "short_name": "Arwyp",
+  "description": "Book specialists, pay online and manage your care at Arwyp Medical Centre.",
+  "id": "/arwyp/",
+  "start_url": "/arwyp/portal/",
+  "scope": "/arwyp/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#ffffff",
+  "theme_color": "#283646",
+  "categories": ["health", "medical"],
+  "icons": [
+    { "src": "/arwyp/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/arwyp/icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/arwyp/icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Book a specialist", "url": "/arwyp/specialists/" },
+    { "name": "My appointments", "url": "/arwyp/portal/appointments/" },
+    { "name": "Emergency", "url": "/arwyp/contact/" }
+  ]
+}

@@ -1,0 +1,108 @@
+---
+import Icon from '@/components/ui/Icon.astro';
+import { url } from '@/lib/paths';
+
+const features = [
+  { icon: 'calendar-check', title: 'Book 24/7', text: 'Real-time availability for every specialist.' },
+  { icon: 'credit-card', title: 'Pay online', text: 'PayFast, Peach Payments and medical aid.' },
+  { icon: 'file-text', title: 'Results & invoices', text: 'Lab, radiology and billing in one place.' },
+  { icon: 'message-circle', title: 'Message the rooms', text: 'Encrypted, with full history retained.' },
+];
+---
+
+<section class="section only-b pb" aria-labelledby="pb-title">
+  <div class="container pb__inner">
+    <div class="pb__copy">
+      <span class="tag-b" data-label="Quote B platform"></span>
+      <h2 id="pb-title">Your care, <span class="serif">in your pocket</span></h2>
+      <p class="lead">
+        The Arwyp patient portal installs on any phone like an app. Book and pay for consultations, complete pre-admission, view results and message your
+        specialist's rooms, even offline.
+      </p>
+      <div class="cluster">
+        <a class="btn btn--accent btn--lg" href={url('/portal/')}><Icon name="smartphone" /> Open the patient portal</a>
+        <button type="button" class="btn btn--outline btn--lg" data-pwa-install hidden><Icon name="download" /> Install app</button>
+      </div>
+    </div>
+    <ul class="pb__grid" role="list">
+      {
+        features.map((f) => (
+          <li>
+            <span class="pb__icon">
+              <Icon name={f.icon} />
+            </span>
+            <strong>{f.title}</strong>
+            <span>{f.text}</span>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .pb {
+    background:
+      radial-gradient(40% 80% at 100% 50%, rgb(0 216 206 / 0.14), transparent 70%),
+      var(--teal-50);
+  }
+
+  .pb__inner {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: var(--sp-12);
+    align-items: center;
+  }
+
+  .pb__copy {
+    display: grid;
+    gap: var(--sp-5);
+    justify-items: start;
+  }
+
+  .pb__grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--sp-4);
+    margin: 0;
+  }
+
+  .pb__grid li {
+    display: grid;
+    gap: var(--sp-2);
+    padding: var(--sp-6);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    box-shadow: var(--shadow-sm), 0 0 0 1px rgb(0 120 122 / 0.12);
+    font-size: var(--fs-sm);
+    color: var(--ink-2);
+  }
+
+  .pb__grid strong {
+    font-size: var(--fs-md);
+    color: var(--navy-900);
+  }
+
+  .pb__icon {
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    margin-bottom: var(--sp-2);
+    border-radius: var(--radius-md);
+    background: var(--navy-800);
+    color: var(--teal-400);
+  }
+
+  @media (max-width: 900px) {
+    .pb__inner {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .pb__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

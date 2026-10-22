@@ -1,0 +1,109 @@
+---
+import Icon from '@/components/ui/Icon.astro';
+import NewsCard from '@/components/sections/NewsCard.astro';
+import { articles } from '@/data/news';
+
+const items = articles.slice(0, 6);
+---
+
+<div class="rail" data-rail>
+  <div class="rail__track" data-rail-track tabindex="0" aria-label="Latest health insights" role="region">
+    {
+      items.map((a) => (
+        <div class="rail__item">
+          <NewsCard article={a} />
+        </div>
+      ))
+    }
+  </div>
+  <div class="rail__controls">
+    <button type="button" class="rail__btn" data-rail-prev aria-label="Previous articles"><Icon name="arrow-left" /></button>
+    <button type="button" class="rail__btn" data-rail-next aria-label="Next articles"><Icon name="arrow-right" /></button>
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-rail]').forEach((rail) => {
+    const track = rail.querySelector<HTMLElement>('[data-rail-track]')!;
+    const step = () => (track.firstElementChild as HTMLElement).offsetWidth + 24;
+    const atEnd = () => track.scrollLeft + track.clientWidth >= track.scrollWidth - 4;
+    const go = (dir: 1 | -1) =>
+      track.scrollBy({ left: dir === 1 && atEnd() ? -track.scrollWidth : dir * step(), behavior: 'smooth' });
+
+    rail.querySelector('[data-rail-prev]')?.addEventListener('click', () => go(-1));
+    rail.querySelector('[data-rail-next]')?.addEventListener('click', () => go(1));
+
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    let timer = window.setInterval(() => go(1), 6000);
+    const pause = () => clearInterval(timer);
+    const resume = () => {
+      clearInterval(timer);
+      timer = window.setInterval(() => go(1), 6000);
+    };
+    rail.addEventListener('pointerenter', pause);
+    rail.addEventListener('pointerleave', resume);
+    rail.addEventListener('focusin', pause);
+    rail.addEventListener('focusout', resume);
+  });
+</script>
+
+<style>
+  .rail__track {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: calc((100% - 2 * 24px) / 3);
+    gap: 24px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    padding: 4px;
+    margin: -4px;
+  }
+
+  .rail__track::-webkit-scrollbar {
+    display: none;
+  }
+
+  .rail__item {
+    scroll-snap-align: start;
+  }
+
+  .rail__controls {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--sp-2);
+    margin-top: var(--sp-6);
+  }
+
+  .rail__btn {
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 50%;
+    border: 1px solid var(--line-2);
+    background: var(--surface);
+    color: var(--navy-800);
+    transition:
+      background-color var(--dur) var(--ease),
+      color var(--dur) var(--ease);
+  }
+
+  .rail__btn:hover {
+    background: var(--navy-800);
+    border-color: var(--navy-800);
+    color: #fff;
+  }
+
+  @media (max-width: 1024px) {
+    .rail__track {
+      grid-auto-columns: calc((100% - 24px) / 2);
+    }
+  }
+
+  @media (max-width: 640px) {
+    .rail__track {
+      grid-auto-columns: 86%;
+    }
+  }
+</style>
