@@ -1,0 +1,195 @@
+---
+import AppLayout from '@/layouts/AppLayout.astro';
+import PageHeader from '@/components/app/PageHeader.astro';
+import DataTable from '@/components/app/DataTable.astro';
+import Tabs from '@/components/app/Tabs.astro';
+import WeekCalendar from '@/components/app/WeekCalendar.astro';
+import FormPanel from '@/components/app/FormPanel.astro';
+import KpiTile from '@/components/app/KpiTile.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { bookings } from '@/data/app/bookings';
+import { doctor, weekDays, slots, blocks } from '@/data/app/doctor';
+import { specialists } from '@/data/specialists';
+import { TODAY } from '@/data/app/common';
+
+const events = slots.map((s) => ({ day: s.day, start: s.start, minutes: s.minutes, title: s.patient, sub: s.type, status: s.status }));
+const todayCount = bookings.filter((b) => b.date === TODAY).length;
+const pending = bookings.filter((b) => b.status === 'Pending payment').length;
+---
+
+<AppLayout title="Bookings" area="admin" gate>
+  <PageHeader title="Bookings" subtitle="Real-time calendars for every specialist, with admin override and block-out.">
+    <span slot="tag" class="tag-b"></span>
+    <button class="btn btn--outline btn--sm" data-open="block-out"><Icon name="ban" /> Block out time</button>
+    <button class="btn btn--sm" data-open="new-booking" data-title="New booking"><Icon name="plus" /> New booking</button>
+  </PageHeader>
+
+  <div class="app-grid app-grid--kpi">
+    <KpiTile label="Today" value={String(todayCount)} icon="calendar-days" />
+    <KpiTile label="Awaiting payment" value={String(pending)} icon="credit-card" />
+    <KpiTile label="Online share" value="71%" delta={6.2} icon="globe" />
+    <KpiTile label="Reminders delivered" value="98.6%" delta={0.4} icon="bell-ring" />
+  </div>
+
+  <section class="panel bk" data-tabs-scope>
+    <div class="bk__head">
+      <Tabs label="Booking views" tabs={[{ id: 'calendar', label: 'Calendar' }, { id: 'list', label: 'All bookings', count: bookings.length }]} />
+      <label class="bk__who">
+        <span class="sr-only">Specialist calendar</span>
+        <select class="select select--sm">
+          <option>{doctor.name} ({doctor.discipline})</option>
+          {specialists.slice(0, 12).map((s) => <option>{s.name} ({s.discipline})</option>)}
+        </select>
+      </label>
+    </div>
+    <div data-tab-panel="calendar" class="bk__cal">
+      <WeekCalendar days={weekDays} events={events} blocks={blocks} newPanel="new-booking" />
+      <p class="bk__legend">
+        <span><i class="k k--confirmed"></i> Confirmed</span>
+        <span><i class="k k--pending"></i> Pending payment</span>
+        <span><i class="k k--done"></i> Completed</span>
+        <span><i class="k k--block"></i> Blocked out</span>
+      </p>
+    </div>
+    <div data-tab-panel="list" hidden>
+      <DataTable
+        id="bookings"
+        search="Search patient, specialist or reference"
+        filter={{ key: 'status', label: 'Statuses' }}
+        kicker="Booking"
+        titleKey="ref"
+        rows={bookings}
+        columns={[
+          { key: 'ref', label: 'Ref', kind: 'mono' },
+          { key: 'patient', label: 'Patient', kind: 'strong', sub: 'type' },
+          { key: 'specialist', label: 'Specialist', kind: 'strong', sub: 'discipline', hideSm: true },
+          { key: 'date', label: 'Date', kind: 'date', hideSm: true },
+          { key: 'start', label: 'Time', hideSm: true },
+          { key: 'source', label: 'Source', hideSm: true },
+          { key: 'amount', label: 'Fee', kind: 'money', align: 'end', hideSm: true },
+          { key: 'status', label: 'Status', kind: 'status' },
+        ]}
+      />
+    </div>
+  </section>
+
+  <FormPanel id="new-booking" title="New booking" subtitle="Admin override: book outside online availability" submit="Confirm booking" toast="Booking confirmed, SMS sent to patient">
+    <div class="field">
+      <label for="nb-patient">Patient</label>
+      <input id="nb-patient" class="input" placeholder="Search by name, ID or phone" required />
+    </div>
+    <div class="field">
+      <label for="nb-sp">Specialist</label>
+      <select id="nb-sp" class="select">{specialists.slice(0, 20).map((s) => <option>{s.name}</option>)}</select>
+    </div>
+    <div class="form-row">
+      <div class="field"><label for="nb-date">Date</label><input id="nb-date" class="input" type="date" value="2026-10-26" /></div>
+      <div class="field"><label for="nb-time">Time</label><input id="nb-time" class="input" type="time" value="09:30" /></div>
+    </div>
+    <div class="form-row">
+      <div class="field">
+        <label for="nb-type">Type</label>
+        <select id="nb-type" class="select"><option>New patient</option><option>Follow-up</option><option>Procedure consult</option><option>Telehealth</option></select>
+      </div>
+      <div class="field">
+        <label for="nb-pay">Payment</label>
+        <select id="nb-pay" class="select"><option>Send PayFast link</option><option>Peach Payments link</option><option>Medical aid</option><option>Pay at rooms</option></select>
+      </div>
+    </div>
+    <label class="check"><input type="checkbox" checked /> Send SMS & email confirmation and 24-hour reminder</label>
+  </FormPanel>
+
+  <FormPanel id="block-out" title="Block out time" submit="Block out" toast="Calendar blocked, affected patients notified" center>
+    <div class="field">
+      <label for="bo-sp">Specialist</label>
+      <select id="bo-sp" class="select"><option>{doctor.name}</option>{specialists.slice(0, 12).map((s) => <option>{s.name}</option>)}</select>
+    </div>
+    <div class="form-row">
+      <div class="field"><label for="bo-from">From</label><input id="bo-from" class="input" type="datetime-local" value="2026-10-26T14:00" /></div>
+      <div class="field"><label for="bo-to">To</label><input id="bo-to" class="input" type="datetime-local" value="2026-10-26T17:00" /></div>
+    </div>
+    <div class="field"><label for="bo-reason">Reason</label><input id="bo-reason" class="input" placeholder="Theatre, leave, congress..." /></div>
+    <label class="check"><input type="checkbox" checked /> Offer affected patients the next available slot</label>
+  </FormPanel>
+</AppLayout>
+
+<style>
+  .bk {
+    margin-top: var(--sp-6);
+  }
+
+  .bk__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--sp-3);
+    padding: var(--sp-2) var(--sp-5) 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .bk__head :global(.tabs) {
+    border-bottom: 0;
+  }
+
+  .bk__who {
+    padding-bottom: var(--sp-3);
+  }
+
+  .bk__who .select {
+    min-width: 260px;
+    border-radius: var(--radius-pill);
+  }
+
+  .bk__cal {
+    padding: var(--sp-4) var(--sp-5) var(--sp-5);
+  }
+
+  .bk__legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-2) var(--sp-5);
+    margin-top: var(--sp-4);
+    font-size: var(--fs-xs);
+    color: var(--ink-2);
+  }
+
+  .bk__legend span {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-2);
+  }
+
+  .k {
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+  }
+
+  .k--confirmed {
+    background: #e8f1fc;
+    box-shadow: inset 3px 0 0 #2a78d6;
+  }
+
+  .k--pending {
+    background: var(--amber-50);
+    box-shadow: inset 3px 0 0 #fab219;
+  }
+
+  .k--done {
+    background: var(--surface-3);
+    box-shadow: inset 3px 0 0 #898781;
+  }
+
+  .k--block {
+    background: repeating-linear-gradient(135deg, var(--surface-3) 0 3px, var(--surface-2) 3px 6px);
+  }
+
+  @media (max-width: 760px) {
+    .bk__who,
+    .bk__who .select {
+      width: 100%;
+      min-width: 0;
+    }
+  }
+</style>

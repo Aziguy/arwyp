@@ -1,0 +1,61 @@
+---
+import AppLayout from '@/layouts/AppLayout.astro';
+import PageHeader from '@/components/app/PageHeader.astro';
+import DataTable from '@/components/app/DataTable.astro';
+import FormPanel from '@/components/app/FormPanel.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { sitePages } from '@/data/app/cms';
+---
+
+<AppLayout title="Pages" area="admin">
+  <PageHeader title="Pages" subtitle="All 13 landing pages and their sub-pages. Edit copy, images, SEO titles and schema without a developer.">
+    <button class="btn btn--sm" data-open="page-editor" data-title="New page"><Icon name="plus" /> New page</button>
+  </PageHeader>
+  <section class="panel">
+    <DataTable
+      id="pages"
+      search="Search pages"
+      filter={{ key: 'status', label: 'Statuses' }}
+      kicker="Page"
+      titleKey="title"
+      rows={sitePages}
+      columns={[
+        { key: 'title', label: 'Page', kind: 'strong', sub: 'path' },
+        { key: 'template', label: 'Template', hideSm: true },
+        { key: 'editor', label: 'Last editor', hideSm: true },
+        { key: 'updated', label: 'Updated', kind: 'date', hideSm: true },
+        { key: 'status', label: 'Status', kind: 'status' },
+      ]}
+    />
+  </section>
+
+  <FormPanel id="page-editor" title="Edit page" submit="Save & publish" toast="Page published">
+    <div class="field">
+      <label for="pe-title">Page title</label>
+      <input id="pe-title" class="input" value="Our Services" />
+    </div>
+    <div class="field">
+      <label for="pe-head">Headline</label>
+      <input id="pe-head" class="input" value="Comprehensive care, all in one place." />
+    </div>
+    <div class="field">
+      <label for="pe-sub">Subhead</label>
+      <textarea id="pe-sub" class="textarea">From your first consultation to complex surgery and recovery, Arwyp brings specialist expertise together under one roof.</textarea>
+    </div>
+    <div class="form-row">
+      <div class="field">
+        <label for="pe-seo">SEO title</label>
+        <input id="pe-seo" class="input" value="Our Services | Arwyp Medical Centre" />
+      </div>
+      <div class="field">
+        <label for="pe-schema">Schema type</label>
+        <select id="pe-schema" class="select"><option>MedicalOrganization</option><option>Hospital</option><option>WebPage</option><option>FAQPage</option></select>
+      </div>
+    </div>
+    <div class="field">
+      <label for="pe-meta">Meta description</label>
+      <input id="pe-meta" class="input" maxlength="160" value="Browse 20+ specialised services at Arwyp Medical Centre, Kempton Park." />
+      <span class="field-hint">Recommended 120 to 160 characters.</span>
+    </div>
+  </FormPanel>
+</AppLayout>

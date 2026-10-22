@@ -1,0 +1,108 @@
+---
+import AppLayout from '@/layouts/AppLayout.astro';
+import PageHeader from '@/components/app/PageHeader.astro';
+import DataTable from '@/components/app/DataTable.astro';
+import FormPanel from '@/components/app/FormPanel.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { specialists } from '@/data/specialists';
+import { disciplines } from '@/data/disciplines';
+
+const rows = specialists.map((s) => ({
+  ...s,
+  calendar: s.accepting ? 'Live' : 'Paused',
+  database: 'Encrypted',
+}));
+---
+
+<AppLayout title="Specialists" area="admin">
+  <PageHeader title="Specialists" subtitle={`${specialists.length} profiles across ${disciplines.length} disciplines. Changes appear instantly in Find a Specialist and department pages.`}>
+    <button class="btn btn--outline btn--sm only-b" data-toast-click="Onboarding invite sent"><Icon name="user-plus" /> Onboard specialist</button>
+    <button class="btn btn--sm" data-open="sp-editor" data-title="New specialist profile"><Icon name="plus" /> Add profile</button>
+  </PageHeader>
+
+  <section class="panel">
+    <DataTable
+      id="specialists"
+      search="Search by name, discipline or practice number"
+      filter={{ key: 'discipline', label: 'Disciplines' }}
+      kicker="Specialist profile"
+      rows={rows}
+      columns={[
+        { key: 'name', label: 'Specialist', kind: 'person', sub: 'discipline' },
+        { key: 'practiceNumber', label: 'Practice no.', kind: 'mono', hideSm: true },
+        { key: 'rooms', label: 'Rooms', hideSm: true },
+        { key: 'phone', label: 'Booking number', hideSm: true, quote: 'a' },
+        { key: 'fee', label: 'Consult fee', kind: 'money', align: 'end', quote: 'b', hideSm: true },
+        { key: 'rating', label: 'Rating', align: 'end', quote: 'b', hideSm: true },
+        { key: 'database', label: 'Patient DB', kind: 'status', quote: 'b', hideSm: true },
+        { key: 'calendar', label: 'Calendar', kind: 'status', quote: 'b' },
+      ]}
+    />
+  </section>
+
+  <FormPanel id="sp-editor" title="Specialist profile" submit="Save profile" toast="Profile saved and published">
+    <div class="form-row">
+      <div class="field">
+        <label for="sp-name">Full name</label>
+        <input id="sp-name" class="input" placeholder="Dr First Last" />
+      </div>
+      <div class="field">
+        <label for="sp-disc">Discipline</label>
+        <select id="sp-disc" class="select">{disciplines.map((d) => <option>{d.name}</option>)}</select>
+      </div>
+    </div>
+    <div class="field">
+      <label for="sp-qual">Qualifications</label>
+      <input id="sp-qual" class="input" placeholder="MBChB, FCS (SA), MMed" />
+    </div>
+    <div class="form-row">
+      <div class="field">
+        <label for="sp-pr">Practice number</label>
+        <input id="sp-pr" class="input" inputmode="numeric" />
+      </div>
+      <div class="field">
+        <label for="sp-rooms">Consulting rooms</label>
+        <input id="sp-rooms" class="input" placeholder="Medical Suite 402, East Wing" />
+      </div>
+    </div>
+    <div class="field">
+      <label for="sp-phone">Direct booking number</label>
+      <input id="sp-phone" class="input" type="tel" />
+    </div>
+    <div class="field">
+      <label for="sp-bio">Short bio</label>
+      <textarea id="sp-bio" class="textarea"></textarea>
+    </div>
+    <fieldset class="only-b sp-b">
+      <legend><span class="tag-b" data-label="Specialist ecosystem"></span></legend>
+      <div class="form-row">
+        <div class="field">
+          <label for="sp-fee">Consultation fee (R)</label>
+          <input id="sp-fee" class="input" type="number" value="1250" />
+        </div>
+        <div class="field">
+          <label for="sp-dep">Deposit</label>
+          <select id="sp-dep" class="select"><option>Full payment</option><option>R500 deposit</option><option>Medical aid only</option></select>
+        </div>
+      </div>
+      <label class="check"><input type="checkbox" checked /> Enable online booking calendar</label>
+      <label class="check"><input type="checkbox" checked /> Provision private encrypted patient database</label>
+      <label class="check"><input type="checkbox" checked /> Send SMS & email reminders 24 hours before</label>
+    </fieldset>
+  </FormPanel>
+</AppLayout>
+
+<style>
+  .sp-b {
+    display: grid;
+    gap: var(--sp-4);
+    padding: var(--sp-5);
+    border: 1px solid var(--teal-100);
+    border-radius: var(--radius-lg);
+    background: var(--teal-50);
+  }
+
+  .sp-b legend {
+    padding: 0 var(--sp-2);
+  }
+</style>

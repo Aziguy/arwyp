@@ -1,0 +1,43 @@
+---
+import AppLayout from '@/layouts/AppLayout.astro';
+import PageHeader from '@/components/app/PageHeader.astro';
+import DataTable from '@/components/app/DataTable.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { auditLog } from '@/data/app/modules';
+---
+
+<AppLayout title="Audit trail" area="admin" gate>
+  <PageHeader title="Audit trail" subtitle="Every login, data access, booking change and payment, logged immutably with timestamp, user and IP.">
+    <span slot="tag" class="tag-b"></span>
+    <button class="btn btn--outline btn--sm" data-toast-click="Audit export signed and downloaded"><Icon name="download" /> Signed export</button>
+  </PageHeader>
+
+  <p class="secure-note au-note"><Icon name="link" size={14} /> Append-only log. Each entry is hash-chained to the previous one; tampering breaks the chain.</p>
+
+  <section class="panel">
+    <DataTable
+      id="audit"
+      search="Search actor, action or target"
+      filter={{ key: 'action', label: 'Actions' }}
+      pageSize={12}
+      dense
+      kicker="Audit entry"
+      titleKey="id"
+      rows={auditLog}
+      columns={[
+        { key: 'at', label: 'Timestamp', kind: 'mono' },
+        { key: 'actor', label: 'Actor', kind: 'strong' },
+        { key: 'action', label: 'Action' },
+        { key: 'target', label: 'Target', kind: 'mono', hideSm: true },
+        { key: 'ip', label: 'IP', kind: 'mono', hideSm: true },
+        { key: 'hash', label: 'Hash', kind: 'mono', hideSm: true },
+      ]}
+    />
+  </section>
+</AppLayout>
+
+<style>
+  .au-note {
+    margin-bottom: var(--sp-4);
+  }
+</style>

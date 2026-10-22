@@ -1,0 +1,115 @@
+---
+import AppLayout from '@/layouts/AppLayout.astro';
+import PageHeader from '@/components/app/PageHeader.astro';
+import DataTable from '@/components/app/DataTable.astro';
+import Tabs from '@/components/app/Tabs.astro';
+import FormPanel from '@/components/app/FormPanel.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { eligibilityChecks, preAuths, claims, tariffs } from '@/data/app/operations';
+import { schemes } from '@/data/app/common';
+---
+
+<AppLayout title="Medical aid" area="admin" gate>
+  <PageHeader title="Medical aid" subtitle="Real-time eligibility, pre-authorisation, claims tracking and scheme tariffs.">
+    <span slot="tag" class="tag-b"></span>
+    <button class="btn btn--sm" data-open="check"><Icon name="shield-check" /> Check eligibility</button>
+  </PageHeader>
+
+  <section class="panel" data-tabs-scope>
+    <div class="ma__tabs">
+      <Tabs
+        label="Medical aid views"
+        tabs={[
+          { id: 'eligibility', label: 'Eligibility', count: eligibilityChecks.length },
+          { id: 'preauth', label: 'Pre-authorisation', count: preAuths.length },
+          { id: 'claims', label: 'Claims', count: claims.length },
+          { id: 'tariffs', label: 'Scheme tariffs', count: tariffs.length },
+        ]}
+      />
+    </div>
+    <div data-tab-panel="eligibility">
+      <DataTable
+        id="eligibility"
+        search="Search checks"
+        filter={{ key: 'result', label: 'Results' }}
+        kicker="Eligibility check"
+        rows={eligibilityChecks}
+        columns={[
+          { key: 'ref', label: 'Ref', kind: 'mono', hideSm: true },
+          { key: 'patient', label: 'Patient', kind: 'strong', sub: 'benefit' },
+          { key: 'scheme', label: 'Scheme', kind: 'strong', sub: 'plan', hideSm: true },
+          { key: 'available', label: 'Benefit available', kind: 'money', align: 'end', hideSm: true },
+          { key: 'checked', label: 'Checked', kind: 'date', hideSm: true },
+          { key: 'result', label: 'Result', kind: 'status' },
+        ]}
+      />
+    </div>
+    <div data-tab-panel="preauth" hidden>
+      <DataTable
+        id="preauth"
+        search="Search pre-authorisations"
+        filter={{ key: 'status', label: 'Statuses' }}
+        kicker="Pre-authorisation"
+        rows={preAuths}
+        columns={[
+          { key: 'ref', label: 'Ref', kind: 'mono' },
+          { key: 'patient', label: 'Patient', kind: 'strong', sub: 'procedure' },
+          { key: 'scheme', label: 'Scheme', hideSm: true },
+          { key: 'icd10', label: 'ICD-10', kind: 'mono', hideSm: true },
+          { key: 'submitted', label: 'Submitted', kind: 'date', hideSm: true },
+          { key: 'status', label: 'Status', kind: 'status' },
+        ]}
+      />
+    </div>
+    <div data-tab-panel="claims" hidden>
+      <DataTable
+        id="claims"
+        search="Search claims"
+        filter={{ key: 'status', label: 'Statuses' }}
+        kicker="Claim"
+        rows={claims}
+        columns={[
+          { key: 'ref', label: 'Claim', kind: 'mono' },
+          { key: 'patient', label: 'Patient', kind: 'strong' },
+          { key: 'scheme', label: 'Scheme', hideSm: true },
+          { key: 'submitted', label: 'Submitted', kind: 'date', hideSm: true },
+          { key: 'amount', label: 'Amount', kind: 'money', align: 'end' },
+          { key: 'status', label: 'Status', kind: 'status' },
+        ]}
+      />
+    </div>
+    <div data-tab-panel="tariffs" hidden>
+      <DataTable
+        id="tariffs"
+        search={false}
+        kicker="Scheme tariff"
+        rows={tariffs}
+        columns={[
+          { key: 'scheme', label: 'Scheme', kind: 'strong' },
+          { key: 'consult', label: 'Consultation', kind: 'money', align: 'end' },
+          { key: 'followUp', label: 'Follow-up', kind: 'money', align: 'end', hideSm: true },
+          { key: 'ward', label: 'Ward / day', kind: 'money', align: 'end', hideSm: true },
+          { key: 'icu', label: 'ICU / day', kind: 'money', align: 'end', hideSm: true },
+          { key: 'status', label: 'Agreement', kind: 'status' },
+        ]}
+      />
+    </div>
+  </section>
+
+  <FormPanel id="check" title="Check eligibility" submit="Run check" toast="Eligible: benefit confirmed by scheme" center>
+    <div class="form-row">
+      <div class="field"><label for="ec-scheme">Scheme</label><select id="ec-scheme" class="select">{schemes.map((s) => <option>{s}</option>)}</select></div>
+      <div class="field"><label for="ec-member">Member number</label><input id="ec-member" class="input" required /></div>
+    </div>
+    <div class="field">
+      <label for="ec-benefit">Benefit</label>
+      <select id="ec-benefit" class="select"><option>Specialist consultation</option><option>In-hospital procedure</option><option>MRI scan</option><option>Maternity programme</option></select>
+    </div>
+  </FormPanel>
+</AppLayout>
+
+<style>
+  .ma__tabs {
+    padding: var(--sp-2) var(--sp-5) 0;
+  }
+</style>

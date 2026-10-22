@@ -1,0 +1,350 @@
+---
+import AppLayout from '@/layouts/AppLayout.astro';
+import PageHeader from '@/components/app/PageHeader.astro';
+import KpiTile from '@/components/app/KpiTile.astro';
+import LineChart from '@/components/app/LineChart.astro';
+import BarChart from '@/components/app/BarChart.astro';
+import DataTable from '@/components/app/DataTable.astro';
+import FormPanel from '@/components/app/FormPanel.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { kpis, bookingsDaily, days30Labels, sessionsDaily, months, revenueMonthly, bookingsByDiscipline, topSpecialists, sourceShare, topPages } from '@/data/app/metrics';
+import { upcoming } from '@/data/app/bookings';
+import { aiVisibility } from '@/data/app/modules';
+import { submissions, activity } from '@/data/app/cms';
+import { specialists } from '@/data/specialists';
+import { articleCategories } from '@/data/news';
+import { badgeClass } from '@/lib/app/status';
+import { money, compact, count } from '@/lib/format';
+import { url } from '@/lib/paths';
+
+const quick = [
+  { icon: 'newspaper', label: 'Publish news', href: '/admin/news/' },
+  { icon: 'briefcase', label: 'Add vacancy', href: '/admin/vacancies/' },
+  { icon: 'stethoscope', label: 'Update specialist', href: '/admin/specialists/' },
+  { icon: 'clock', label: 'Visiting hours', href: '/admin/patient-info/' },
+  { icon: 'graduation-cap', label: 'Add programme', href: '/admin/programmes/' },
+  { icon: 'image', label: 'Upload media', href: '/admin/media/' },
+];
+---
+
+<AppLayout title="Dashboard" area="admin">
+  <div class="only-a">
+    <PageHeader kicker="Content management" title="Good morning, Carmen" subtitle="Update pages, specialists, news, vacancies, programmes and visiting hours without a developer.">
+      <a class="btn btn--outline btn--sm" href={url('/')}><Icon name="external-link" /> View website</a>
+      <button class="btn btn--sm" data-open="new-article"><Icon name="plus" /> New article</button>
+    </PageHeader>
+
+    <div class="app-grid app-grid--kpi">
+      <KpiTile label="Website sessions" value={compact(kpis.sessions.value)} delta={kpis.sessions.delta} trend={kpis.sessions.trend} icon="globe" />
+      <KpiTile label="Avg. engagement time" value={kpis.avgTime.value} delta={kpis.avgTime.delta} trend={kpis.avgTime.trend} icon="clock-3" />
+      <KpiTile label="Form submissions" value={count(kpis.forms.value)} delta={kpis.forms.delta} trend={kpis.forms.trend} icon="inbox" />
+      <KpiTile label="Specialist profiles" value={String(specialists.length)} delta={5.6} trend={[96, 98, 99, 101, 103, 104, 106, 108, 109, 110, 111, specialists.length]} icon="stethoscope" />
+    </div>
+
+    <div class="app-grid app-grid--main dash-row">
+      <section class="panel">
+        <header class="panel__head">
+          <div>
+            <h2 class="panel__title">Website sessions</h2>
+            <p class="panel__sub">Google Analytics 4, last 30 days</p>
+          </div>
+          <span class="badge badge--teal"><Icon name="circle-check" size={12} /> GA4 connected</span>
+        </header>
+        <div class="panel__body">
+          <LineChart id="sessions" labels={days30Labels} series={[{ name: 'Sessions', values: sessionsDaily }]} area caption="Daily website sessions, last 30 days" />
+        </div>
+      </section>
+
+      <section class="panel">
+        <header class="panel__head">
+          <h2 class="panel__title">Quick actions</h2>
+        </header>
+        <div class="panel__body">
+          <ul class="quick" role="list">
+            {
+              quick.map((q) => (
+                <li>
+                  <a href={url(q.href)}>
+                    <Icon name={q.icon} size={20} />
+                    {q.label}
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+      </section>
+    </div>
+
+    <div class="app-grid app-grid--2 dash-row">
+      <section class="panel">
+        <header class="panel__head">
+          <h2 class="panel__title">Top pages</h2>
+          <p class="panel__sub">Views, last 30 days</p>
+        </header>
+        <div class="panel__body"><BarChart items={topPages} caption="Top pages by views" /></div>
+      </section>
+      <section class="panel">
+        <header class="panel__head">
+          <h2 class="panel__title">Traffic sources</h2>
+          <p class="panel__sub">Share of sessions</p>
+        </header>
+        <div class="panel__body"><BarChart items={sourceShare} format="percent" caption="Traffic sources by share of sessions" /></div>
+      </section>
+    </div>
+
+    <div class="app-grid app-grid--main dash-row">
+      <section class="panel">
+        <header class="panel__head">
+          <div>
+            <h2 class="panel__title">Latest form submissions</h2>
+            <p class="panel__sub">Contact Us and Pre-admission, routed by subject, POPIA consent captured</p>
+          </div>
+          <a class="btn btn--ghost btn--sm" href={url('/admin/submissions/')}>View all <Icon name="arrow-right" /></a>
+        </header>
+        <div class="panel__body--flush">
+          <DataTable
+            id="dash-subs"
+            search={false}
+            pageSize={5}
+            kicker="Form submission"
+            titleKey="name"
+            rows={submissions}
+            columns={[
+              { key: 'name', label: 'Name', kind: 'strong', sub: 'subject' },
+              { key: 'form', label: 'Form', hideSm: true },
+              { key: 'routed', label: 'Routed to', kind: 'mono', hideSm: true },
+              { key: 'status', label: 'Status', kind: 'status' },
+            ]}
+          />
+        </div>
+      </section>
+      <section class="panel">
+        <header class="panel__head">
+          <h2 class="panel__title">Recent activity</h2>
+        </header>
+        <ul class="list-rows dash-list" role="list">
+          {
+            activity.map((a) => (
+              <li>
+                <span class="icon-dot icon-dot--navy">
+                  <Icon name={a.icon} size={16} />
+                </span>
+                <span class="list-rows__main">
+                  <strong>{a.text}</strong>
+                  <small>{a.at}</small>
+                </span>
+              </li>
+            ))
+          }
+        </ul>
+      </section>
+    </div>
+  </div>
+
+  <div class="only-b">
+    <PageHeader kicker="Arwyp admin dashboard" title="Platform overview" subtitle="Bookings, patients, payments, content and SEO across 100+ specialists, in real time.">
+      <span slot="tag" class="tag-b"></span>
+      <button class="btn btn--outline btn--sm" data-toast-click="Report exported to CSV"><Icon name="download" /> Export CSV</button>
+      <a class="btn btn--sm" href={url('/admin/bookings/')}><Icon name="plus" /> New booking</a>
+    </PageHeader>
+
+    <div class="app-grid app-grid--kpi app-grid--kpi-6">
+      <KpiTile label="Bookings this month" value={count(kpis.bookings.value)} delta={kpis.bookings.delta} trend={kpis.bookings.trend} icon="calendar-check" />
+      <KpiTile label="Revenue (October)" value={`R${compact(kpis.revenue.value)}`} delta={kpis.revenue.delta} trend={kpis.revenue.trend} icon="wallet" />
+      <KpiTile label="Booking conversion" value={`${kpis.conversion.value}%`} delta={kpis.conversion.delta} trend={kpis.conversion.trend} icon="gauge" />
+      <KpiTile label="No-show rate" value={`${kpis.noShow.value}%`} delta={kpis.noShow.delta} upIsGood={false} trend={kpis.noShow.trend} icon="ban" />
+      <KpiTile label="Registered patients" value={count(kpis.patients.value)} delta={kpis.patients.delta} trend={kpis.patients.trend} icon="users" />
+      <KpiTile label="Avg. keyword rank" value={String(kpis.rank.value)} delta={kpis.rank.delta} upIsGood={false} trend={kpis.rank.trend} icon="search-check" />
+    </div>
+
+    <div class="app-grid app-grid--main dash-row">
+      <section class="panel">
+        <header class="panel__head">
+          <div>
+            <h2 class="panel__title">Bookings per day</h2>
+            <p class="panel__sub">Online (web, portal, Google) vs phone, last 30 days</p>
+          </div>
+        </header>
+        <div class="panel__body">
+          <LineChart
+            id="bookings-daily"
+            labels={days30Labels}
+            series={[
+              { name: 'Online', values: bookingsDaily.online },
+              { name: 'Phone', values: bookingsDaily.phone },
+            ]}
+            caption="Bookings per day by channel"
+          />
+        </div>
+      </section>
+      <section class="panel">
+        <header class="panel__head">
+          <div>
+            <h2 class="panel__title">Bookings by discipline</h2>
+            <p class="panel__sub">Last 30 days</p>
+          </div>
+        </header>
+        <div class="panel__body"><BarChart items={bookingsByDiscipline} caption="Bookings by discipline" /></div>
+      </section>
+    </div>
+
+    <div class="app-grid app-grid--main dash-row">
+      <section class="panel">
+        <header class="panel__head">
+          <div>
+            <h2 class="panel__title">Revenue</h2>
+            <p class="panel__sub">Online payments and medical aid settlements, last 6 months</p>
+          </div>
+        </header>
+        <div class="panel__body">
+          <LineChart id="revenue" labels={months} series={[{ name: 'Revenue', values: revenueMonthly }]} format="money" area height={220} caption="Monthly revenue" />
+        </div>
+      </section>
+      <section class="panel">
+        <header class="panel__head">
+          <div>
+            <h2 class="panel__title">AI assistant visibility</h2>
+            <p class="panel__sub">Share of tracked queries citing Arwyp</p>
+          </div>
+        </header>
+        <div class="panel__body"><BarChart items={aiVisibility} format="percent" caption="AI assistant citation share" color="#1baf7a" /></div>
+      </section>
+    </div>
+
+    <div class="app-grid app-grid--main dash-row">
+      <section class="panel">
+        <header class="panel__head">
+          <div>
+            <h2 class="panel__title">Per-specialist performance</h2>
+            <p class="panel__sub">Top earners this month</p>
+          </div>
+          <a class="btn btn--ghost btn--sm" href={url('/admin/specialists/')}>All specialists <Icon name="arrow-right" /></a>
+        </header>
+        <div class="panel__body--flush">
+          <DataTable
+            id="top-specialists"
+            search={false}
+            pageSize={6}
+            kicker="Specialist"
+            rows={topSpecialists}
+            columns={[
+              { key: 'name', label: 'Specialist', kind: 'person' },
+              { key: 'bookings', label: 'Bookings', kind: 'number', align: 'end' },
+              { key: 'noShow', label: 'No-shows', kind: 'number', align: 'end', hideSm: true },
+              { key: 'revenue', label: 'Revenue', kind: 'money', align: 'end' },
+            ]}
+          />
+        </div>
+      </section>
+      <section class="panel">
+        <header class="panel__head">
+          <h2 class="panel__title">Next appointments</h2>
+          <a class="btn btn--ghost btn--sm" href={url('/admin/bookings/')}>Calendar <Icon name="arrow-right" /></a>
+        </header>
+        <ul class="list-rows dash-list" role="list">
+          {
+            upcoming.slice(0, 6).map((b) => (
+              <li>
+                <span class="when tabular">
+                  <strong>{b.start}</strong>
+                  <small>{b.date.slice(5).replace('-', '/')}</small>
+                </span>
+                <span class="list-rows__main">
+                  <strong>{b.patient}</strong>
+                  <small>
+                    {b.specialist} &middot; {money(b.amount)}
+                  </small>
+                </span>
+                <span class={badgeClass(b.status)}>{b.status}</span>
+              </li>
+            ))
+          }
+        </ul>
+      </section>
+    </div>
+  </div>
+
+  <FormPanel id="new-article" title="New article" subtitle="Publishes to Media / News and the home page feed" submit="Publish" toast="Article published">
+    <div class="field">
+      <label for="na-title">Title</label>
+      <input id="na-title" class="input" required placeholder="e.g. Five signs it is time to see a cardiologist" />
+    </div>
+    <div class="form-row">
+      <div class="field">
+        <label for="na-cat">Category</label>
+        <select id="na-cat" class="select">{articleCategories.map((c) => <option>{c}</option>)}</select>
+      </div>
+      <div class="field">
+        <label for="na-date">Publish date</label>
+        <input id="na-date" class="input" type="date" value="2026-10-22" />
+      </div>
+    </div>
+    <div class="field">
+      <label for="na-body">Body</label>
+      <textarea id="na-body" class="textarea" placeholder="Write the article..."></textarea>
+    </div>
+    <div class="field">
+      <label for="na-seo">SEO description</label>
+      <input id="na-seo" class="input" maxlength="160" placeholder="Shown in Google results (max 160 characters)" />
+    </div>
+  </FormPanel>
+</AppLayout>
+
+<style>
+  .dash-row {
+    margin-top: var(--sp-6);
+  }
+
+  .dash-list {
+    padding-top: var(--sp-3);
+  }
+
+  .quick {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--sp-3);
+    margin: 0;
+  }
+
+  .quick a {
+    display: grid;
+    gap: var(--sp-2);
+    padding: var(--sp-4);
+    border-radius: var(--radius-md);
+    background: var(--surface-2);
+    color: var(--navy-900);
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    text-decoration: none;
+    transition:
+      background-color var(--dur) var(--ease),
+      box-shadow var(--dur) var(--ease);
+  }
+
+  .quick a:hover {
+    background: var(--teal-50);
+    box-shadow: inset 0 0 0 1px var(--teal-100);
+    color: var(--navy-900);
+  }
+
+  .quick :global(svg) {
+    color: var(--teal-700);
+  }
+
+  .when {
+    display: grid;
+    flex: none;
+    width: 3.25rem;
+    line-height: 1.2;
+  }
+
+  .when strong {
+    color: var(--navy-900);
+  }
+
+  .when small {
+    font-size: var(--fs-xs);
+    color: var(--ink-3);
+  }
+</style>

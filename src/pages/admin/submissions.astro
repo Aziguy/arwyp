@@ -1,0 +1,32 @@
+---
+import AppLayout from '@/layouts/AppLayout.astro';
+import PageHeader from '@/components/app/PageHeader.astro';
+import DataTable from '@/components/app/DataTable.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { submissions } from '@/data/app/cms';
+---
+
+<AppLayout title="Submissions" area="admin">
+  <PageHeader title="Form submissions" subtitle="Contact Us messages routed by subject and Pre-admission forms. Every entry stores the POPIA consent given at submission.">
+    <button class="btn btn--outline btn--sm" data-toast-click="Export ready (CSV)"><Icon name="download" /> Export</button>
+  </PageHeader>
+  <section class="panel">
+    <DataTable
+      id="submissions"
+      search="Search by name or subject"
+      filter={{ key: 'form', label: 'Forms' }}
+      kicker="Form submission"
+      titleKey="name"
+      rows={submissions}
+      columns={[
+        { key: 'id', label: 'Ref', kind: 'mono', hideSm: true },
+        { key: 'name', label: 'From', kind: 'strong', sub: 'subject' },
+        { key: 'form', label: 'Form', hideSm: true },
+        { key: 'routed', label: 'Routed to', kind: 'mono', hideSm: true },
+        { key: 'received', label: 'Received', hideSm: true },
+        { key: 'consent', label: 'POPIA consent', kind: 'status', hideSm: true },
+        { key: 'status', label: 'Status', kind: 'status' },
+      ]}
+    />
+  </section>
+</AppLayout>

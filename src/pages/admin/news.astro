@@ -1,0 +1,59 @@
+---
+import AppLayout from '@/layouts/AppLayout.astro';
+import PageHeader from '@/components/app/PageHeader.astro';
+import DataTable from '@/components/app/DataTable.astro';
+import FormPanel from '@/components/app/FormPanel.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { articles, articleCategories } from '@/data/news';
+
+const rows = articles.map((a, i) => ({ ...a, status: i === 0 ? 'Scheduled' : 'Published', views: 4200 - i * 380 }));
+---
+
+<AppLayout title="News" area="admin">
+  <PageHeader title="News & health insights" subtitle="Articles feed the Media / News page and the rotating feed on the home page.">
+    <button class="btn btn--sm" data-open="article-editor"><Icon name="plus" /> New article</button>
+  </PageHeader>
+  <section class="panel">
+    <DataTable
+      id="news"
+      search="Search articles"
+      filter={{ key: 'category', label: 'Categories' }}
+      kicker="Article"
+      titleKey="title"
+      rows={rows}
+      columns={[
+        { key: 'title', label: 'Title', kind: 'strong', sub: 'author' },
+        { key: 'category', label: 'Category', hideSm: true },
+        { key: 'date', label: 'Date', kind: 'date', hideSm: true },
+        { key: 'views', label: 'Views', kind: 'number', align: 'end', hideSm: true },
+        { key: 'status', label: 'Status', kind: 'status' },
+      ]}
+    />
+  </section>
+
+  <FormPanel id="article-editor" title="New article" submit="Publish" toast="Article published">
+    <div class="field">
+      <label for="ae-title">Title</label>
+      <input id="ae-title" class="input" required />
+    </div>
+    <div class="form-row">
+      <div class="field">
+        <label for="ae-cat">Category</label>
+        <select id="ae-cat" class="select">{articleCategories.map((c) => <option>{c}</option>)}</select>
+      </div>
+      <div class="field">
+        <label for="ae-date">Publish on</label>
+        <input id="ae-date" class="input" type="date" value="2026-10-22" />
+      </div>
+    </div>
+    <div class="field">
+      <label for="ae-img">Cover image</label>
+      <input id="ae-img" class="input" type="file" accept="image/*" />
+    </div>
+    <div class="field">
+      <label for="ae-body">Body</label>
+      <textarea id="ae-body" class="textarea"></textarea>
+    </div>
+    <label class="check"><input type="checkbox" checked /> Show in the home page feed</label>
+  </FormPanel>
+</AppLayout>

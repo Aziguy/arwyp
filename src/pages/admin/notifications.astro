@@ -1,0 +1,48 @@
+---
+import AppLayout from '@/layouts/AppLayout.astro';
+import PageHeader from '@/components/app/PageHeader.astro';
+import DataTable from '@/components/app/DataTable.astro';
+import KpiTile from '@/components/app/KpiTile.astro';
+import { notifications } from '@/data/app/modules';
+
+const rate = (channel: string) => {
+  const list = notifications.filter((n) => n.channel === channel);
+  return `${Math.round((list.filter((n) => n.status === 'Delivered' || n.status === 'Read').length / list.length) * 100)}%`;
+};
+---
+
+<AppLayout title="Notifications" area="admin" gate>
+  <PageHeader title="Notifications" subtitle="SMS, email and WhatsApp messages: confirmations, 24-hour reminders, receipts and results alerts.">
+    <span slot="tag" class="tag-b"></span>
+  </PageHeader>
+
+  <div class="app-grid app-grid--kpi">
+    <KpiTile label="SMS delivery rate" value={rate('SMS')} icon="smartphone" />
+    <KpiTile label="Email delivery rate" value={rate('Email')} icon="mail" />
+    <KpiTile label="WhatsApp delivery rate" value={rate('WhatsApp')} icon="message-circle" />
+    <KpiTile label="Messages (30 days)" value="18 940" delta={9.1} icon="bell-ring" />
+  </div>
+
+  <section class="panel nt">
+    <DataTable
+      id="notifications"
+      search="Search messages"
+      filter={{ key: 'channel', label: 'Channels' }}
+      kicker="Message"
+      rows={notifications}
+      columns={[
+        { key: 'id', label: 'ID', kind: 'mono', hideSm: true },
+        { key: 'template', label: 'Template', kind: 'strong', sub: 'channel' },
+        { key: 'to', label: 'Recipient', kind: 'masked', hideSm: true },
+        { key: 'sent', label: 'Sent', hideSm: true },
+        { key: 'status', label: 'Status', kind: 'status' },
+      ]}
+    />
+  </section>
+</AppLayout>
+
+<style>
+  .nt {
+    margin-top: var(--sp-6);
+  }
+</style>

@@ -1,0 +1,51 @@
+---
+import AuthLayout from '@/layouts/AuthLayout.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { url } from '@/lib/paths';
+---
+
+<AuthLayout title="Sign in" heading="Back-office sign in" intro="Arwyp staff and specialists sign in here.">
+  <form class="form" data-auth-step="credentials">
+    <div class="field">
+      <label for="li-email">Work email</label>
+      <input id="li-email" class="input" type="email" value="c.abrahams@arwyp.example" autocomplete="username" required />
+    </div>
+    <div class="field">
+      <label for="li-pass">Password</label>
+      <input id="li-pass" class="input" type="password" value="demo-password" autocomplete="current-password" required />
+    </div>
+    <label class="check"><input type="checkbox" checked /> Keep me signed in on this device</label>
+    <button class="btn btn--lg btn--block" type="submit">Sign in <Icon name="arrow-right" /></button>
+    <p class="auth__alt only-b">Specialist? <a href={url('/doctor/')}>Open the specialist workspace</a></p>
+  </form>
+
+  <form class="form" data-auth-step="otp" hidden>
+    <div class="auth__otp-head">
+      <span class="icon-dot"><Icon name="smartphone" size={18} /></span>
+      <p>Enter the 6-digit code sent to <strong>+27 82 *** 0144</strong>.</p>
+    </div>
+    <div class="otp" role="group" aria-label="One-time code">
+      {Array.from({ length: 6 }, (_, i) => <input class="input otp__box" inputmode="numeric" maxlength="1" aria-label={`Digit ${i + 1}`} value={String((i * 3 + 4) % 10)} />)}
+    </div>
+    <button class="btn btn--lg btn--block" type="submit"><Icon name="shield-check" /> Verify & continue</button>
+    <p class="auth__alt">Two-factor authentication is enforced for all staff. <span class="tag-b"></span></p>
+  </form>
+</AuthLayout>
+
+<script>
+  import { url } from '@/lib/paths';
+  const creds = document.querySelector<HTMLFormElement>('[data-auth-step="credentials"]')!;
+  const otp = document.querySelector<HTMLFormElement>('[data-auth-step="otp"]')!;
+  const go = () => location.assign(url('/admin/'));
+  creds.addEventListener('submit', (e) => {
+    e.preventDefault();
+    if (document.documentElement.dataset.quote !== 'b') return go();
+    creds.hidden = true;
+    otp.hidden = false;
+    otp.querySelector<HTMLInputElement>('input')?.focus();
+  });
+  otp.addEventListener('submit', (e) => {
+    e.preventDefault();
+    go();
+  });
+</script>

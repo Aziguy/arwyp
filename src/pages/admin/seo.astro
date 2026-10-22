@@ -1,0 +1,87 @@
+---
+import AppLayout from '@/layouts/AppLayout.astro';
+import PageHeader from '@/components/app/PageHeader.astro';
+import DataTable from '@/components/app/DataTable.astro';
+import KpiTile from '@/components/app/KpiTile.astro';
+import BarChart from '@/components/app/BarChart.astro';
+import LineChart from '@/components/app/LineChart.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { keywords, aiVisibility } from '@/data/app/modules';
+import { kpis, months } from '@/data/app/metrics';
+
+const top10 = keywords.filter((k) => k.rank <= 10).length;
+const cited = keywords.filter((k) => k.ai === 'Cited').length;
+const rows = keywords.map((k) => ({ ...k, changeLabel: `${k.change > 0 ? '+' : ''}${k.change}` }));
+---
+
+<AppLayout title="SEO & AI search" area="admin" gate>
+  <PageHeader title="SEO & AI search" subtitle={`Rank tracking for ${keywords.length} high-intent keywords across Google, Bing and AI assistants.`}>
+    <span slot="tag" class="tag-b"></span>
+    <button class="btn btn--outline btn--sm" data-toast-click="Monthly ranking report generated"><Icon name="file-down" /> Monthly report</button>
+  </PageHeader>
+
+  <div class="app-grid app-grid--kpi">
+    <KpiTile label="Tracked keywords" value={String(keywords.length)} icon="search-check" />
+    <KpiTile label="Page-one rankings" value={String(top10)} delta={12.6} trend={[64, 71, 80, 88, 97, 104, 112, 120, 131, 140, 148, top10]} icon="trending-up" />
+    <KpiTile label="Average position" value={String(kpis.rank.value)} delta={kpis.rank.delta} upIsGood={false} trend={kpis.rank.trend} icon="gauge" />
+    <KpiTile label="Cited by AI assistants" value={String(cited)} delta={19.4} icon="bot" />
+  </div>
+
+  <div class="app-grid app-grid--main seo">
+    <section class="panel">
+      <header class="panel__head">
+        <div>
+          <h2 class="panel__title">Keywords on page one</h2>
+          <p class="panel__sub">Google, last 6 months</p>
+        </div>
+      </header>
+      <div class="panel__body">
+        <LineChart
+          id="page-one"
+          labels={months}
+          series={[
+            { name: 'Google', values: [72, 88, 104, 121, 139, top10] },
+            { name: 'Bing', values: [51, 63, 77, 90, 102, Math.round(top10 * 0.78)] },
+          ]}
+          height={220}
+          caption="Keywords ranking on page one per search engine"
+        />
+      </div>
+    </section>
+    <section class="panel">
+      <header class="panel__head">
+        <div>
+          <h2 class="panel__title">AI assistant visibility</h2>
+          <p class="panel__sub">Share of tracked queries citing Arwyp</p>
+        </div>
+      </header>
+      <div class="panel__body"><BarChart items={aiVisibility} format="percent" caption="AI assistant citation share" color="#1baf7a" /></div>
+    </section>
+  </div>
+
+  <section class="panel">
+    <DataTable
+      id="keywords"
+      search="Search keywords"
+      filter={{ key: 'intent', label: 'Intents' }}
+      pageSize={12}
+      kicker="Keyword"
+      titleKey="keyword"
+      rows={rows}
+      columns={[
+        { key: 'keyword', label: 'Keyword', kind: 'strong' },
+        { key: 'intent', label: 'Intent', hideSm: true },
+        { key: 'volume', label: 'Volume', kind: 'number', align: 'end', hideSm: true },
+        { key: 'rank', label: 'Position', kind: 'number', align: 'end' },
+        { key: 'changeLabel', label: 'Change', align: 'end', hideSm: true },
+        { key: 'ai', label: 'AI search', kind: 'status' },
+      ]}
+    />
+  </section>
+</AppLayout>
+
+<style>
+  .seo {
+    margin-block: var(--sp-6);
+  }
+</style>

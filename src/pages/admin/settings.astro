@@ -1,0 +1,139 @@
+---
+import AppLayout from '@/layouts/AppLayout.astro';
+import PageHeader from '@/components/app/PageHeader.astro';
+import Tabs from '@/components/app/Tabs.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { site } from '@/config/site';
+
+const integrations = [
+  { name: 'Google Analytics 4', icon: 'chart-line', status: 'Connected' },
+  { name: 'Google Search Console', icon: 'search-check', status: 'Connected' },
+  { name: 'Google Business Profile', icon: 'map-pin', status: 'Connected' },
+  { name: 'Google Maps embed', icon: 'map', status: 'Connected' },
+  { name: 'PayFast', icon: 'credit-card', status: 'Live', quote: 'b' },
+  { name: 'Peach Payments', icon: 'credit-card', status: 'Live', quote: 'b' },
+  { name: 'SMS gateway', icon: 'smartphone', status: 'Live', quote: 'b' },
+  { name: 'WhatsApp Business API', icon: 'message-circle', status: 'Live', quote: 'b' },
+  { name: 'Medical aid switch', icon: 'shield-plus', status: 'Live', quote: 'b' },
+];
+---
+
+<AppLayout title="Settings" area="admin">
+  <PageHeader title="Settings" subtitle="Hospital details, SEO defaults, integrations and security." />
+
+  <div class="panel" data-tabs-scope>
+    <div class="set__tabs">
+      <Tabs
+        label="Settings sections"
+        tabs={[
+          { id: 'general', label: 'General' },
+          { id: 'seo', label: 'SEO & schema' },
+          { id: 'integrations', label: 'Integrations' },
+          { id: 'security', label: 'Security & POPIA' },
+        ]}
+      />
+    </div>
+
+    <form class="panel__body form set__form" data-tab-panel="general" data-demo-form data-toast="Settings saved">
+      <div class="form-row">
+        <div class="field"><label for="s-name">Hospital name</label><input id="s-name" class="input" value={site.name} /></div>
+        <div class="field"><label for="s-tag">Tagline</label><input id="s-tag" class="input" value={site.tagline} /></div>
+      </div>
+      <div class="form-row">
+        <div class="field"><label for="s-phone">Main number</label><input id="s-phone" class="input" value={site.phone.display} /></div>
+        <div class="field"><label for="s-em">Emergency number</label><input id="s-em" class="input" value={site.emergency.display} /></div>
+        <div class="field"><label for="s-mail">General enquiries</label><input id="s-mail" class="input" value={site.email} /></div>
+      </div>
+      <div class="field"><label for="s-addr">Address</label><input id="s-addr" class="input" value={`${site.address.street}, ${site.address.area}, ${site.address.city}, ${site.address.postcode}`} /></div>
+      <label class="check only-b"><input type="checkbox" checked /> Show the emergency alert banner on every page</label>
+      <button class="btn btn--sm set__save" type="submit">Save changes</button>
+    </form>
+
+    <form class="panel__body form set__form" data-tab-panel="seo" data-demo-form data-toast="SEO defaults saved" hidden>
+      <div class="field"><label for="s-title">Default title pattern</label><input id="s-title" class="input" value="%page% | Arwyp Medical Centre" /></div>
+      <div class="field"><label for="s-desc">Default meta description</label><textarea id="s-desc" class="textarea">{site.description}</textarea></div>
+      <div class="form-row">
+        <div class="field">
+          <label for="s-schema">Organisation schema</label>
+          <select id="s-schema" class="select"><option>Hospital + MedicalOrganization</option><option>Hospital</option></select>
+        </div>
+        <div class="field">
+          <label for="s-sitemap">XML sitemap</label>
+          <select id="s-sitemap" class="select"><option>Auto-generate on publish</option><option>Manual</option></select>
+        </div>
+      </div>
+      <label class="check"><input type="checkbox" checked /> Physician schema on every specialist profile</label>
+      <label class="check only-b"><input type="checkbox" checked /> FAQ structured data and AI-search entity markup</label>
+      <button class="btn btn--sm set__save" type="submit">Save changes</button>
+    </form>
+
+    <div class="panel__body" data-tab-panel="integrations" hidden>
+      <ul class="integ" role="list">
+        {
+          integrations.map((i) => (
+            <li class={i.quote ? `only-${i.quote}` : undefined}>
+              <span class="icon-dot icon-dot--navy">
+                <Icon name={i.icon} size={18} />
+              </span>
+              <span class="integ__name">
+                {i.name} {i.quote && <span class="tag-b" />}
+              </span>
+              <span class="badge badge--green badge--dot">{i.status}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+
+    <form class="panel__body form set__form" data-tab-panel="security" data-demo-form data-toast="Security settings saved" hidden>
+      <div class="form-row">
+        <div class="field"><label for="s-io">Information Officer</label><input id="s-io" class="input" value="Kyle Pieterse" /></div>
+        <div class="field"><label for="s-iomail">Information Officer email</label><input id="s-iomail" class="input" value="popia@arwyp.example" /></div>
+      </div>
+      <label class="check"><input type="checkbox" checked /> Require POPIA consent on every form</label>
+      <label class="check"><input type="checkbox" checked /> SSL, HSTS and security headers</label>
+      <label class="check"><input type="checkbox" checked /> Daily backups</label>
+      <label class="check only-b"><input type="checkbox" checked /> Enforce two-factor authentication for all staff</label>
+      <label class="check only-b"><input type="checkbox" checked /> AES-256 encryption at rest for patient databases</label>
+      <label class="check only-b"><input type="checkbox" checked /> WAF, DDoS protection and weekly vulnerability scans</label>
+      <button class="btn btn--sm set__save" type="submit">Save changes</button>
+    </form>
+  </div>
+</AppLayout>
+
+<style>
+  .set__tabs {
+    padding: var(--sp-2) var(--sp-6) 0;
+  }
+
+  .set__form {
+    max-width: 860px;
+  }
+
+  .set__save {
+    justify-self: start;
+  }
+
+  .integ {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+    gap: var(--sp-3);
+    margin: 0;
+  }
+
+  .integ li {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3);
+    padding: var(--sp-4);
+    border-radius: var(--radius-md);
+    box-shadow: 0 0 0 1px var(--line);
+  }
+
+  .integ__name {
+    flex: 1;
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    color: var(--navy-900);
+  }
+</style>

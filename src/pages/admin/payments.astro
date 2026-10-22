@@ -1,0 +1,76 @@
+---
+import AppLayout from '@/layouts/AppLayout.astro';
+import PageHeader from '@/components/app/PageHeader.astro';
+import DataTable from '@/components/app/DataTable.astro';
+import KpiTile from '@/components/app/KpiTile.astro';
+import BarChart from '@/components/app/BarChart.astro';
+import FormPanel from '@/components/app/FormPanel.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { payments } from '@/data/app/operations';
+import { money } from '@/lib/format';
+
+const sum = (filter: (p: (typeof payments)[number]) => boolean) => payments.filter(filter).reduce((s, p) => s + p.amount, 0);
+const byGateway = ['PayFast', 'Peach Payments', 'Medical aid'].map((g) => ({ label: g, value: sum((p) => p.gateway === g && p.status === 'Successful') }));
+---
+
+<AppLayout title="Payments" area="admin" gate>
+  <PageHeader title="Payments" subtitle="PayFast and Peach Payments transactions, medical aid settlements, receipts and refunds.">
+    <span slot="tag" class="tag-b"></span>
+    <button class="btn btn--outline btn--sm" data-open="refund"><Icon name="refresh-cw" /> Issue refund</button>
+    <button class="btn btn--sm" data-toast-click="Reconciliation exported (PDF)"><Icon name="download" /> Reconciliation</button>
+  </PageHeader>
+
+  <div class="app-grid app-grid--kpi">
+    <KpiTile label="Collected (30 days)" value={money(sum((p) => p.status === 'Successful'))} delta={4.8} icon="wallet" />
+    <KpiTile label="Pending" value={money(sum((p) => p.status === 'Pending'))} icon="clock-3" />
+    <KpiTile label="Refunded" value={money(sum((p) => p.status === 'Refunded'))} upIsGood={false} delta={-2.1} icon="refresh-cw" />
+    <KpiTile label="Failed attempts" value={String(payments.filter((p) => p.status === 'Failed').length)} icon="circle-alert" />
+  </div>
+
+  <div class="app-grid app-grid--main pay">
+    <section class="panel">
+      <DataTable
+        id="payments"
+        search="Search transactions"
+        filter={{ key: 'status', label: 'Statuses' }}
+        kicker="Transaction"
+        rows={payments}
+        columns={[
+          { key: 'ref', label: 'Transaction', kind: 'mono' },
+          { key: 'patient', label: 'Patient', kind: 'strong', sub: 'specialist' },
+          { key: 'gateway', label: 'Gateway', kind: 'strong', sub: 'method', hideSm: true },
+          { key: 'kind', label: 'Type', hideSm: true },
+          { key: 'date', label: 'Date', kind: 'date', hideSm: true },
+          { key: 'amount', label: 'Amount', kind: 'money', align: 'end' },
+          { key: 'status', label: 'Status', kind: 'status' },
+        ]}
+      />
+    </section>
+    <section class="panel">
+      <header class="panel__head">
+        <div>
+          <h2 class="panel__title">Collected by gateway</h2>
+          <p class="panel__sub">Successful transactions</p>
+        </div>
+      </header>
+      <div class="panel__body"><BarChart items={byGateway} format="money" caption="Collected amount by payment gateway" /></div>
+    </section>
+  </div>
+
+  <FormPanel id="refund" title="Issue refund" submit="Process refund" toast="Refund processed, receipt emailed" center>
+    <div class="field"><label for="rf-tx">Transaction reference</label><input id="rf-tx" class="input mono" placeholder="TX-903100" required /></div>
+    <div class="form-row">
+      <div class="field"><label for="rf-amt">Amount (R)</label><input id="rf-amt" class="input" type="number" /></div>
+      <div class="field">
+        <label for="rf-reason">Reason</label>
+        <select id="rf-reason" class="select"><option>Cancelled by patient</option><option>Cancelled by specialist</option><option>Duplicate payment</option></select>
+      </div>
+    </div>
+  </FormPanel>
+</AppLayout>
+
+<style>
+  .pay {
+    margin-top: var(--sp-6);
+  }
+</style>

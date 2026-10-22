@@ -1,0 +1,54 @@
+---
+import AppLayout from '@/layouts/AppLayout.astro';
+import PageHeader from '@/components/app/PageHeader.astro';
+import DataTable from '@/components/app/DataTable.astro';
+import KpiTile from '@/components/app/KpiTile.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { patients } from '@/data/app/operations';
+import { count } from '@/lib/format';
+import { kpis } from '@/data/app/metrics';
+
+const databases = new Set(patients.map((p) => p.database)).size;
+---
+
+<AppLayout title="Patients" area="admin" gate>
+  <PageHeader title="Patients" subtitle="Each specialist's patients live in a private, isolated database. Admins see demographics only; clinical data stays with the treating specialist.">
+    <span slot="tag" class="tag-b"></span>
+    <button class="btn btn--outline btn--sm" data-toast-click="Data subject access request logged"><Icon name="file-down" /> DSAR export</button>
+  </PageHeader>
+
+  <div class="app-grid app-grid--kpi">
+    <KpiTile label="Registered patients" value={count(kpis.patients.value)} delta={kpis.patients.delta} trend={kpis.patients.trend} icon="users" />
+    <KpiTile label="Isolated databases" value={`${databases}+`} icon="folder-lock" />
+    <KpiTile label="Portal activation" value="72%" delta={8.1} icon="smartphone" />
+    <KpiTile label="POPIA consent on file" value="99.2%" icon="shield-check" />
+  </div>
+
+  <p class="secure-note pt-note"><Icon name="lock" size={14} /> AES-256 encryption at rest and in transit. ID and member numbers are masked. Every view is written to the audit trail.</p>
+
+  <section class="panel">
+    <DataTable
+      id="patients"
+      search="Search patients"
+      filter={{ key: 'scheme', label: 'Medical schemes' }}
+      kicker="Patient (demographics)"
+      titleKey="name"
+      rows={patients}
+      columns={[
+        { key: 'name', label: 'Patient', kind: 'person', sub: 'id' },
+        { key: 'idNumber', label: 'ID number', kind: 'masked', hideSm: true },
+        { key: 'scheme', label: 'Medical aid', hideSm: true },
+        { key: 'member', label: 'Member no.', kind: 'masked', hideSm: true },
+        { key: 'database', label: 'Specialist database', kind: 'mono', hideSm: true },
+        { key: 'lastVisit', label: 'Last visit', kind: 'date', hideSm: true },
+        { key: 'consent', label: 'Consent', kind: 'status' },
+      ]}
+    />
+  </section>
+</AppLayout>
+
+<style>
+  .pt-note {
+    margin: var(--sp-6) 0 var(--sp-4);
+  }
+</style>

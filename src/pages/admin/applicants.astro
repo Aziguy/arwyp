@@ -1,0 +1,200 @@
+---
+import AppLayout from '@/layouts/AppLayout.astro';
+import PageHeader from '@/components/app/PageHeader.astro';
+import DataTable from '@/components/app/DataTable.astro';
+import FormPanel from '@/components/app/FormPanel.astro';
+import Avatar from '@/components/ui/Avatar.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { applicants, pipelineStages } from '@/data/app/modules';
+import { vacancies } from '@/data/careers';
+---
+
+<AppLayout title="Applicants" area="admin" gate>
+  <PageHeader title="Applicant tracking" subtitle="Online applications with CV upload, interview scheduling and automated status notifications.">
+    <span slot="tag" class="tag-b"></span>
+    <button class="btn btn--sm" data-open="interview"><Icon name="calendar-plus" /> Schedule interview</button>
+  </PageHeader>
+
+  <div class="pipe" role="list">
+    {
+      pipelineStages.map((stage) => {
+        const items = applicants.filter((a) => a.stage === stage);
+        return (
+          <section class="pipe__col" role="listitem" aria-label={stage}>
+            <header>
+              <h2>{stage}</h2>
+              <span class="tabs__count">{items.length}</span>
+            </header>
+            <ul role="list">
+              {items.slice(0, 5).map((a) => (
+                <li class="pipe__card">
+                  <Avatar name={a.name} size={32} />
+                  <span>
+                    <strong>{a.name}</strong>
+                    <small>{a.role}</small>
+                    <span class="pipe__meta">
+                      <span>
+                        <Icon name="paperclip" size={12} /> {a.cv}
+                      </span>
+                      <span class="pipe__score">{a.score}</span>
+                    </span>
+                  </span>
+                </li>
+              ))}
+              {items.length > 5 && <li class="pipe__more">+{items.length - 5} more</li>}
+            </ul>
+          </section>
+        );
+      })
+    }
+  </div>
+
+  <section class="panel">
+    <DataTable
+      id="applicants"
+      search="Search applicants"
+      filter={{ key: 'stage', label: 'Stages' }}
+      kicker="Applicant"
+      titleKey="name"
+      rows={applicants.map((a) => ({ ...a, statusLabel: a.stage === 'Applied' ? 'New' : a.stage }))}
+      columns={[
+        { key: 'name', label: 'Applicant', kind: 'person', sub: 'id' },
+        { key: 'role', label: 'Vacancy', kind: 'strong', sub: 'vacancy', hideSm: true },
+        { key: 'department', label: 'Department', hideSm: true },
+        { key: 'applied', label: 'Applied', kind: 'date', hideSm: true },
+        { key: 'score', label: 'Score', kind: 'number', align: 'end', hideSm: true },
+        { key: 'statusLabel', label: 'Stage', kind: 'status' },
+      ]}
+    />
+  </section>
+
+  <FormPanel id="interview" title="Schedule interview" submit="Send invitation" toast="Interview invitation sent by email and SMS" center>
+    <div class="field">
+      <label for="iv-app">Applicant</label>
+      <select id="iv-app" class="select">{applicants.filter((a) => a.stage === 'Screening' || a.stage === 'Interview').map((a) => <option>{a.name} ({a.role})</option>)}</select>
+    </div>
+    <div class="form-row">
+      <div class="field"><label for="iv-date">Date & time</label><input id="iv-date" class="input" type="datetime-local" value="2026-10-28T10:00" /></div>
+      <div class="field"><label for="iv-mode">Format</label><select id="iv-mode" class="select"><option>On-site</option><option>Video call</option></select></div>
+    </div>
+    <div class="field">
+      <label for="iv-panel">Panel</label>
+      <select id="iv-panel" class="select"><option>Nursing Director + Unit Manager</option><option>HR + Department head</option></select>
+    </div>
+    <p class="field-hint">Open vacancies: {vacancies.length}</p>
+  </FormPanel>
+</AppLayout>
+
+<style>
+  .pipe {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(196px, 1fr));
+    gap: var(--sp-4);
+    margin-bottom: var(--sp-6);
+    overflow-x: auto;
+    padding-bottom: var(--sp-2);
+  }
+
+  .pipe__col {
+    padding: var(--sp-3);
+    border-radius: var(--radius-lg);
+    background: var(--surface-3);
+  }
+
+  .pipe__col header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--sp-1) var(--sp-2) var(--sp-3);
+  }
+
+  .pipe__col h2 {
+    font-size: var(--fs-sm);
+  }
+
+  .tabs__count {
+    padding: 0 0.5rem;
+    border-radius: var(--radius-pill);
+    background: var(--surface);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    line-height: 1.4rem;
+    color: var(--ink-2);
+  }
+
+  .pipe ul {
+    display: grid;
+    gap: var(--sp-2);
+    margin: 0;
+  }
+
+  .pipe__card {
+    display: flex;
+    gap: var(--sp-3);
+    padding: var(--sp-3);
+    border-radius: var(--radius-md);
+    background: var(--surface);
+    box-shadow: var(--shadow-xs), 0 0 0 1px var(--line);
+    font-size: var(--fs-xs);
+    line-height: 1.35;
+    min-width: 0;
+  }
+
+  .pipe__card > span {
+    display: grid;
+    gap: 2px;
+    min-width: 0;
+    flex: 1;
+  }
+
+  .pipe__card strong {
+    font-size: var(--fs-sm);
+    color: var(--navy-900);
+  }
+
+  .pipe__card small {
+    color: var(--ink-3);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .pipe__meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sp-2);
+    margin-top: 4px;
+    color: var(--ink-2);
+  }
+
+  .pipe__meta > span:first-child {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .pipe__meta :global(svg) {
+    flex: none;
+  }
+
+  .pipe__score {
+    padding: 0 0.4rem;
+    border-radius: var(--radius-pill);
+    background: var(--teal-50);
+    color: var(--teal-800);
+    font-weight: 700;
+  }
+
+  .pipe__more {
+    padding: var(--sp-2);
+    text-align: center;
+    font-size: var(--fs-xs);
+    font-weight: 600;
+    color: var(--ink-3);
+  }
+</style>

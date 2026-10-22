@@ -1,0 +1,159 @@
+---
+import AppLayout from '@/layouts/AppLayout.astro';
+import PageHeader from '@/components/app/PageHeader.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { visitingHours, admissionChecklist, amenities } from '@/data/patients';
+---
+
+<AppLayout title="Patient information" area="admin">
+  <PageHeader title="Patient information" subtitle="Visiting hours, pre-admission requirements and on-site amenities, published to the Patient Information pages." />
+
+  <div class="app-grid app-grid--main">
+    <form class="panel" data-demo-form data-toast="Visiting hours published">
+      <header class="panel__head">
+        <div>
+          <h2 class="panel__title">Visiting hours</h2>
+          <p class="panel__sub">Shown on the Visiting Hours page and the site footer</p>
+        </div>
+        <button class="btn btn--sm" type="submit"><Icon name="check" /> Publish</button>
+      </header>
+      <div class="panel__body">
+        <div class="vh">
+          <span class="vh__h">Ward</span>
+          <span class="vh__h">Hours</span>
+          <span class="vh__h">Visitors</span>
+          {
+            visitingHours.map((w, i) => (
+              <>
+                <input class="input input--sm" value={w.ward} aria-label={`Ward ${i + 1}`} />
+                <input class="input input--sm" value={w.hours} aria-label={`${w.ward} hours`} />
+                <input class="input input--sm" value={w.visitors} aria-label={`${w.ward} visitors`} />
+              </>
+            ))
+          }
+        </div>
+        <div class="field vh__note">
+          <label for="vh-note">Notice</label>
+          <textarea id="vh-note" class="textarea">Children under the age of 12 are not permitted in the wards due to infection control measures.</textarea>
+        </div>
+      </div>
+    </form>
+
+    <form class="panel" data-demo-form data-toast="Checklist updated">
+      <header class="panel__head">
+        <h2 class="panel__title">What to bring</h2>
+        <button class="btn btn--outline btn--sm" type="submit">Save</button>
+      </header>
+      <ul class="list-rows checklist" role="list">
+        {
+          admissionChecklist.map((item) => (
+            <li>
+              <Icon name="grip-vertical" size={16} class="grip" />
+              <input class="input input--sm" value={item} aria-label="Checklist item" />
+            </li>
+          ))
+        }
+      </ul>
+      <div class="panel__body">
+        <button type="button" class="btn btn--ghost btn--sm" data-toast-click="Item added"><Icon name="plus" /> Add item</button>
+      </div>
+    </form>
+  </div>
+
+  <section class="panel amen">
+    <header class="panel__head">
+      <h2 class="panel__title">Amenities</h2>
+      <p class="panel__sub">Coffee Shop, Gift Shop and Retail Pharmacy</p>
+    </header>
+    <div class="panel__body app-grid app-grid--3">
+      {
+        amenities.map((a) => (
+          <form class="amen__card" data-demo-form data-toast={`${a.name} updated`}>
+            <p class="amen__title">
+              <span class="icon-dot">
+                <Icon name={a.icon} size={16} />
+              </span>
+              {a.name}
+            </p>
+            <div class="field">
+              <label>Operating hours</label>
+              <textarea class="textarea amen__hours">{a.hours.join('\n')}</textarea>
+            </div>
+            <div class="field">
+              <label>Contact email</label>
+              <input class="input input--sm" value={a.contact.email} />
+            </div>
+            <button class="btn btn--outline btn--sm" type="submit">Save</button>
+          </form>
+        ))
+      }
+    </div>
+  </section>
+</AppLayout>
+
+<style>
+  .vh {
+    display: grid;
+    grid-template-columns: 1fr 0.8fr 1.4fr;
+    gap: var(--sp-2) var(--sp-3);
+  }
+
+  .vh__h {
+    font-size: var(--fs-xs);
+    font-weight: 650;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+
+  .vh__note {
+    margin-top: var(--sp-5);
+  }
+
+  .checklist {
+    padding-top: var(--sp-3);
+  }
+
+  .checklist :global(.grip) {
+    flex: none;
+    color: var(--ink-3);
+  }
+
+  .amen {
+    margin-top: var(--sp-6);
+  }
+
+  .amen__card {
+    display: grid;
+    gap: var(--sp-4);
+    align-content: start;
+    padding: var(--sp-5);
+    border-radius: var(--radius-md);
+    background: var(--surface-2);
+  }
+
+  .amen__card .btn {
+    justify-self: start;
+  }
+
+  .amen__title {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3);
+    font-weight: 700;
+    color: var(--navy-900);
+  }
+
+  .amen__hours {
+    min-height: 5rem;
+  }
+
+  @media (max-width: 760px) {
+    .vh {
+      grid-template-columns: 1fr;
+    }
+    .vh__h {
+      display: none;
+    }
+  }
+</style>

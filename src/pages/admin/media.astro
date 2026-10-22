@@ -1,0 +1,102 @@
+---
+import AppLayout from '@/layouts/AppLayout.astro';
+import PageHeader from '@/components/app/PageHeader.astro';
+import Visual from '@/components/ui/Visual.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { media } from '@/data/app/cms';
+---
+
+<AppLayout title="Media library" area="admin">
+  <PageHeader title="Media library" subtitle="Photos, headshots, videos and documents supplied by Arwyp, optimised automatically for speed.">
+    <label class="btn btn--sm upload">
+      <Icon name="upload" /> Upload files
+      <input type="file" multiple class="sr-only" data-upload />
+    </label>
+  </PageHeader>
+
+  <ul class="media" role="list">
+    {
+      media.map((m) => (
+        <li class="media__item">
+          <button type="button" class="media__btn" aria-label={`Open ${m.name}`} data-media={JSON.stringify({ title: m.name, fields: { Dimensions: m.dims, Size: m.size, 'Used on': `${m.used} page(s)`, 'Alt text': 'Supplied by Arwyp', CDN: 'WebP and AVIF variants generated' } })}>
+            <Visual icon={m.icon} tone={m.tone} ratio="4 / 3" caption={false} />
+          </button>
+          <div class="media__meta">
+            <p class="media__name">{m.name}</p>
+            <p class="media__info">
+              {m.dims} &middot; {m.size} &middot; used on {m.used} page{m.used > 1 ? 's' : ''}
+            </p>
+          </div>
+        </li>
+      ))
+    }
+  </ul>
+</AppLayout>
+
+<script>
+  import { toast, openRecord } from '@/scripts/app';
+  document.querySelectorAll<HTMLElement>('[data-media]').forEach((btn) =>
+    btn.addEventListener('click', () => {
+      const { title, fields } = JSON.parse(btn.dataset.media!);
+      openRecord(title, 'Media file', fields);
+    }),
+  );
+  document.querySelector<HTMLInputElement>('[data-upload]')?.addEventListener('change', (e) => {
+    const files = (e.target as HTMLInputElement).files?.length ?? 0;
+    if (files) toast(`${files} file${files > 1 ? 's' : ''} uploaded and optimised`);
+  });
+</script>
+
+<style>
+  .upload {
+    cursor: pointer;
+  }
+
+  .media {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr));
+    gap: var(--sp-5);
+    margin: 0;
+  }
+
+  .media__item {
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    box-shadow: 0 0 0 1px var(--line);
+    overflow: hidden;
+  }
+
+  .media__btn {
+    display: block;
+    width: 100%;
+  }
+
+  .media__btn :global(.visual) {
+    border-radius: 0;
+    transition: transform 300ms var(--ease);
+  }
+
+  .media__btn:hover :global(.visual) {
+    transform: scale(1.03);
+  }
+
+  .media__meta {
+    position: relative;
+    padding: var(--sp-3) var(--sp-4) var(--sp-4);
+    background: var(--surface);
+  }
+
+  .media__name {
+    font-size: var(--fs-sm);
+    font-weight: 650;
+    color: var(--navy-900);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .media__info {
+    font-size: var(--fs-xs);
+    color: var(--ink-3);
+  }
+</style>

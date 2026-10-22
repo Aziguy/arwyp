@@ -1,0 +1,64 @@
+---
+import AppLayout from '@/layouts/AppLayout.astro';
+import PageHeader from '@/components/app/PageHeader.astro';
+import DataTable from '@/components/app/DataTable.astro';
+import FormPanel from '@/components/app/FormPanel.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { programmes } from '@/data/training';
+import { courses } from '@/data/app/modules';
+
+const rows = programmes.map((p) => {
+  const c = courses.find((x) => x.slug === p.slug);
+  return { ...p, modulesCount: p.modules.length, enrolled: c?.enrolled ?? 0, status: c?.status ?? 'Draft' };
+});
+---
+
+<AppLayout title="Programmes" area="admin">
+  <PageHeader title="Training programmes" subtitle="Accredited courses on the Training Institute page, with course layout, requirements, documents and Apply button.">
+    <button class="btn btn--sm" data-open="prog-editor"><Icon name="plus" /> Add programme</button>
+  </PageHeader>
+  <section class="panel">
+    <DataTable
+      id="programmes"
+      search="Search programmes"
+      filter={{ key: 'nqf', label: 'Levels' }}
+      kicker="Programme"
+      rows={rows}
+      columns={[
+        { key: 'name', label: 'Programme', kind: 'strong', sub: 'accreditation' },
+        { key: 'nqf', label: 'Level' },
+        { key: 'duration', label: 'Duration', hideSm: true },
+        { key: 'intake', label: 'Next intake', hideSm: true },
+        { key: 'modulesCount', label: 'Modules', kind: 'number', align: 'end', hideSm: true },
+        { key: 'enrolled', label: 'Enrolled', kind: 'number', align: 'end', quote: 'b' },
+        { key: 'status', label: 'Status', kind: 'status' },
+      ]}
+    />
+  </section>
+
+  <FormPanel id="prog-editor" title="New programme" submit="Save programme" toast="Programme saved">
+    <div class="field">
+      <label for="pr-name">Programme name</label>
+      <input id="pr-name" class="input" required />
+    </div>
+    <div class="form-row">
+      <div class="field">
+        <label for="pr-nqf">NQF level</label>
+        <input id="pr-nqf" class="input" placeholder="NQF 5" />
+      </div>
+      <div class="field">
+        <label for="pr-int">Next intake</label>
+        <input id="pr-int" class="input" placeholder="February 2027" />
+      </div>
+    </div>
+    <div class="field">
+      <label for="pr-mod">Course layout (one module per line)</label>
+      <textarea id="pr-mod" class="textarea"></textarea>
+    </div>
+    <div class="field">
+      <label for="pr-req">Requirements & documents</label>
+      <textarea id="pr-req" class="textarea"></textarea>
+    </div>
+    <label class="check only-b"><input type="checkbox" checked /> Enable online registration, payment and e-learning</label>
+  </FormPanel>
+</AppLayout>

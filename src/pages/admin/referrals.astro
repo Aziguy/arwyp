@@ -1,0 +1,45 @@
+---
+import AppLayout from '@/layouts/AppLayout.astro';
+import PageHeader from '@/components/app/PageHeader.astro';
+import DataTable from '@/components/app/DataTable.astro';
+import KpiTile from '@/components/app/KpiTile.astro';
+import { referrals } from '@/data/app/operations';
+---
+
+<AppLayout title="GP referrals" area="admin" gate>
+  <PageHeader title="GP referrals" subtitle="Referrals submitted by GPs through the referral portal, tracked from receipt to case feedback.">
+    <span slot="tag" class="tag-b"></span>
+  </PageHeader>
+
+  <div class="app-grid app-grid--kpi">
+    <KpiTile label="Referrals (30 days)" value="184" delta={14.2} icon="send" />
+    <KpiTile label="Referring practices" value="62" delta={5.1} icon="hospital" />
+    <KpiTile label="Avg. time to appointment" value="2.4 days" delta={-18} upIsGood={false} icon="clock-3" />
+    <KpiTile label="Feedback sent to GP" value="96%" icon="message-square" />
+  </div>
+
+  <section class="panel ref">
+    <DataTable
+      id="referrals"
+      search="Search referrals"
+      filter={{ key: 'status', label: 'Statuses' }}
+      kicker="GP referral"
+      rows={referrals}
+      columns={[
+        { key: 'ref', label: 'Ref', kind: 'mono' },
+        { key: 'gp', label: 'Referring GP', kind: 'strong', sub: 'practice' },
+        { key: 'patient', label: 'Patient', hideSm: true },
+        { key: 'specialist', label: 'Referred to', kind: 'strong', sub: 'discipline', hideSm: true },
+        { key: 'urgency', label: 'Urgency', kind: 'status', hideSm: true },
+        { key: 'received', label: 'Received', kind: 'date', hideSm: true },
+        { key: 'status', label: 'Status', kind: 'status' },
+      ]}
+    />
+  </section>
+</AppLayout>
+
+<style>
+  .ref {
+    margin-top: var(--sp-6);
+  }
+</style>

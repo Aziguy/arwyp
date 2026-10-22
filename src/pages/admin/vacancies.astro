@@ -1,0 +1,71 @@
+---
+import AppLayout from '@/layouts/AppLayout.astro';
+import PageHeader from '@/components/app/PageHeader.astro';
+import DataTable from '@/components/app/DataTable.astro';
+import FormPanel from '@/components/app/FormPanel.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { vacancies, careerDepartments } from '@/data/careers';
+import { applicants } from '@/data/app/modules';
+
+const rows = vacancies.map((v) => ({
+  ...v,
+  applicants: applicants.filter((a) => a.vacancy === v.ref).length,
+  status: v.closes < '2026-10-31' ? 'Expiring' : 'Live',
+}));
+---
+
+<AppLayout title="Vacancies" area="admin">
+  <PageHeader title="Vacancies" subtitle="Openings shown on the Careers page with role, department, employment type and Apply button.">
+    <button class="btn btn--sm" data-open="vac-editor"><Icon name="plus" /> Add vacancy</button>
+  </PageHeader>
+  <section class="panel">
+    <DataTable
+      id="vacancies"
+      search="Search vacancies"
+      filter={{ key: 'department', label: 'Departments' }}
+      kicker="Vacancy"
+      titleKey="title"
+      rows={rows}
+      columns={[
+        { key: 'title', label: 'Role', kind: 'strong', sub: 'ref' },
+        { key: 'department', label: 'Department', hideSm: true },
+        { key: 'type', label: 'Type', hideSm: true },
+        { key: 'closes', label: 'Closes', kind: 'date', hideSm: true },
+        { key: 'applicants', label: 'Applicants', kind: 'number', align: 'end', quote: 'b' },
+        { key: 'status', label: 'Status', kind: 'status' },
+      ]}
+    />
+  </section>
+
+  <FormPanel id="vac-editor" title="New vacancy" submit="Publish vacancy" toast="Vacancy published to Careers">
+    <div class="field">
+      <label for="ve-title">Role title</label>
+      <input id="ve-title" class="input" required />
+    </div>
+    <div class="form-row">
+      <div class="field">
+        <label for="ve-dep">Department</label>
+        <select id="ve-dep" class="select">{careerDepartments.map((d) => <option>{d}</option>)}</select>
+      </div>
+      <div class="field">
+        <label for="ve-type">Employment type</label>
+        <select id="ve-type" class="select"><option>Full-time</option><option>Part-time</option><option>Locum</option></select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="field">
+        <label for="ve-close">Closing date</label>
+        <input id="ve-close" class="input" type="date" />
+      </div>
+      <div class="field">
+        <label for="ve-apply">Apply via</label>
+        <input id="ve-apply" class="input only-a" value="careers@arwyp.example" />
+        <select class="select only-b" aria-label="Apply via"><option>Online application (ATS)</option><option>Email to HR</option></select>
+      </div>
+    </div>
+    <div class="field">
+      <label for="ve-desc">Description</label>
+      <textarea id="ve-desc" class="textarea"></textarea>
+    </div>
+  </FormPanel>
+</AppLayout>

@@ -1,0 +1,74 @@
+---
+import AppLayout from '@/layouts/AppLayout.astro';
+import PageHeader from '@/components/app/PageHeader.astro';
+import DataTable from '@/components/app/DataTable.astro';
+import KpiTile from '@/components/app/KpiTile.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { courses, enrolments } from '@/data/app/modules';
+import { money } from '@/lib/format';
+
+const learners = courses.reduce((s, c) => s + c.enrolled, 0);
+const revenue = courses.reduce((s, c) => s + c.revenue, 0);
+---
+
+<AppLayout title="E-learning" area="admin" gate>
+  <PageHeader title="Training Institute portal" subtitle="Course catalogue, online registration and payment, CPD point tracking, certificates and instructor access.">
+    <span slot="tag" class="tag-b"></span>
+    <button class="btn btn--outline btn--sm" data-toast-click="Certificates issued to 4 learners"><Icon name="award" /> Issue certificates</button>
+  </PageHeader>
+
+  <div class="app-grid app-grid--kpi">
+    <KpiTile label="Active learners" value={String(learners)} delta={11.4} icon="graduation-cap" />
+    <KpiTile label="Course revenue (YTD)" value={money(revenue)} delta={9.8} icon="wallet" />
+    <KpiTile label="CPD points awarded" value="1 284" delta={22} icon="award" />
+    <KpiTile label="Avg. completion" value="71%" delta={3.5} icon="circle-check" />
+  </div>
+
+  <div class="app-grid app-grid--2 el">
+    <section class="panel">
+      <header class="panel__head">
+        <h2 class="panel__title">Courses</h2>
+      </header>
+      <div class="panel__body--flush">
+        <DataTable
+          id="courses"
+          search={false}
+          kicker="Course"
+          rows={courses}
+          columns={[
+            { key: 'name', label: 'Course', kind: 'strong', sub: 'nqf' },
+            { key: 'enrolled', label: 'Learners', kind: 'number', align: 'end' },
+            { key: 'completion', label: 'Completion', kind: 'progress', hideSm: true },
+            { key: 'status', label: 'Status', kind: 'status' },
+          ]}
+        />
+      </div>
+    </section>
+    <section class="panel">
+      <header class="panel__head">
+        <h2 class="panel__title">Enrolments</h2>
+      </header>
+      <div class="panel__body--flush">
+        <DataTable
+          id="enrolments"
+          search="Search learners"
+          kicker="Enrolment"
+          titleKey="learner"
+          rows={enrolments}
+          columns={[
+            { key: 'learner', label: 'Learner', kind: 'strong', sub: 'course' },
+            { key: 'progress', label: 'Progress', kind: 'progress', hideSm: true },
+            { key: 'cpd', label: 'CPD', kind: 'number', align: 'end', hideSm: true },
+            { key: 'status', label: 'Status', kind: 'status' },
+          ]}
+        />
+      </div>
+    </section>
+  </div>
+</AppLayout>
+
+<style>
+  .el {
+    margin-top: var(--sp-6);
+  }
+</style>

@@ -1,0 +1,57 @@
+---
+import AppLayout from '@/layouts/AppLayout.astro';
+import PageHeader from '@/components/app/PageHeader.astro';
+import DataTable from '@/components/app/DataTable.astro';
+import FormPanel from '@/components/app/FormPanel.astro';
+import KpiTile from '@/components/app/KpiTile.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { investorDocs } from '@/data/app/modules';
+---
+
+<AppLayout title="Investor hub" area="admin" gate>
+  <PageHeader title="Investor & governance hub" subtitle="Password-protected annual reports, governance documents and financial highlights, with document versioning.">
+    <span slot="tag" class="tag-b"></span>
+    <button class="btn btn--sm" data-open="upload-doc"><Icon name="upload" /> Upload document</button>
+  </PageHeader>
+
+  <div class="app-grid app-grid--kpi">
+    <KpiTile label="Registered investors" value="146" delta={4.3} icon="landmark" />
+    <KpiTile label="Document downloads (30 days)" value="612" delta={17.9} icon="file-down" />
+    <KpiTile label="Enquiries to CFO" value="23" icon="mail" />
+    <KpiTile label="Partnership enquiries" value="9" icon="handshake" />
+  </div>
+
+  <section class="panel inv">
+    <DataTable
+      id="investor-docs"
+      search="Search documents"
+      filter={{ key: 'access', label: 'Access levels' }}
+      kicker="Investor document"
+      titleKey="title"
+      rows={investorDocs}
+      columns={[
+        { key: 'title', label: 'Document', kind: 'strong', sub: 'type' },
+        { key: 'version', label: 'Version', kind: 'mono' },
+        { key: 'updated', label: 'Updated', kind: 'date', hideSm: true },
+        { key: 'size', label: 'Size', hideSm: true },
+        { key: 'access', label: 'Access', kind: 'status' },
+      ]}
+    />
+  </section>
+
+  <FormPanel id="upload-doc" title="Upload document" submit="Publish version" toast="New version published, investors notified">
+    <div class="field"><label for="ud-title">Title</label><input id="ud-title" class="input" required /></div>
+    <div class="form-row">
+      <div class="field"><label for="ud-type">Type</label><select id="ud-type" class="select"><option>Annual report</option><option>Financials</option><option>Governance</option><option>Strategy</option></select></div>
+      <div class="field"><label for="ud-access">Access</label><select id="ud-access" class="select"><option>Public</option><option>Shareholders</option><option>Board only</option></select></div>
+    </div>
+    <div class="field"><label for="ud-file">File (PDF)</label><input id="ud-file" class="input" type="file" accept="application/pdf" /></div>
+    <label class="check"><input type="checkbox" checked /> Keep previous version in history</label>
+  </FormPanel>
+</AppLayout>
+
+<style>
+  .inv {
+    margin-top: var(--sp-6);
+  }
+</style>

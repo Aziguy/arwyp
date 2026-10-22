@@ -1,0 +1,51 @@
+---
+import AppLayout from '@/layouts/AppLayout.astro';
+import PageHeader from '@/components/app/PageHeader.astro';
+import DataTable from '@/components/app/DataTable.astro';
+import FormPanel from '@/components/app/FormPanel.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { cmsUsers } from '@/data/app/cms';
+import { roles } from '@/data/app/modules';
+import { url } from '@/lib/paths';
+
+const columns = [
+  { key: 'name', label: 'User', kind: 'person' as const, sub: 'email' },
+  { key: 'role', label: 'Role' },
+  { key: 'lastActive', label: 'Last active', hideSm: true },
+  { key: 'status', label: 'Status', kind: 'status' as const },
+];
+---
+
+<AppLayout title="Users" area="admin">
+  <PageHeader title="Users" subtitle="People who can sign in to the back-office.">
+    <a class="btn btn--outline btn--sm only-b" href={url('/admin/roles/')}><Icon name="key-round" /> Roles & permissions</a>
+    <button class="btn btn--sm" data-open="invite"><Icon name="user-plus" /> Invite user</button>
+  </PageHeader>
+
+  <section class="panel only-a">
+    <DataTable id="users-a" search="Search users" kicker="User" rows={cmsUsers.filter((u) => u.quote === 'both')} columns={columns} />
+  </section>
+  <section class="panel only-b">
+    <DataTable id="users-b" search="Search users" filter={{ key: 'role', label: 'Roles' }} kicker="User" rows={cmsUsers} columns={columns} />
+  </section>
+
+  <FormPanel id="invite" title="Invite user" submit="Send invite" toast="Invitation sent" center>
+    <div class="form-row">
+      <div class="field">
+        <label for="iu-name">Full name</label>
+        <input id="iu-name" class="input" required />
+      </div>
+      <div class="field">
+        <label for="iu-email">Work email</label>
+        <input id="iu-email" class="input" type="email" required />
+      </div>
+    </div>
+    <div class="field">
+      <label for="iu-role">Role</label>
+      <select id="iu-role" class="select only-a"><option>Editor</option><option>Admin</option></select>
+      <select class="select only-b" aria-label="Role">{roles.map((r) => <option>{r}</option>)}</select>
+      <span class="field-hint only-a">Editors manage content. Admins also manage users and settings.</span>
+      <span class="field-hint only-b">Permissions follow the role-based access matrix. Two-factor authentication is enforced.</span>
+    </div>
+  </FormPanel>
+</AppLayout>
