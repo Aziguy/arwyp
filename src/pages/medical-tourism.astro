@@ -1,0 +1,221 @@
+---
+import SiteLayout from '@/layouts/SiteLayout.astro';
+import PageHero from '@/components/ui/PageHero.astro';
+import Icon from '@/components/ui/Icon.astro';
+import Avatar from '@/components/ui/Avatar.astro';
+import Visual from '@/components/ui/Visual.astro';
+import { site } from '@/config/site';
+
+const inbound = [
+  'Specialist consultations and surgical procedures across multiple disciplines',
+  'Coordinated care from arrival to discharge',
+  'Assistance with medical documentation for cross-border care, where required',
+];
+
+const outbound = [
+  'Pre-travel health consultations tailored to your destination',
+  'Travel vaccinations and preventative medication, including malaria prophylaxis',
+  'Advice on regional health risks for destinations like the Kruger area and beyond',
+  'Guidance for travellers with existing medical conditions',
+];
+---
+
+<SiteLayout title="Medical Tourism & Travel Clinic" description="World-class care, wherever you are travelling from.">
+  <PageHero
+    tone="dark"
+    eyebrow="Medical Tourism & Travel Clinic"
+    title="World-class care, <span class='serif'>wherever you are</span> travelling from."
+    subtitle="Arwyp Medical Centre welcomes patients travelling into South Africa for medical treatment, and helps outbound travellers prepare for their trip abroad: two sides of the same commitment to accessible, quality healthcare."
+    crumbs={[{ label: 'Medical Tourism' }]}
+  >
+    <div slot="actions" class="cluster">
+      <a class="btn btn--accent" href="#inbound"><Icon name="plane-landing" /> Travelling to Arwyp</a>
+      <a class="btn btn--outline-light" href="#travel-clinic"><Icon name="plane-takeoff" /> Travel Clinic</a>
+    </div>
+  </PageHero>
+
+  <section class="section" id="inbound">
+    <div class="container split">
+      <div class="stack" style="--stack: var(--sp-5)">
+        <p class="eyebrow">Inbound patients</p>
+        <h2>Travelling to South Africa <span class="serif">for treatment</span></h2>
+        <p class="lead">
+          International and cross-border patients choose Arwyp for a combination of specialist expertise, modern facilities, and more accessible costs than many
+          home countries offer, all without compromising on care standards, backed by our COHSASA accreditation.
+        </p>
+        <ul class="list-check">{inbound.map((i) => <li>{i}</li>)}</ul>
+        <p class="note">
+          <Icon name="info" size={18} />
+          If you are planning to travel to Arwyp for treatment, contact us in advance so our team can help coordinate your specialist appointment and admission ahead
+          of your arrival.
+        </p>
+      </div>
+
+      <form class="enquiry form" data-demo-form>
+        <h3>International patient enquiry</h3>
+        <div class="form-row">
+          <div class="field"><label for="ip-name">Full name</label><input id="ip-name" class="input" required /></div>
+          <div class="field"><label for="ip-country">Country</label><input id="ip-country" class="input" required placeholder="e.g. Botswana" /></div>
+        </div>
+        <div class="form-row">
+          <div class="field"><label for="ip-email">Email</label><input id="ip-email" class="input" type="email" required /></div>
+          <div class="field"><label for="ip-phone">Phone / WhatsApp</label><input id="ip-phone" class="input" type="tel" /></div>
+        </div>
+        <div class="field"><label for="ip-need">Treatment required</label><textarea id="ip-need" class="textarea" placeholder="Speciality, procedure, preferred dates"></textarea></div>
+        <div class="field only-b">
+          <label for="ip-files">Medical reports <span class="tag-b"></span></label>
+          <input id="ip-files" class="input" type="file" multiple />
+        </div>
+        <label class="check consent"><input type="checkbox" required /><span>I consent to Arwyp processing my information to coordinate my care (POPIA).</span></label>
+        <button class="btn btn--accent" type="submit"><Icon name="send" /> Send enquiry</button>
+        <p class="form-success" tabindex="-1"><Icon name="circle-check" /> Demo: enquiry received. Our international patient coordinator will reply within 24 hours.</p>
+      </form>
+    </div>
+  </section>
+
+  <section class="section section--tint" id="travel-clinic">
+    <div class="container split split--rev">
+      <div class="stack" style="--stack: var(--sp-5)">
+        <p class="eyebrow">Outbound travellers</p>
+        <h2>Our Travel Clinic</h2>
+        <p class="lead">
+          Planning a trip, especially to Sub-Saharan Africa? Between 22% and 64% of international travellers report falling ill during or after a trip, and around
+          a quarter of those hospitalisations involve serious conditions. A visit to our Travel Clinic before you go can make the difference between a great trip
+          and a ruined one.
+        </p>
+        <ul class="list-check">{outbound.map((i) => <li>{i}</li>)}</ul>
+        <p class="note note--amber">
+          <Icon name="calendar-clock" size={18} />
+          Book your Travel Clinic appointment at least 4 to 6 weeks before departure where possible, as some vaccinations need time to take full effect.
+        </p>
+      </div>
+
+      <aside class="doctor">
+        <Visual icon="plane" tone="teal" ratio="16 / 9" caption={false} />
+        <div class="doctor__body">
+          <div class="doctor__id">
+            <Avatar name="Dr Millicent Hadebe" size={56} />
+            <div>
+              <strong>Dr Millicent Hadebe</strong>
+              <span>General Practitioner | Travel Medicine</span>
+            </div>
+          </div>
+          <ul class="doctor__info" role="list">
+            <li><Icon name="building-2" size={16} /> Arwyp Medical Centre Casualty Department</li>
+            <li><Icon name="map-pin" size={16} /> {site.address.street}, {site.address.area}</li>
+            <li><Icon name="phone" size={16} /> 011 922 1000 (ext. 1179)</li>
+            <li><Icon name="mail" size={16} /> travelclinic@arwyp.example</li>
+          </ul>
+          <a class="btn btn--block only-a" href="tel:+27119221000"><Icon name="phone" /> Book a Travel Clinic Appointment</a>
+          <a class="btn btn--accent btn--block only-b" href="#"><Icon name="calendar-check" /> Book online</a>
+        </div>
+      </aside>
+    </div>
+  </section>
+</SiteLayout>
+
+<style>
+  .split {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+    gap: clamp(2rem, 1rem + 4vw, 5rem);
+    align-items: start;
+  }
+
+  .note {
+    display: flex;
+    gap: var(--sp-3);
+    padding: var(--sp-4) var(--sp-5);
+    border-radius: var(--radius-md);
+    background: var(--teal-50);
+    color: var(--teal-800);
+    font-weight: 550;
+    font-size: var(--fs-sm);
+  }
+
+  .note :global(svg) {
+    flex: none;
+    margin-top: 2px;
+  }
+
+  .note--amber {
+    background: var(--amber-50);
+    color: #5c3f00;
+  }
+
+  .enquiry {
+    padding: var(--sp-8);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-md), 0 0 0 1px var(--line);
+  }
+
+  .enquiry .btn {
+    justify-self: start;
+  }
+
+  .doctor {
+    border-radius: var(--radius-xl);
+    background: var(--surface);
+    box-shadow: var(--shadow-md), 0 0 0 1px var(--line);
+    overflow: hidden;
+  }
+
+  .doctor :global(.visual) {
+    border-radius: 0;
+  }
+
+  .doctor__body {
+    display: grid;
+    gap: var(--sp-5);
+    padding: var(--sp-6);
+  }
+
+  .doctor__id {
+    display: flex;
+    gap: var(--sp-4);
+    align-items: center;
+    line-height: 1.35;
+  }
+
+  .doctor__id strong {
+    display: block;
+    color: var(--navy-900);
+  }
+
+  .doctor__id span {
+    font-size: var(--fs-sm);
+    color: var(--teal-700);
+    font-weight: 600;
+  }
+
+  .doctor__info {
+    display: grid;
+    gap: var(--sp-3);
+    margin: 0;
+    font-size: var(--fs-sm);
+    color: var(--ink-2);
+  }
+
+  .doctor__info li {
+    display: flex;
+    gap: var(--sp-3);
+    align-items: center;
+  }
+
+  .doctor__info :global(svg) {
+    flex: none;
+    color: var(--ink-3);
+  }
+
+  @media (max-width: 960px) {
+    .split {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 520px) {
+    .enquiry {
+      padding: var(--sp-5);
+    }
+  }
+</style>
