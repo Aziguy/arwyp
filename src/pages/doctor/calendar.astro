@@ -1,0 +1,86 @@
+---
+import AppLayout from '@/layouts/AppLayout.astro';
+import PageHeader from '@/components/app/PageHeader.astro';
+import WeekCalendar from '@/components/app/WeekCalendar.astro';
+import FormPanel from '@/components/app/FormPanel.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { weekDays, slots, blocks, doctor } from '@/data/app/doctor';
+import { dayMonth } from '@/data/app/common';
+import { money } from '@/lib/format';
+
+const events = slots.map((s) => ({ day: s.day, start: s.start, minutes: s.minutes, title: s.patient, sub: s.type, status: s.status }));
+const free = weekDays.length * 18 - slots.length - blocks.reduce((sum, b) => sum + b.minutes / 30, 0);
+---
+
+<AppLayout title="Calendar" area="doctor">
+  <PageHeader title="My calendar" subtitle={`Week of ${dayMonth(weekDays[0])}. Patients see your availability in real time on your public profile.`}>
+    <span slot="tag" class="tag-b"></span>
+    <button class="btn btn--outline btn--sm" data-open="dr-block"><Icon name="ban" /> Block out</button>
+    <button class="btn btn--sm" data-open="dr-new" data-title="New appointment"><Icon name="plus" /> New appointment</button>
+  </PageHeader>
+
+  <section class="panel">
+    <div class="cal__bar">
+      <div class="cal__nav">
+        <button type="button" class="icon-btn" aria-label="Previous week"><Icon name="chevron-left" size={18} /></button>
+        <strong>{dayMonth(weekDays[0])} - {dayMonth(weekDays[weekDays.length - 1])} 2026</strong>
+        <button type="button" class="icon-btn" aria-label="Next week"><Icon name="chevron-right" size={18} /></button>
+      </div>
+      <p class="cal__free"><Icon name="circle-check" size={14} /> {free} open slots this week</p>
+    </div>
+    <div class="cal__body">
+      <WeekCalendar days={weekDays} events={events} blocks={blocks} newPanel="dr-new" />
+    </div>
+  </section>
+
+  <FormPanel id="dr-new" title="New appointment" submit="Book" toast="Appointment booked, patient notified by SMS">
+    <div class="field"><label for="dn-p">Patient</label><input id="dn-p" class="input" placeholder="Search my patients" required /></div>
+    <div class="form-row">
+      <div class="field"><label for="dn-t">Type</label><select id="dn-t" class="select"><option>Follow-up</option><option>New patient</option><option>Echo review</option><option>Telehealth</option></select></div>
+      <div class="field"><label for="dn-d">Duration</label><select id="dn-d" class="select"><option>30 min</option><option>15 min</option><option>45 min</option><option>60 min</option></select></div>
+    </div>
+    <div class="field"><label for="dn-n">Note for rooms</label><textarea id="dn-n" class="textarea"></textarea></div>
+    <p class="field-hint">Consultation fee {money(doctor.fee)}. A payment link is sent automatically.</p>
+  </FormPanel>
+
+  <FormPanel id="dr-block" title="Block out time" submit="Block out" toast="Time blocked, affected patients offered new slots" center>
+    <div class="form-row">
+      <div class="field"><label for="db-f">From</label><input id="db-f" class="input" type="datetime-local" value="2026-10-26T14:00" /></div>
+      <div class="field"><label for="db-t">To</label><input id="db-t" class="input" type="datetime-local" value="2026-10-26T17:00" /></div>
+    </div>
+    <div class="field"><label for="db-r">Reason (private)</label><input id="db-r" class="input" placeholder="Theatre, leave, congress..." /></div>
+    <label class="check"><input type="checkbox" /> Repeat weekly</label>
+  </FormPanel>
+</AppLayout>
+
+<style>
+  .cal__bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sp-3);
+    padding: var(--sp-3) var(--sp-5);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .cal__nav {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+    color: var(--navy-900);
+  }
+
+  .cal__free {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-2);
+    font-size: var(--fs-xs);
+    font-weight: 600;
+    color: #006300;
+  }
+
+  .cal__body {
+    padding: var(--sp-4) var(--sp-5) var(--sp-5);
+  }
+</style>

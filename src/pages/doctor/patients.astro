@@ -1,0 +1,237 @@
+---
+import AppLayout from '@/layouts/AppLayout.astro';
+import PageHeader from '@/components/app/PageHeader.astro';
+import DataTable from '@/components/app/DataTable.astro';
+import Tabs from '@/components/app/Tabs.astro';
+import Avatar from '@/components/ui/Avatar.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { doctor, doctorPatients } from '@/data/app/doctor';
+import { longDate } from '@/lib/format';
+
+const featured = doctorPatients.slice(0, 4);
+const history = [
+  { date: '2026-10-01', title: 'Follow-up consultation', text: 'BP 138/86. Continue amlodipine 5 mg. Repeat lipids in 3 weeks.' },
+  { date: '2026-08-19', title: 'Echocardiogram', text: 'LVEF 58%. Mild LVH. No significant valve disease.' },
+  { date: '2026-07-02', title: 'New patient consultation', text: 'Referred by GP for hypertension work-up. Started on amlodipine.' },
+];
+const documents = [
+  { name: 'Echo report 2026-08-19.pdf', size: '420 KB' },
+  { name: 'GP referral letter.pdf', size: '180 KB' },
+  { name: 'Lipid profile 2026-10-20.pdf', size: '96 KB' },
+];
+---
+
+<AppLayout title="My patients" area="doctor">
+  <PageHeader title="My patients" subtitle="Your private, encrypted patient database. Isolated from every other specialist at Arwyp.">
+    <span slot="tag" class="tag-b"></span>
+  </PageHeader>
+
+  <p class="secure-note dp__note">
+    <Icon name="folder-lock" size={14} /> Database <span class="mono">db_{doctor.slug.replace(/-/g, '_')}</span> &middot; AES-256 &middot; Only you and your rooms have access.
+  </p>
+
+  <ul class="dp__recent" role="list">
+    {
+      featured.map((p) => (
+        <li>
+          <button type="button" class="dp__card" data-open="patient-record" data-title={p.name}>
+            <Avatar name={p.name} size={40} />
+            <span>
+              <strong>{p.name}</strong>
+              <small>
+                {p.condition} &middot; {p.age} yrs
+              </small>
+            </span>
+            <Icon name="chevron-right" size={18} />
+          </button>
+        </li>
+      ))
+    }
+  </ul>
+
+  <section class="panel">
+    <DataTable
+      id="dr-patients"
+      search="Search my patients"
+      filter={{ key: 'condition', label: 'Conditions' }}
+      kicker="Patient"
+      titleKey="name"
+      rows={doctorPatients}
+      columns={[
+        { key: 'name', label: 'Patient', kind: 'person', sub: 'id' },
+        { key: 'idNumber', label: 'ID number', kind: 'masked', hideSm: true },
+        { key: 'age', label: 'Age', kind: 'number', align: 'end', hideSm: true },
+        { key: 'condition', label: 'Condition', hideSm: true },
+        { key: 'scheme', label: 'Medical aid', hideSm: true },
+        { key: 'lastVisit', label: 'Last visit', kind: 'date', hideSm: true },
+        { key: 'consent', label: 'Consent', kind: 'status' },
+      ]}
+    />
+  </section>
+
+  <div class="drawer-panel" id="patient-record" data-drawer-panel hidden>
+    <div class="drawer-panel__scrim" data-drawer-dismiss></div>
+    <section class="drawer-panel__sheet" role="dialog" aria-modal="true" aria-labelledby="pr-title" data-tabs-scope>
+      <header class="drawer-panel__head">
+        <div>
+          <p>Patient record &middot; PT-30120</p>
+          <h2 id="pr-title" data-panel-title>Patient</h2>
+        </div>
+        <button type="button" class="icon-btn" data-drawer-dismiss aria-label="Close"><Icon name="x" size={20} /></button>
+      </header>
+      <div class="pr__tabs">
+        <Tabs
+          label="Record sections"
+          tabs={[
+            { id: 'history', label: 'History' },
+            { id: 'notes', label: 'Notes' },
+            { id: 'documents', label: 'Documents', count: documents.length },
+            { id: 'consent', label: 'Consent' },
+          ]}
+        />
+      </div>
+      <div class="drawer-panel__body">
+        <ol class="timeline" data-tab-panel="history">
+          {
+            history.map((h) => (
+              <li>
+                <time datetime={h.date}>{longDate(h.date)}</time>
+                <strong>{h.title}</strong>
+                <p>{h.text}</p>
+              </li>
+            ))
+          }
+        </ol>
+        <form class="form" data-tab-panel="notes" data-demo-form data-toast="Clinical note saved and encrypted" hidden>
+          <div class="field">
+            <label for="pr-note">New clinical note</label>
+            <textarea id="pr-note" class="textarea" placeholder="Subjective, objective, assessment, plan..."></textarea>
+          </div>
+          <button class="btn btn--sm" type="submit">Save note</button>
+        </form>
+        <ul class="list-rows pr__docs" data-tab-panel="documents" role="list" hidden>
+          {
+            documents.map((d) => (
+              <li>
+                <span class="icon-dot icon-dot--navy">
+                  <Icon name="file-text" size={16} />
+                </span>
+                <span class="list-rows__main">
+                  <strong>{d.name}</strong>
+                  <small>{d.size}</small>
+                </span>
+                <button type="button" class="icon-btn" aria-label={`Download ${d.name}`} data-toast-click="Download started">
+                  <Icon name="download" size={16} />
+                </button>
+              </li>
+            ))
+          }
+        </ul>
+        <dl class="kv" data-tab-panel="consent" hidden>
+          <div><dt>POPIA processing consent</dt><dd><span class="badge badge--green badge--dot">Granted</span></dd></div>
+          <div><dt>Captured</dt><dd>2 July 2026, patient portal</dd></div>
+          <div><dt>Share with referring GP</dt><dd>Yes</dd></div>
+          <div><dt>Marketing communication</dt><dd>No</dd></div>
+          <div><dt>Retention</dt><dd>Until 2036 (HPCSA guideline)</dd></div>
+        </dl>
+      </div>
+    </section>
+  </div>
+</AppLayout>
+
+<style>
+  .dp__note {
+    margin-bottom: var(--sp-5);
+  }
+
+  .dp__recent {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr));
+    gap: var(--sp-3);
+    margin: 0 0 var(--sp-6);
+  }
+
+  .dp__card {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3);
+    width: 100%;
+    padding: var(--sp-4);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    box-shadow: 0 0 0 1px var(--line);
+    text-align: left;
+    line-height: 1.35;
+    transition: box-shadow var(--dur) var(--ease);
+  }
+
+  .dp__card:hover {
+    box-shadow: var(--shadow-md), 0 0 0 1px var(--line-2);
+  }
+
+  .dp__card > span {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .dp__card strong {
+    display: block;
+    font-size: var(--fs-sm);
+    color: var(--navy-900);
+  }
+
+  .dp__card small {
+    display: block;
+    font-size: var(--fs-xs);
+    color: var(--ink-3);
+  }
+
+  .pr__tabs {
+    padding: 0 var(--sp-6);
+  }
+
+  .timeline {
+    display: grid;
+    gap: var(--sp-5);
+    margin: 0;
+    padding: 0 0 0 var(--sp-5);
+    list-style: none;
+    border-left: 2px solid var(--line);
+  }
+
+  .timeline li {
+    position: relative;
+    display: grid;
+    gap: 2px;
+    font-size: var(--fs-sm);
+  }
+
+  .timeline li::before {
+    content: '';
+    position: absolute;
+    left: calc(-1 * var(--sp-5) - 6px);
+    top: 4px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--teal-600);
+    box-shadow: 0 0 0 3px var(--surface);
+  }
+
+  .timeline time {
+    font-size: var(--fs-xs);
+    color: var(--ink-3);
+  }
+
+  .timeline strong {
+    color: var(--navy-900);
+  }
+
+  .timeline p {
+    color: var(--ink-2);
+  }
+
+  .pr__docs > li {
+    padding-inline: 0;
+  }
+</style>

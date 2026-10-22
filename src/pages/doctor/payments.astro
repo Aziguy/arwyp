@@ -1,0 +1,61 @@
+---
+import AppLayout from '@/layouts/AppLayout.astro';
+import PageHeader from '@/components/app/PageHeader.astro';
+import DataTable from '@/components/app/DataTable.astro';
+import KpiTile from '@/components/app/KpiTile.astro';
+import LineChart from '@/components/app/LineChart.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { doctorPayments, doctorRevenue } from '@/data/app/doctor';
+import { money } from '@/lib/format';
+
+const settled = doctorPayments.filter((p) => p.status === 'Successful').reduce((s, p) => s + p.amount, 0);
+---
+
+<AppLayout title="Payments" area="doctor">
+  <PageHeader title="Payments" subtitle="Online payments via PayFast and Peach Payments, plus medical aid settlements for your practice.">
+    <span slot="tag" class="tag-b"></span>
+    <button class="btn btn--outline btn--sm" data-toast-click="Statement exported (PDF)"><Icon name="file-down" /> Monthly statement</button>
+  </PageHeader>
+
+  <div class="app-grid app-grid--kpi">
+    <KpiTile label="October revenue" value={money(doctorRevenue.values[5])} delta={4.8} trend={doctorRevenue.values} icon="wallet" />
+    <KpiTile label="Settled (12 days)" value={money(settled)} icon="circle-check" />
+    <KpiTile label="Online share" value="64%" delta={7.5} icon="credit-card" />
+    <KpiTile label="Refunds" value={String(doctorPayments.filter((p) => p.status === 'Refunded').length)} icon="refresh-cw" />
+  </div>
+
+  <div class="app-grid app-grid--main dpay">
+    <section class="panel">
+      <DataTable
+        id="dr-payments"
+        search="Search payments"
+        filter={{ key: 'gateway', label: 'Gateways' }}
+        kicker="Payment"
+        rows={doctorPayments}
+        columns={[
+          { key: 'ref', label: 'Transaction', kind: 'mono' },
+          { key: 'patient', label: 'Patient', kind: 'strong' },
+          { key: 'gateway', label: 'Gateway', hideSm: true },
+          { key: 'date', label: 'Date', kind: 'date', hideSm: true },
+          { key: 'amount', label: 'Amount', kind: 'money', align: 'end' },
+          { key: 'status', label: 'Status', kind: 'status' },
+        ]}
+      />
+    </section>
+    <section class="panel">
+      <header class="panel__head">
+        <h2 class="panel__title">Revenue trend</h2>
+      </header>
+      <div class="panel__body">
+        <LineChart id="dpay-rev" labels={doctorRevenue.labels} series={[{ name: 'Revenue', values: doctorRevenue.values }]} format="money" area height={200} caption="Monthly revenue" />
+      </div>
+    </section>
+  </div>
+</AppLayout>
+
+<style>
+  .dpay {
+    margin-top: var(--sp-6);
+    align-items: start;
+  }
+</style>

@@ -1,0 +1,184 @@
+---
+import AppLayout from '@/layouts/AppLayout.astro';
+import PageHeader from '@/components/app/PageHeader.astro';
+import KpiTile from '@/components/app/KpiTile.astro';
+import LineChart from '@/components/app/LineChart.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { doctor, today, doctorRevenue, doctorPayments, slots } from '@/data/app/doctor';
+import { badgeClass } from '@/lib/app/status';
+import { money } from '@/lib/format';
+import { url } from '@/lib/paths';
+
+const weekRevenue = slots.filter((s) => s.status === 'Completed' || s.status === 'Confirmed').length * doctor.fee;
+const next = today.find((s) => s.status !== 'Completed');
+---
+
+<AppLayout title="Specialist workspace" area="doctor">
+  <PageHeader kicker="Specialist workspace" title={`Good morning, ${doctor.title} ${doctor.lastName}`} subtitle={`${doctor.discipline} · ${doctor.rooms}`}>
+    <span slot="tag" class="tag-b"></span>
+    <a class="btn btn--outline btn--sm" href={url(`/specialists/${doctor.slug}/`)}><Icon name="external-link" /> My public page</a>
+    <a class="btn btn--sm" href={url('/doctor/calendar/')}><Icon name="calendar-days" /> Open calendar</a>
+  </PageHeader>
+
+  <div class="app-grid app-grid--kpi">
+    <KpiTile label="Appointments today" value={String(today.length)} icon="calendar-check" />
+    <KpiTile label="Revenue this week" value={money(weekRevenue)} delta={6.4} icon="wallet" />
+    <KpiTile label="New patients (30 days)" value="38" delta={12} trend={[18, 22, 21, 26, 25, 29, 31, 30, 33, 35, 36, 38]} icon="user-plus" />
+    <KpiTile label="Patient rating" value={`${doctor.rating.toFixed(1)} / 5`} icon="star" />
+  </div>
+
+  <div class="app-grid app-grid--main dr">
+    <section class="panel">
+      <header class="panel__head">
+        <div>
+          <h2 class="panel__title">Today's schedule</h2>
+          <p class="panel__sub">Thursday 22 October 2026</p>
+        </div>
+        <label class="dr__toggle">
+          <input type="checkbox" checked data-toast-change />
+          <span>Accepting online bookings</span>
+        </label>
+      </header>
+      <ul class="list-rows dr__list" role="list">
+        {
+          today.map((s) => (
+            <li class:list={{ 'is-next': s === next }}>
+              <span class="dr__time tabular">{s.time}</span>
+              <span class="list-rows__main">
+                <strong>{s.patient}</strong>
+                <small>
+                  {s.type} &middot; {s.minutes} min
+                </small>
+              </span>
+              <span class={badgeClass(s.status)}>{s.status}</span>
+              {s === next && (
+                <a class="btn btn--accent btn--sm" href={url('/doctor/patients/')}>
+                  Open record
+                </a>
+              )}
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <div class="app-grid">
+      <section class="panel">
+        <header class="panel__head">
+          <div>
+            <h2 class="panel__title">Monthly revenue</h2>
+            <p class="panel__sub">Online payments and medical aid</p>
+          </div>
+        </header>
+        <div class="panel__body">
+          <LineChart id="dr-rev" labels={doctorRevenue.labels} series={[{ name: 'Revenue', values: doctorRevenue.values }]} format="money" area height={180} caption="Monthly revenue" />
+        </div>
+      </section>
+      <section class="panel">
+        <header class="panel__head">
+          <h2 class="panel__title">Latest payments</h2>
+          <a class="btn btn--ghost btn--sm" href={url('/doctor/payments/')}>All <Icon name="arrow-right" /></a>
+        </header>
+        <ul class="list-rows dr__list" role="list">
+          {
+            doctorPayments.slice(0, 4).map((p) => (
+              <li>
+                <span class="icon-dot icon-dot--green">
+                  <Icon name="credit-card" size={16} />
+                </span>
+                <span class="list-rows__main">
+                  <strong>{p.patient}</strong>
+                  <small>{p.gateway}</small>
+                </span>
+                <span class="tabular dr__amt">{money(p.amount)}</span>
+              </li>
+            ))
+          }
+        </ul>
+      </section>
+    </div>
+  </div>
+</AppLayout>
+
+<script>
+  import { toast } from '@/scripts/app';
+  document.querySelector<HTMLInputElement>('[data-toast-change]')?.addEventListener('change', (e) =>
+    toast((e.target as HTMLInputElement).checked ? 'Online bookings resumed' : 'Online bookings paused'),
+  );
+</script>
+
+<style>
+  .dr {
+    margin-top: var(--sp-6);
+    align-items: start;
+  }
+
+  .dr__list {
+    padding-top: var(--sp-3);
+  }
+
+  .dr__list li.is-next {
+    background: var(--teal-50);
+    box-shadow: inset 3px 0 0 var(--teal-600);
+  }
+
+  .dr__time {
+    flex: none;
+    width: 3rem;
+    font-weight: 700;
+    color: var(--navy-900);
+  }
+
+  .dr__amt {
+    font-weight: 650;
+    color: var(--navy-900);
+  }
+
+  .dr__toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-2);
+    font-size: var(--fs-xs);
+    font-weight: 600;
+    color: var(--ink-2);
+    cursor: pointer;
+  }
+
+  .dr__toggle input {
+    appearance: none;
+    position: relative;
+    width: 36px;
+    height: 20px;
+    border-radius: var(--radius-pill);
+    background: var(--line-2);
+    transition: background-color var(--dur) var(--ease);
+    cursor: pointer;
+  }
+
+  .dr__toggle input::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: var(--shadow-xs);
+    transition: transform var(--dur) var(--ease);
+  }
+
+  .dr__toggle input:checked {
+    background: var(--teal-600);
+  }
+
+  .dr__toggle input:checked::after {
+    transform: translateX(16px);
+  }
+
+  @media (max-width: 560px) {
+    .dr__list .btn {
+      display: none;
+    }
+  }
+</style>
