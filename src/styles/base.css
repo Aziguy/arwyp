@@ -1,0 +1,96 @@
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: calc(var(--header-h) + 1rem);
+}
+
+body {
+  font-family: var(--font-sans);
+  font-size: var(--fs-md);
+  line-height: var(--lh-body);
+  color: var(--ink);
+  background: var(--surface);
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-weight: 700;
+  line-height: var(--lh-tight);
+  letter-spacing: -0.02em;
+  color: var(--navy-900);
+  text-wrap: balance;
+}
+
+h1 {
+  font-size: var(--fs-4xl);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+h2 {
+  font-size: var(--fs-3xl);
+}
+
+h3 {
+  font-size: var(--fs-xl);
+  line-height: var(--lh-snug);
+  letter-spacing: -0.01em;
+}
+
+h4 {
+  font-size: var(--fs-lg);
+  letter-spacing: -0.005em;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+a {
+  color: var(--accent-ink);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+a:hover {
+  color: var(--teal-800);
+}
+
+em.serif,
+.serif {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+h1 .serif,
+h2 .serif {
+  font-size: 1.12em;
+  line-height: 1;
+}
+
+:focus-visible {
+  outline: none;
+  box-shadow: var(--ring);
+  border-radius: var(--radius-sm);
+}
+
+::selection {
+  background: var(--teal-100);
+  color: var(--navy-900);
+}
+
+hr {
+  border: 0;
+  border-top: 1px solid var(--line);
+}
+
+strong {
+  font-weight: 650;
+}
+
+small {
+  font-size: var(--fs-sm);
+}

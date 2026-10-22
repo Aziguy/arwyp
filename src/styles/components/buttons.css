@@ -1,0 +1,125 @@
+.btn {
+  --btn-bg: var(--navy-800);
+  --btn-fg: #fff;
+  --btn-bd: transparent;
+  --btn-bg-hover: var(--navy-900);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  min-height: 2.875rem;
+  padding: 0.7rem 1.25rem;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--btn-bd);
+  background: var(--btn-bg);
+  color: var(--btn-fg);
+  font-size: var(--fs-sm);
+  font-weight: 650;
+  line-height: 1.2;
+  letter-spacing: 0.005em;
+  text-decoration: none;
+  white-space: nowrap;
+  transition:
+    background-color var(--dur) var(--ease),
+    border-color var(--dur) var(--ease),
+    color var(--dur) var(--ease),
+    transform var(--dur) var(--ease),
+    box-shadow var(--dur) var(--ease);
+}
+
+.btn:hover {
+  background: var(--btn-bg-hover);
+  color: var(--btn-fg);
+}
+
+.btn:active {
+  transform: translateY(1px);
+}
+
+.btn svg {
+  width: 1.1em;
+  height: 1.1em;
+  flex: none;
+}
+
+.btn--accent {
+  --btn-bg: var(--teal-400);
+  --btn-fg: var(--navy-950);
+  --btn-bg-hover: var(--teal-500);
+}
+
+.btn--danger {
+  --btn-bg: var(--red-600);
+  --btn-bg-hover: var(--red-700);
+}
+
+.btn--outline {
+  --btn-bg: transparent;
+  --btn-fg: var(--navy-800);
+  --btn-bd: var(--line-2);
+  --btn-bg-hover: var(--navy-50);
+}
+
+.btn--outline:hover {
+  border-color: var(--navy-600);
+}
+
+.btn--ghost {
+  --btn-bg: transparent;
+  --btn-fg: var(--navy-800);
+  --btn-bg-hover: var(--navy-50);
+}
+
+.btn--light {
+  --btn-bg: #fff;
+  --btn-fg: var(--navy-900);
+  --btn-bg-hover: var(--teal-50);
+}
+
+.btn--outline-light {
+  --btn-bg: transparent;
+  --btn-fg: #fff;
+  --btn-bd: rgb(255 255 255 / 0.35);
+  --btn-bg-hover: rgb(255 255 255 / 0.08);
+}
+
+.btn--sm {
+  min-height: 2.25rem;
+  padding: 0.45rem 0.95rem;
+  font-size: var(--fs-xs);
+}
+
+.btn--lg {
+  min-height: 3.25rem;
+  padding: 0.85rem 1.6rem;
+  font-size: var(--fs-md);
+}
+
+.btn--block {
+  width: 100%;
+}
+
+.btn--square {
+  border-radius: var(--radius-md);
+}
+
+.link-arrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-weight: 650;
+  font-size: var(--fs-sm);
+  text-decoration: none;
+  color: var(--accent-ink);
+}
+
+.link-arrow svg {
+  width: 1rem;
+  height: 1rem;
+  transition: transform var(--dur) var(--ease);
+}
+
+.link-arrow:hover svg,
+a:hover .link-arrow svg {
+  transform: translateX(3px);
+}

@@ -1,0 +1,80 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radius-pill);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  line-height: 1.5;
+  white-space: nowrap;
+  color: var(--ink-2);
+  background: var(--surface-3);
+}
+
+.badge--teal {
+  color: var(--teal-800);
+  background: var(--teal-50);
+}
+
+.badge--navy {
+  color: #fff;
+  background: var(--navy-800);
+}
+
+.badge--green {
+  color: #0d5c35;
+  background: var(--green-50);
+}
+
+.badge--amber {
+  color: #7a5200;
+  background: var(--amber-50);
+}
+
+.badge--red {
+  color: var(--red-700);
+  background: var(--red-50);
+}
+
+.badge--dot::before {
+  content: '';
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 2.25rem;
+  padding: 0.4rem 0.95rem;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--line-2);
+  background: var(--surface);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--ink-2);
+  transition:
+    background-color var(--dur) var(--ease),
+    border-color var(--dur) var(--ease),
+    color var(--dur) var(--ease);
+}
+
+.chip:hover {
+  border-color: var(--navy-600);
+  color: var(--navy-900);
+}
+
+.chip[aria-pressed='true'] {
+  background: var(--navy-800);
+  border-color: var(--navy-800);
+  color: #fff;
+}
+
+.chip .count {
+  font-size: var(--fs-xs);
+  opacity: 0.7;
+}

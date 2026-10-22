@@ -1,0 +1,75 @@
+---
+import Icon from '@/components/ui/Icon.astro';
+import { url } from '@/lib/paths';
+---
+
+<div class="alert only-b" role="region" aria-label="Hospital alert" data-alert>
+  <div class="container alert__inner">
+    <Icon name="megaphone" size={16} />
+    <p>
+      <strong>Emergency Alert Banner:</strong> Load-shedding is scheduled tonight. All theatres and ICU run on uninterrupted backup power.
+      <a href={url('/news/')}>Read update</a>
+    </p>
+    <button type="button" class="alert__close" aria-label="Dismiss alert" data-alert-close>
+      <Icon name="x" size={16} />
+    </button>
+  </div>
+</div>
+
+<script>
+  const KEY = 'arwyp.alert.dismissed';
+  const banner = document.querySelector<HTMLElement>('[data-alert]');
+  try {
+    if (sessionStorage.getItem(KEY)) banner?.remove();
+  } catch {}
+  banner?.querySelector('[data-alert-close]')?.addEventListener('click', () => {
+    banner.remove();
+    try {
+      sessionStorage.setItem(KEY, '1');
+    } catch {}
+  });
+</script>
+
+<style>
+  .alert {
+    background: var(--amber-50);
+    border-bottom: 1px solid #f3dfae;
+    color: #5c3f00;
+    font-size: var(--fs-sm);
+  }
+
+  .alert__inner {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3);
+    min-height: 44px;
+    padding-block: var(--sp-2);
+  }
+
+  .alert__inner > :global(svg) {
+    flex: none;
+    color: #a26d00;
+  }
+
+  .alert p {
+    flex: 1;
+  }
+
+  .alert a {
+    color: inherit;
+    font-weight: 700;
+  }
+
+  .alert__close {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+  }
+
+  .alert__close:hover {
+    background: rgb(0 0 0 / 0.06);
+  }
+</style>

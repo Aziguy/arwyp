@@ -1,0 +1,122 @@
+---
+import Icon from './Icon.astro';
+
+interface Props {
+  icon?: string;
+  label?: string;
+  tone?: 'teal' | 'navy' | 'sand' | 'rose' | 'sky';
+  ratio?: string;
+  class?: string;
+  caption?: boolean;
+}
+
+const { icon = 'hospital', label = 'Photography supplied by Arwyp', tone = 'teal', ratio = '4 / 3', class: className, caption = true } = Astro.props;
+---
+
+<figure class:list={['visual', `visual--${tone}`, className]} style={`--ratio: ${ratio}`}>
+  <div class="visual__art" aria-hidden="true">
+    <span class="visual__ring visual__ring--1"></span>
+    <span class="visual__ring visual__ring--2"></span>
+    <Icon name={icon} size={96} strokeWidth={1.2} class="visual__icon" />
+  </div>
+  {caption && <figcaption class="visual__caption">{label}</figcaption>}
+  <slot />
+</figure>
+
+<style>
+  .visual {
+    --c1: var(--teal-700);
+    --c2: var(--teal-800);
+    --c3: var(--teal-400);
+    position: relative;
+    aspect-ratio: var(--ratio);
+    overflow: hidden;
+    border-radius: var(--radius-xl);
+    background:
+      radial-gradient(120% 90% at 100% 0%, color-mix(in srgb, var(--c3) 45%, transparent), transparent 55%),
+      radial-gradient(90% 90% at 0% 100%, color-mix(in srgb, var(--c2) 85%, transparent), transparent 70%),
+      linear-gradient(140deg, var(--c1), var(--c2));
+    isolation: isolate;
+  }
+
+  .visual--navy {
+    --c1: var(--navy-700);
+    --c2: var(--navy-950);
+    --c3: var(--teal-500);
+  }
+
+  .visual--sand {
+    --c1: #d9c7ac;
+    --c2: #a88a63;
+    --c3: #fff4e0;
+  }
+
+  .visual--rose {
+    --c1: #d97d8f;
+    --c2: #8c3a55;
+    --c3: #ffd3dc;
+  }
+
+  .visual--sky {
+    --c1: #4f8fd1;
+    --c2: #1f4f86;
+    --c3: #bfe3ff;
+  }
+
+  .visual::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgb(255 255 255 / 0.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(255 255 255 / 0.06) 1px, transparent 1px);
+    background-size: 32px 32px;
+    mask-image: radial-gradient(80% 80% at 50% 50%, #000, transparent);
+    z-index: -1;
+  }
+
+  .visual__art {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    color: rgb(255 255 255 / 0.9);
+  }
+
+  .visual__ring {
+    position: absolute;
+    border-radius: 50%;
+    border: 1px solid rgb(255 255 255 / 0.22);
+  }
+
+  .visual__ring--1 {
+    width: 46%;
+    aspect-ratio: 1;
+  }
+
+  .visual__ring--2 {
+    width: 72%;
+    aspect-ratio: 1;
+    border-color: rgb(255 255 255 / 0.1);
+  }
+
+  .visual__art :global(.visual__icon) {
+    width: clamp(56px, 22%, 112px);
+    height: auto;
+    filter: drop-shadow(0 10px 24px rgb(0 0 0 / 0.18));
+  }
+
+  .visual__caption {
+    position: absolute;
+    left: var(--sp-4);
+    bottom: var(--sp-4);
+    padding: 0.3rem 0.7rem;
+    border-radius: var(--radius-pill);
+    background: rgb(0 0 0 / 0.28);
+    backdrop-filter: blur(6px);
+    color: rgb(255 255 255 / 0.9);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+</style>

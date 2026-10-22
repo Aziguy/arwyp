@@ -1,0 +1,30 @@
+html[data-quote='a'] .only-b,
+html[data-quote='b'] .only-a {
+  display: none !important;
+}
+
+.tag-b {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3em;
+  padding: 0.15em 0.55em;
+  border-radius: var(--radius-pill);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  line-height: 1.5;
+  color: var(--teal-800);
+  background: var(--teal-50);
+  box-shadow: inset 0 0 0 1px var(--teal-100);
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.tag-b::before {
+  content: 'Quote B';
+}
+
+.tag-b[data-label]::before {
+  content: attr(data-label);
+}

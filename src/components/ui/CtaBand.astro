@@ -1,0 +1,68 @@
+---
+interface Props {
+  eyebrow?: string;
+  title: string;
+  text?: string;
+}
+
+const { eyebrow, title, text } = Astro.props;
+---
+
+<section class="section">
+  <div class="container">
+    <div class="cta">
+      <div class="cta__copy">
+        {eyebrow && <p class="eyebrow">{eyebrow}</p>}
+        <h2 set:html={title} />
+        {text && <p>{text}</p>}
+      </div>
+      <div class="cta__actions">
+        <slot />
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .cta {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) auto;
+    gap: var(--sp-8);
+    align-items: center;
+    padding: clamp(2rem, 1rem + 4vw, 3.5rem);
+    border-radius: var(--radius-xl);
+    background:
+      radial-gradient(60% 120% at 100% 0%, rgb(0 216 206 / 0.25), transparent 60%),
+      linear-gradient(135deg, var(--navy-800), var(--navy-950));
+    color: rgb(255 255 255 / 0.78);
+    overflow: hidden;
+  }
+
+  .cta__copy {
+    display: grid;
+    gap: var(--sp-3);
+    max-width: 640px;
+  }
+
+  .cta h2 {
+    color: #fff;
+    font-size: var(--fs-2xl);
+  }
+
+  .cta .eyebrow {
+    color: var(--teal-400);
+  }
+
+  .cta__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-3);
+  }
+
+  @media (max-width: 860px) {
+    .cta {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

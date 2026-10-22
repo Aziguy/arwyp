@@ -1,0 +1,521 @@
+---
+import Icon from '@/components/ui/Icon.astro';
+import Logo from './Logo.astro';
+import { primaryNav, utilityNav, site } from '@/config/site';
+import { url, isActive } from '@/lib/paths';
+
+const path = Astro.url.pathname;
+---
+
+<div class="topbar">
+  <div class="container topbar__inner">
+    <p class="topbar__tag">
+      <Icon name="award" size={15} />
+      <span>{site.tagline}</span>
+    </p>
+    <nav class="topbar__nav" aria-label="Utility">
+      {utilityNav.map((l) => <a href={url(l.href)}>{l.label}</a>)}
+      <a class="only-b" href={url('/doctor/')}>Doctors Login</a>
+      <a class="only-b" href={url('/portal/')}>Patient Portal</a>
+      <a class="topbar__emergency" href={site.emergency.href}>
+        <Icon name="siren" size={15} />
+        Emergency {site.emergency.display}
+      </a>
+    </nav>
+  </div>
+</div>
+
+<header class="header" data-header>
+  <div class="container header__inner">
+    <Logo />
+
+    <nav class="nav" aria-label="Primary">
+      <ul class="nav__list" role="list">
+        {
+          primaryNav.map((item, i) => (
+            <li class="nav__item" data-nav-item>
+              {item.children ? (
+                <>
+                  <button
+                    type="button"
+                    class:list={['nav__link', { 'is-active': isActive(path, item.href) }]}
+                    aria-expanded="false"
+                    aria-controls={`menu-${i}`}
+                    data-nav-trigger
+                  >
+                    {item.label}
+                    <Icon name="chevron-down" size={15} class="nav__chev" />
+                  </button>
+                  <div class="nav__menu" id={`menu-${i}`}>
+                    <ul role="list">
+                      {item.children.map((c) => (
+                        <li class={c.quote ? `only-${c.quote}` : undefined}>
+                          <a href={url(c.href)} class="nav__sub">
+                            {c.icon && (
+                              <span class="nav__subicon">
+                                <Icon name={c.icon} size={18} />
+                              </span>
+                            )}
+                            <span>
+                              <span class="nav__subtitle">
+                                {c.label}
+                                {c.quote && <span class="tag-b" />}
+                              </span>
+                              {c.description && <span class="nav__subdesc">{c.description}</span>}
+                            </span>
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </>
+              ) : (
+                <a
+                  href={url(item.href)}
+                  class:list={['nav__link', { 'is-active': isActive(path, item.href) }]}
+                  aria-current={isActive(path, item.href) ? 'page' : undefined}
+                >
+                  {item.label}
+                </a>
+              )}
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <div class="header__actions">
+      <a class="btn btn--outline only-a header__cta" href={url('/patients/pre-admission/')}>
+        <Icon name="clipboard-check" /> Pre-Admission
+      </a>
+      <a class="btn btn--accent only-b header__cta" href={url('/specialists/')}>
+        <Icon name="calendar-check" /> Book online
+      </a>
+      <a class="header__icon only-b" href={url('/portal/')} aria-label="Patient portal">
+        <Icon name="circle-user-round" size={22} />
+      </a>
+      <a class="header__icon header__icon--sos" href={site.emergency.href} aria-label={`Emergency ${site.emergency.display}`}>
+        <Icon name="phone-call" size={20} />
+      </a>
+      <button type="button" class="header__icon header__burger" aria-expanded="false" aria-controls="drawer" data-drawer-open>
+        <span class="sr-only">Open menu</span>
+        <Icon name="menu" size={22} />
+      </button>
+    </div>
+  </div>
+</header>
+
+<div class="drawer" id="drawer" data-drawer hidden>
+  <div class="drawer__head">
+    <Logo />
+    <button type="button" class="header__icon" data-drawer-close>
+      <span class="sr-only">Close menu</span>
+      <Icon name="x" size={22} />
+    </button>
+  </div>
+  <nav class="drawer__body" aria-label="Mobile">
+    <a class="drawer__link" href={url('/')}>Home</a>
+    {
+      primaryNav.map((item) =>
+        item.children ? (
+          <details class="drawer__group">
+            <summary class="drawer__link">
+              {item.label}
+              <Icon name="chevron-down" size={18} />
+            </summary>
+            <ul role="list">
+              {item.children.map((c) => (
+                <li class={c.quote ? `only-${c.quote}` : undefined}>
+                  <a href={url(c.href)}>
+                    {c.label} {c.quote && <span class="tag-b" />}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </details>
+        ) : (
+          <a class="drawer__link" href={url(item.href)}>
+            {item.label}
+          </a>
+        ),
+      )
+    }
+    {
+      utilityNav.map((l) => (
+        <a class="drawer__link" href={url(l.href)}>
+          {l.label}
+        </a>
+      ))
+    }
+    <div class="drawer__actions">
+      <a class="btn btn--accent btn--block only-b" href={url('/specialists/')}><Icon name="calendar-check" /> Book online</a>
+      <a class="btn btn--outline btn--block only-b" href={url('/portal/')}><Icon name="circle-user-round" /> Patient Portal</a>
+      <a class="btn btn--outline btn--block only-a" href={url('/patients/pre-admission/')}><Icon name="clipboard-check" /> Pre-Admission</a>
+      <a class="btn btn--danger btn--block" href={site.emergency.href}><Icon name="phone-call" /> Emergency {site.emergency.display}</a>
+    </div>
+  </nav>
+</div>
+
+<script>
+  import '@/scripts/navigation';
+</script>
+
+<style>
+  .topbar {
+    background: var(--navy-950);
+    color: rgb(255 255 255 / 0.72);
+    font-size: var(--fs-xs);
+  }
+
+  .topbar__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sp-4);
+    min-height: 40px;
+  }
+
+  .topbar__tag {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+    font-weight: 500;
+  }
+
+  .topbar__tag :global(svg) {
+    color: var(--teal-400);
+  }
+
+  .topbar__nav {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-5);
+  }
+
+  .topbar__nav a {
+    color: inherit;
+    text-decoration: none;
+    font-weight: 550;
+    transition: color var(--dur) var(--ease);
+  }
+
+  .topbar__nav a:hover {
+    color: #fff;
+  }
+
+  .topbar__emergency {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.25rem 0.7rem;
+    border-radius: var(--radius-pill);
+    background: var(--red-600);
+    color: #fff !important;
+    font-weight: 700 !important;
+  }
+
+  .topbar__emergency:hover {
+    background: var(--red-700);
+  }
+
+  .header {
+    position: sticky;
+    top: 0;
+    z-index: var(--z-header);
+    background: rgb(255 255 255 / 0.96);
+    backdrop-filter: saturate(1.4) blur(12px);
+    border-bottom: 1px solid var(--line);
+    transition: box-shadow var(--dur) var(--ease);
+  }
+
+  .header[data-scrolled] {
+    box-shadow: var(--shadow-sm);
+  }
+
+  .header__inner {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-6);
+    min-height: var(--header-h);
+  }
+
+  .nav {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+  }
+
+  .nav__list {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    margin: 0;
+  }
+
+  .nav__item {
+    position: relative;
+  }
+
+  .nav__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    min-height: 2.5rem;
+    padding: 0 0.7rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--navy-800);
+    text-decoration: none;
+    white-space: nowrap;
+    transition:
+      color var(--dur) var(--ease),
+      background-color var(--dur) var(--ease);
+  }
+
+  .nav__link:hover,
+  .nav__link[aria-expanded='true'] {
+    color: var(--navy-950);
+    background: var(--navy-50);
+  }
+
+  .nav__link.is-active {
+    color: var(--teal-700);
+  }
+
+  .nav__link :global(.nav__chev) {
+    opacity: 0.6;
+    transition: transform var(--dur) var(--ease);
+  }
+
+  .nav__link[aria-expanded='true'] :global(.nav__chev) {
+    transform: rotate(180deg);
+  }
+
+  .nav__menu {
+    position: absolute;
+    top: calc(100% + 10px);
+    left: 50%;
+    min-width: 300px;
+    padding: var(--sp-2);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    box-shadow: var(--shadow-lg), 0 0 0 1px var(--line);
+    opacity: 0;
+    visibility: hidden;
+    transform: translate(-50%, 6px);
+    transition:
+      opacity var(--dur) var(--ease),
+      transform var(--dur) var(--ease),
+      visibility 0s linear var(--dur);
+  }
+
+  .nav__menu::before {
+    content: '';
+    position: absolute;
+    inset: -12px 0 auto;
+    height: 12px;
+  }
+
+  .nav__item[data-open] .nav__menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translate(-50%, 0);
+    transition-delay: 0s;
+  }
+
+  .nav__menu ul {
+    margin: 0;
+    display: grid;
+    gap: 2px;
+  }
+
+  .nav__sub {
+    display: flex;
+    gap: var(--sp-3);
+    align-items: center;
+    padding: 0.6rem 0.7rem;
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    color: var(--navy-900);
+    transition: background-color var(--dur) var(--ease);
+  }
+
+  .nav__sub:hover {
+    background: var(--surface-2);
+    color: var(--navy-950);
+  }
+
+  .nav__subicon {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: var(--radius-md);
+    background: var(--teal-50);
+    color: var(--teal-700);
+  }
+
+  .nav__subtitle {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+    font-size: var(--fs-sm);
+    font-weight: 650;
+  }
+
+  .nav__subdesc {
+    display: block;
+    font-size: var(--fs-xs);
+    color: var(--ink-3);
+  }
+
+  .header__actions {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+    margin-left: auto;
+  }
+
+  .header__icon {
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 50%;
+    color: var(--navy-800);
+    transition: background-color var(--dur) var(--ease);
+  }
+
+  .header__icon:hover {
+    background: var(--navy-50);
+    color: var(--navy-950);
+  }
+
+  .header__icon--sos {
+    color: var(--red-600);
+    background: var(--red-50);
+  }
+
+  .header__icon--sos:hover {
+    color: var(--red-700);
+    background: #fbd9d9;
+  }
+
+  .header__burger,
+  .header__icon--sos {
+    display: none;
+  }
+
+  @media (max-width: 1239px) {
+    .nav {
+      display: none;
+    }
+    .header__burger {
+      display: grid;
+    }
+  }
+
+  @media (max-width: 900px) {
+    .topbar__nav a:not(.topbar__emergency) {
+      display: none;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .topbar {
+      display: none;
+    }
+    .header__cta {
+      display: none !important;
+    }
+    .header__icon--sos {
+      display: grid;
+    }
+    .header__inner {
+      gap: var(--sp-3);
+    }
+  }
+
+  .drawer {
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-overlay);
+    display: flex;
+    flex-direction: column;
+    background: var(--surface);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    animation: drawer-in 220ms var(--ease);
+  }
+
+  .drawer[hidden] {
+    display: none;
+  }
+
+  @keyframes drawer-in {
+    from {
+      opacity: 0;
+      transform: translateY(-8px);
+    }
+  }
+
+  .drawer__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: var(--header-h);
+    padding-inline: var(--gutter);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .drawer__body {
+    display: grid;
+    padding: var(--sp-4) var(--gutter) var(--sp-16);
+  }
+
+  .drawer__link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 3.25rem;
+    border-bottom: 1px solid var(--line);
+    font-size: var(--fs-lg);
+    font-weight: 650;
+    color: var(--navy-900);
+    text-decoration: none;
+    list-style: none;
+    cursor: pointer;
+  }
+
+  .drawer__link::-webkit-details-marker {
+    display: none;
+  }
+
+  .drawer__group[open] summary :global(svg) {
+    transform: rotate(180deg);
+  }
+
+  .drawer__group ul {
+    margin: 0;
+    padding: var(--sp-2) 0 var(--sp-3) var(--sp-4);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .drawer__group a {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+    padding: 0.55rem 0;
+    color: var(--ink-2);
+    text-decoration: none;
+    font-weight: 550;
+  }
+
+  .drawer__actions {
+    display: grid;
+    gap: var(--sp-3);
+    margin-top: var(--sp-6);
+  }
+</style>

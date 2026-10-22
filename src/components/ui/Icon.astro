@@ -1,0 +1,27 @@
+---
+import { iconBody } from '@/lib/icons';
+
+interface Props {
+  name: string;
+  size?: number | string;
+  label?: string;
+  class?: string;
+  strokeWidth?: number;
+}
+
+const { name, size = 20, label, class: className, strokeWidth } = Astro.props;
+let body = iconBody(name);
+if (strokeWidth) body = body.replace(/stroke-width="2"/g, `stroke-width="${strokeWidth}"`);
+---
+
+<svg
+  class={className}
+  width={size}
+  height={size}
+  viewBox="0 0 24 24"
+  role={label ? 'img' : undefined}
+  aria-label={label}
+  aria-hidden={label ? undefined : 'true'}
+  focusable="false"
+  set:html={body}
+/>

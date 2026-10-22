@@ -1,0 +1,68 @@
+---
+import Icon from './Icon.astro';
+import { url } from '@/lib/paths';
+
+export type Crumb = { label: string; href?: string };
+
+interface Props {
+  items: Crumb[];
+  tone?: 'light' | 'dark';
+}
+
+const { items, tone = 'light' } = Astro.props;
+const all: Crumb[] = [{ label: 'Home', href: '/' }, ...items];
+---
+
+<nav aria-label="Breadcrumb" class:list={['crumbs', `crumbs--${tone}`]}>
+  <ol role="list">
+    {
+      all.map((c, i) => (
+        <li>
+          {c.href && i < all.length - 1 ? <a href={url(c.href)}>{c.label}</a> : <span aria-current="page">{c.label}</span>}
+          {i < all.length - 1 && <Icon name="chevron-right" size={14} />}
+        </li>
+      ))
+    }
+  </ol>
+</nav>
+
+<style>
+  .crumbs ol {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sp-2);
+    margin: 0;
+    font-size: var(--fs-xs);
+    font-weight: 550;
+    color: var(--ink-3);
+  }
+
+  .crumbs li {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-2);
+  }
+
+  .crumbs a {
+    color: var(--ink-2);
+    text-decoration: none;
+  }
+
+  .crumbs a:hover {
+    color: var(--teal-700);
+  }
+
+  .crumbs--dark ol,
+  .crumbs--dark a {
+    color: rgb(255 255 255 / 0.62);
+  }
+
+  .crumbs--dark a:hover {
+    color: #fff;
+  }
+
+  .crumbs--dark [aria-current] {
+    color: rgb(255 255 255 / 0.9);
+  }
+</style>

@@ -1,0 +1,82 @@
+---
+import Icon from './Icon.astro';
+import { url } from '@/lib/paths';
+
+interface Props {
+  title?: string;
+  text?: string;
+  fallbackHref?: string;
+  fallbackLabel?: string;
+}
+
+const {
+  title = 'This module is part of Quote B',
+  text = 'Quote A delivers the website as specified. Switch to Quote B to preview this working system with fictitious data.',
+  fallbackHref = '/',
+  fallbackLabel = 'Back to the website',
+} = Astro.props;
+---
+
+<div class="only-b">
+  <slot />
+</div>
+
+<div class="only-a gate">
+  <div class="gate__card">
+    <span class="gate__icon"><Icon name="lock-keyhole" size={26} /></span>
+    <span class="tag-b"></span>
+    <h2>{title}</h2>
+    <p>{text}</p>
+    <div class="cluster">
+      <button type="button" class="btn btn--accent" data-set-quote="b"><Icon name="sparkles" /> Preview with Quote B</button>
+      <a class="btn btn--outline" href={url(fallbackHref)}>{fallbackLabel}</a>
+    </div>
+  </div>
+</div>
+
+<style>
+  .gate {
+    display: grid;
+    place-items: center;
+    min-height: 70vh;
+    padding: var(--sp-16) var(--gutter);
+    background:
+      radial-gradient(50% 50% at 50% 0%, rgb(0 216 206 / 0.12), transparent 70%),
+      var(--surface-2);
+  }
+
+  .gate__card {
+    display: grid;
+    justify-items: center;
+    gap: var(--sp-4);
+    max-width: 520px;
+    padding: var(--sp-10) var(--sp-8);
+    border-radius: var(--radius-xl);
+    background: var(--surface);
+    box-shadow: var(--shadow-md), 0 0 0 1px var(--line);
+    text-align: center;
+  }
+
+  .gate__icon {
+    display: grid;
+    place-items: center;
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 50%;
+    background: var(--teal-50);
+    color: var(--teal-700);
+  }
+
+  .gate h2 {
+    font-size: var(--fs-2xl);
+  }
+
+  .gate p {
+    color: var(--ink-2);
+  }
+
+  .gate .cluster {
+    justify-content: center;
+    margin-top: var(--sp-2);
+  }
+</style>

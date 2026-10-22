@@ -1,0 +1,56 @@
+---
+import Icon from '@/components/ui/Icon.astro';
+import { site } from '@/config/site';
+---
+
+<a class="wa only-b" href={site.whatsapp.href} target="_blank" rel="noopener" aria-label="Chat with Arwyp on WhatsApp">
+  <Icon name="message-circle" size={24} />
+  <span>WhatsApp us</span>
+</a>
+
+<style>
+  .wa {
+    position: fixed;
+    right: max(1rem, env(safe-area-inset-right));
+    bottom: max(1rem, env(safe-area-inset-bottom));
+    z-index: var(--z-switcher);
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-2);
+    min-height: 3rem;
+    padding: 0 1.1rem 0 0.9rem;
+    border-radius: var(--radius-pill);
+    background: #1f9d55;
+    color: #fff;
+    font-weight: 700;
+    font-size: var(--fs-sm);
+    text-decoration: none;
+    box-shadow: var(--shadow-lg);
+    transition:
+      transform var(--dur) var(--ease),
+      background-color var(--dur) var(--ease);
+  }
+
+  .wa:hover {
+    color: #fff;
+    background: #188446;
+    transform: translateY(-2px);
+  }
+
+  @media (max-width: 640px) {
+    .wa {
+      width: 3rem;
+      padding: 0;
+      justify-content: center;
+    }
+    .wa span {
+      display: none;
+    }
+  }
+
+  @media print {
+    .wa {
+      display: none;
+    }
+  }
+</style>

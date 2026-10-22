@@ -1,0 +1,259 @@
+---
+import Icon from '@/components/ui/Icon.astro';
+import { quotes } from '@/config/quotes';
+import { url } from '@/lib/paths';
+
+const backends = [
+  { label: 'Content management', href: '/admin/', icon: 'layout-dashboard', only: 'a' },
+  { label: 'Admin dashboard', href: '/admin/', icon: 'layout-dashboard', only: 'b' },
+  { label: 'Specialist workspace', href: '/doctor/', icon: 'stethoscope', only: 'b' },
+  { label: 'Patient portal', href: '/portal/', icon: 'smartphone', only: 'b' },
+];
+---
+
+<div class="qs" data-qs>
+  <div class="qs__panel" id="qs-panel" hidden>
+    <p class="qs__demo"><Icon name="info" size={14} /> Demo template with fictitious data</p>
+    {
+      Object.values(quotes).map((q) => (
+        <div class={`qs__quote only-${q.id}`}>
+          <p class="qs__ref">{q.ref}</p>
+          <p class="qs__title">{q.title}</p>
+          <p class="qs__summary">{q.summary}</p>
+          <dl class="qs__meta">
+            <div>
+              <dt>Delivery</dt>
+              <dd>{q.delivery}</dd>
+            </div>
+            <div>
+              <dt>Progress</dt>
+              <dd>{q.progress}</dd>
+            </div>
+          </dl>
+        </div>
+      ))
+    }
+    <p class="qs__label">Explore</p>
+    <ul class="qs__links" role="list">
+      <li>
+        <a href={url('/')}><Icon name="globe" size={16} /> Public website</a>
+      </li>
+      {
+        backends.map((b) => (
+          <li class={`only-${b.only}`}>
+            <a href={url(b.href)}>
+              <Icon name={b.icon} size={16} /> {b.label}
+            </a>
+          </li>
+        ))
+      }
+      <li>
+        <a href={url('/compare/')}><Icon name="columns-2" size={16} /> Compare Quote A and B</a>
+      </li>
+    </ul>
+  </div>
+
+  <div class="qs__bar">
+    <div class="qs__toggle" role="group" aria-label="Template version">
+      <button type="button" data-set-quote="a" aria-pressed="false">Quote A</button>
+      <button type="button" data-set-quote="b" aria-pressed="false">Quote B</button>
+    </div>
+    <button type="button" class="qs__more" aria-expanded="false" aria-controls="qs-panel" data-qs-toggle>
+      <span class="sr-only">Template details</span>
+      <Icon name="chevron-up" size={18} />
+    </button>
+  </div>
+</div>
+
+<script>
+  const root = document.querySelector<HTMLElement>('[data-qs]');
+  const toggle = root?.querySelector<HTMLButtonElement>('[data-qs-toggle]');
+  const panel = root?.querySelector<HTMLElement>('#qs-panel');
+
+  const setOpen = (open: boolean) => {
+    if (!toggle || !panel) return;
+    toggle.setAttribute('aria-expanded', String(open));
+    panel.hidden = !open;
+  };
+
+  toggle?.addEventListener('click', () => setOpen(panel?.hidden ?? false));
+  document.addEventListener('keydown', (e) => e.key === 'Escape' && setOpen(false));
+  document.addEventListener('click', (e) => {
+    if (root && !root.contains(e.target as Node)) setOpen(false);
+  });
+</script>
+
+<style>
+  .qs {
+    position: fixed;
+    left: max(1rem, env(safe-area-inset-left));
+    bottom: max(1rem, env(safe-area-inset-bottom));
+    z-index: var(--z-switcher);
+    display: grid;
+    gap: var(--sp-2);
+    justify-items: start;
+    font-size: var(--fs-sm);
+  }
+
+  .qs__bar {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    padding: 4px;
+    border-radius: var(--radius-pill);
+    background: rgb(20 28 38 / 0.94);
+    backdrop-filter: blur(12px);
+    box-shadow: var(--shadow-lg), inset 0 0 0 1px rgb(255 255 255 / 0.08);
+  }
+
+  .qs__toggle {
+    display: flex;
+    gap: 2px;
+  }
+
+  .qs__toggle button {
+    min-height: 2.25rem;
+    padding: 0 0.95rem;
+    border-radius: var(--radius-pill);
+    font-weight: 650;
+    font-size: var(--fs-xs);
+    letter-spacing: 0.02em;
+    color: rgb(255 255 255 / 0.72);
+    transition:
+      background-color var(--dur) var(--ease),
+      color var(--dur) var(--ease);
+  }
+
+  .qs__toggle button:hover {
+    color: #fff;
+  }
+
+  .qs__toggle button[aria-pressed='true'] {
+    background: var(--teal-400);
+    color: var(--navy-950);
+  }
+
+  .qs__more {
+    display: grid;
+    place-items: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 50%;
+    color: rgb(255 255 255 / 0.8);
+    transition:
+      transform var(--dur) var(--ease),
+      background-color var(--dur) var(--ease);
+  }
+
+  .qs__more:hover {
+    background: rgb(255 255 255 / 0.08);
+    color: #fff;
+  }
+
+  .qs__more[aria-expanded='true'] {
+    transform: rotate(180deg);
+  }
+
+  .qs__panel {
+    width: min(340px, calc(100vw - 2rem));
+    padding: var(--sp-5);
+    border-radius: var(--radius-lg);
+    background: var(--navy-950);
+    color: rgb(255 255 255 / 0.78);
+    box-shadow: var(--shadow-lg), inset 0 0 0 1px rgb(255 255 255 / 0.08);
+    display: grid;
+    gap: var(--sp-3);
+  }
+
+  .qs__panel[hidden] {
+    display: none;
+  }
+
+  .qs__demo {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+    font-size: var(--fs-xs);
+    color: var(--teal-400);
+    font-weight: 600;
+  }
+
+  .qs__ref {
+    font-size: var(--fs-xs);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgb(255 255 255 / 0.5);
+  }
+
+  .qs__title {
+    margin-top: 2px;
+    font-size: var(--fs-md);
+    font-weight: 700;
+    color: #fff;
+  }
+
+  .qs__summary {
+    margin-top: var(--sp-2);
+    font-size: var(--fs-xs);
+    line-height: 1.55;
+  }
+
+  .qs__meta {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--sp-3);
+    margin-top: var(--sp-3);
+    padding-top: var(--sp-3);
+    border-top: 1px solid rgb(255 255 255 / 0.1);
+    font-size: var(--fs-xs);
+  }
+
+  .qs__meta dt {
+    color: rgb(255 255 255 / 0.5);
+  }
+
+  .qs__meta dd {
+    margin: 0;
+    color: #fff;
+    font-weight: 600;
+  }
+
+  .qs__label {
+    margin-top: var(--sp-2);
+    font-size: var(--fs-xs);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgb(255 255 255 / 0.5);
+  }
+
+  .qs__links {
+    display: grid;
+    gap: 2px;
+    margin: 0;
+  }
+
+  .qs__links a {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3);
+    padding: 0.5rem 0.6rem;
+    border-radius: var(--radius-sm);
+    color: #fff;
+    text-decoration: none;
+    font-weight: 550;
+  }
+
+  .qs__links a:hover {
+    background: rgb(255 255 255 / 0.07);
+  }
+
+  .qs__links :global(svg) {
+    color: var(--teal-400);
+  }
+
+  @media print {
+    .qs {
+      display: none;
+    }
+  }
+</style>

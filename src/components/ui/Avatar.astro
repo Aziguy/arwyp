@@ -1,0 +1,65 @@
+---
+import { initials } from '@/lib/format';
+import { hash } from '@/lib/random';
+
+interface Props {
+  name: string;
+  size?: number;
+  shape?: 'circle' | 'rounded' | 'portrait';
+  class?: string;
+}
+
+const { name, size = 48, shape = 'circle', class: className } = Astro.props;
+const palettes = [
+  ['#00787a', '#004a5e'],
+  ['#354659', '#141c26'],
+  ['#4f8fd1', '#1f4f86'],
+  ['#a88a63', '#6b5333'],
+  ['#8c3a55', '#4d1f2f'],
+  ['#138a4e', '#0b4f2d'],
+];
+const [from, to] = palettes[hash(name) % palettes.length];
+---
+
+<span
+  class:list={['avatar', `avatar--${shape}`, className]}
+  style={`--size:${size}px;--from:${from};--to:${to}`}
+  role="img"
+  aria-label={name}
+>
+  {initials(name)}
+</span>
+
+<style>
+  .avatar {
+    display: inline-grid;
+    place-items: center;
+    flex: none;
+    width: var(--size);
+    height: var(--size);
+    border-radius: 50%;
+    background:
+      radial-gradient(80% 80% at 30% 20%, rgb(255 255 255 / 0.22), transparent 60%),
+      linear-gradient(145deg, var(--from), var(--to));
+    color: #fff;
+    font-weight: 700;
+    font-size: calc(var(--size) * 0.36);
+    letter-spacing: 0.02em;
+    user-select: none;
+  }
+
+  .avatar--rounded {
+    border-radius: calc(var(--size) * 0.22);
+  }
+
+  .avatar--portrait {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 5;
+    border-radius: var(--radius-lg);
+    font-size: clamp(2rem, 8vw, 3.5rem);
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-weight: 600;
+  }
+</style>

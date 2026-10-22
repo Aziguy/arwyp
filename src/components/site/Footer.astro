@@ -1,0 +1,321 @@
+---
+import Icon from '@/components/ui/Icon.astro';
+import Logo from './Logo.astro';
+import { footerNav, legalNav, site } from '@/config/site';
+import { url } from '@/lib/paths';
+
+const year = new Date().getFullYear();
+const { address } = site;
+---
+
+<section class="closing" aria-labelledby="closing-title">
+  <div class="container closing__inner">
+    <div>
+      <p class="eyebrow">Always open</p>
+      <h2 id="closing-title">We are here when you need us</h2>
+    </div>
+    <ul class="closing__list" role="list">
+      <li>
+        <a href={site.emergency.href} class="closing__item closing__item--sos">
+          <span class="closing__icon"><Icon name="siren" /></span>
+          <span><small>24/7 Emergency</small>{site.emergency.display}</span>
+        </a>
+      </li>
+      <li>
+        <a href={`mailto:${site.email}`} class="closing__item">
+          <span class="closing__icon"><Icon name="mail" /></span>
+          <span><small>General enquiries</small>{site.email}</span>
+        </a>
+      </li>
+      <li>
+        <a href={url('/patients/visiting-hours/')} class="closing__item">
+          <span class="closing__icon"><Icon name="clock" /></span>
+          <span><small>Daily 08h00 - 20h00</small>Visiting Hours</span>
+        </a>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer__top">
+      <div class="footer__brand">
+        <Logo tone="light" />
+        <p>{site.description}</p>
+        <address>
+          <Icon name="map-pin" size={16} />
+          <span>{address.street}, {address.area}<br />{address.city}, {address.province}, {address.postcode}</span>
+        </address>
+        <ul class="footer__social" role="list">
+          {
+            site.social.map((s) => (
+              <li>
+                <a href={s.href} aria-label={s.label} rel="noopener" target="_blank">
+                  <Icon name={s.icon} size={18} />
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+
+      {
+        footerNav.map((col) => (
+          <nav class="footer__col" aria-label={col.title}>
+            <p class="footer__title">{col.title}</p>
+            <ul role="list">
+              {col.links.map((l) => (
+                <li class={l.quote ? `only-${l.quote}` : undefined}>
+                  <a href={url(l.href)}>{l.label}</a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        ))
+      }
+    </div>
+
+    <div class="footer__accred">
+      <p class="footer__title">Accreditation & memberships</p>
+      <ul role="list">
+        {site.accreditations.map((a) => <li>{a}</li>)}
+      </ul>
+    </div>
+
+    <div class="footer__bottom">
+      <p>&copy; {year} {site.name} (Pty) Ltd. All rights reserved.</p>
+      <ul role="list">
+        {
+          legalNav.map((l) => (
+            <li>
+              <a href={url(l.href)}>{l.label}</a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .closing {
+    background: linear-gradient(120deg, var(--teal-800), var(--navy-800));
+    color: #fff;
+  }
+
+  .closing__inner {
+    display: grid;
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 2fr);
+    gap: var(--sp-8);
+    align-items: center;
+    padding-block: var(--sp-12);
+  }
+
+  .closing h2 {
+    color: #fff;
+    font-size: var(--fs-2xl);
+  }
+
+  .closing .eyebrow {
+    color: var(--teal-400);
+  }
+
+  .closing__list {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--sp-4);
+    margin: 0;
+  }
+
+  .closing__item {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3);
+    height: 100%;
+    padding: var(--sp-4);
+    border-radius: var(--radius-lg);
+    background: rgb(255 255 255 / 0.07);
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.12);
+    color: #fff;
+    text-decoration: none;
+    font-weight: 650;
+    font-size: var(--fs-sm);
+    line-height: 1.35;
+    transition: background-color var(--dur) var(--ease);
+    overflow-wrap: anywhere;
+  }
+
+  .closing__item:hover {
+    background: rgb(255 255 255 / 0.13);
+    color: #fff;
+  }
+
+  .closing__item small {
+    display: block;
+    font-size: var(--fs-xs);
+    font-weight: 500;
+    color: rgb(255 255 255 / 0.65);
+  }
+
+  .closing__icon {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 50%;
+    background: rgb(0 216 206 / 0.16);
+    color: var(--teal-400);
+  }
+
+  .closing__item--sos .closing__icon {
+    background: var(--red-600);
+    color: #fff;
+  }
+
+  .footer {
+    background: var(--navy-950);
+    color: rgb(255 255 255 / 0.66);
+    font-size: var(--fs-sm);
+    padding-top: var(--sp-16);
+    padding-bottom: calc(var(--sp-8) + 64px);
+  }
+
+  .footer a {
+    color: rgb(255 255 255 / 0.78);
+    text-decoration: none;
+    transition: color var(--dur) var(--ease);
+  }
+
+  .footer a:hover {
+    color: var(--teal-400);
+  }
+
+  .footer__top {
+    display: grid;
+    grid-template-columns: minmax(0, 1.6fr) repeat(3, minmax(0, 1fr));
+    gap: var(--sp-10);
+  }
+
+  .footer__brand {
+    display: grid;
+    gap: var(--sp-5);
+    align-content: start;
+    max-width: 380px;
+  }
+
+  .footer__brand p {
+    line-height: 1.7;
+  }
+
+  address {
+    display: flex;
+    gap: var(--sp-2);
+    font-style: normal;
+    line-height: 1.6;
+  }
+
+  address :global(svg) {
+    flex: none;
+    margin-top: 3px;
+    color: var(--teal-400);
+  }
+
+  .footer__social {
+    display: flex;
+    gap: var(--sp-2);
+    margin: 0;
+  }
+
+  .footer__social a {
+    display: grid;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    background: rgb(255 255 255 / 0.06);
+  }
+
+  .footer__social a:hover {
+    background: rgb(0 216 206 / 0.14);
+  }
+
+  .footer__title {
+    margin-bottom: var(--sp-4);
+    font-size: var(--fs-xs);
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #fff;
+  }
+
+  .footer__col ul {
+    display: grid;
+    gap: var(--sp-3);
+    margin: 0;
+  }
+
+  .footer__accred {
+    margin-top: var(--sp-12);
+    padding-top: var(--sp-8);
+    border-top: 1px solid rgb(255 255 255 / 0.08);
+  }
+
+  .footer__accred ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-3);
+    margin: 0;
+  }
+
+  .footer__accred li {
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius-md);
+    background: rgb(255 255 255 / 0.05);
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.08);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: rgb(255 255 255 / 0.82);
+  }
+
+  .footer__bottom {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--sp-4);
+    margin-top: var(--sp-8);
+    padding-top: var(--sp-6);
+    border-top: 1px solid rgb(255 255 255 / 0.08);
+    font-size: var(--fs-xs);
+  }
+
+  .footer__bottom ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-5);
+    margin: 0;
+  }
+
+  @media (max-width: 1024px) {
+    .closing__inner {
+      grid-template-columns: 1fr;
+    }
+    .footer__top {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    .footer__brand {
+      grid-column: 1 / -1;
+      max-width: none;
+    }
+  }
+
+  @media (max-width: 720px) {
+    .closing__list {
+      grid-template-columns: 1fr;
+    }
+    .footer__top {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+</style>
