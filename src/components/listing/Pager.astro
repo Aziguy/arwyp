@@ -1,0 +1,9 @@
+---
+interface Props {
+  label?: string;
+}
+
+const { label = 'Pagination' } = Astro.props;
+---
+
+<nav class="pager" data-pager aria-label={label} hidden></nav>

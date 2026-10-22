@@ -1,0 +1,71 @@
+---
+interface Props {
+  total: number;
+  noun: string;
+  sorts?: { value: string; label: string; quote?: 'a' | 'b' }[];
+  id?: string;
+}
+
+const { total, noun, sorts = [], id = 'sort' } = Astro.props;
+---
+
+<div class="rbar" data-scroll-anchor>
+  <p class="rbar__summary" aria-live="polite">
+    Showing <strong data-range>1-{total}</strong> of <strong data-count>{total}</strong> {noun}
+  </p>
+  {
+    sorts.length > 0 && (
+      <label class="rbar__sort" for={id}>
+        <span>Sort by</span>
+        <select id={id} class="select select--sm" data-sort>
+          <option value="">Relevance</option>
+          {sorts.map((s) => (
+            <option value={s.value} data-quote={s.quote}>
+              {s.label}
+            </option>
+          ))}
+        </select>
+      </label>
+    )
+  }
+</div>
+<div class="active" data-active hidden></div>
+
+<style>
+  .rbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sp-3) var(--sp-6);
+    margin-bottom: var(--sp-4);
+    padding-bottom: var(--sp-4);
+    border-bottom: 1px solid var(--line);
+    scroll-margin-top: calc(var(--header-h) + var(--sp-6));
+  }
+
+  .rbar__summary {
+    font-size: var(--fs-sm);
+    color: var(--ink-2);
+  }
+
+  .rbar__summary strong {
+    color: var(--navy-900);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .rbar__sort {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    color: var(--ink-2);
+    white-space: nowrap;
+  }
+
+  .rbar__sort .select {
+    width: auto;
+    min-width: 190px;
+  }
+</style>
