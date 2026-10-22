@@ -13,3 +13,7 @@ export function isActive(current: string, href: string): boolean {
   if (target === url('/')) return current === target;
   return current.startsWith(target);
 }
+
+export function absolute(path = '/'): string {
+  return new URL(url(path), import.meta.env.SITE).href;
+}

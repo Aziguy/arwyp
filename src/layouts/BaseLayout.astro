@@ -3,20 +3,15 @@ import '@fontsource-variable/plus-jakarta-sans';
 import '@fontsource/cormorant-garamond/600-italic.css';
 import '@/styles/global.css';
 import QuoteSwitcher from '@/components/site/QuoteSwitcher.astro';
-import { site } from '@/config/site';
+import Seo, { type SeoProps } from '@/components/seo/Seo.astro';
 import { DEFAULT_QUOTE, QUOTE_STORAGE_KEY } from '@/config/quotes';
 import { url } from '@/lib/paths';
 
-interface Props {
-  title: string;
-  description?: string;
+interface Props extends SeoProps {
   bodyClass?: string;
-  schema?: Record<string, unknown> | Record<string, unknown>[];
 }
 
-const { title, description = site.description, bodyClass, schema } = Astro.props;
-const fullTitle = title === site.name ? title : `${title} | ${site.name}`;
-const canonical = new URL(Astro.url.pathname, Astro.site);
+const { bodyClass, ...seoProps } = Astro.props;
 ---
 
 <!doctype html>
@@ -24,17 +19,11 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <title>{fullTitle}</title>
-    <meta name="description" content={description} />
-    <meta name="robots" content="noindex, nofollow" />
+    <Seo {...seoProps} />
     <meta name="theme-color" content="#283646" />
-    <link rel="canonical" href={canonical} />
+    <meta name="format-detection" content="telephone=no" />
     <link rel="icon" href={url('/favicon.svg')} type="image/svg+xml" />
     <link rel="apple-touch-icon" href={url('/icons/apple-touch-icon.png')} />
-    <meta property="og:type" content="website" />
-    <meta property="og:title" content={fullTitle} />
-    <meta property="og:description" content={description} />
-    <meta property="og:locale" content="en_ZA" />
     <script is:inline define:vars={{ key: QUOTE_STORAGE_KEY, fallback: DEFAULT_QUOTE }}>
       (function () {
         var q = new URLSearchParams(location.search).get('quote');
@@ -44,7 +33,6 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
         document.documentElement.dataset.quote = q === 'a' || q === 'b' ? q : fallback;
       })();
     </script>
-    {schema && <script type="application/ld+json" set:html={JSON.stringify(schema)} />}
   </head>
   <body class={bodyClass}>
     <a class="skip-link" href="#main">Skip to content</a>

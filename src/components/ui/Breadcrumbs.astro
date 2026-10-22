@@ -1,6 +1,7 @@
 ---
 import Icon from './Icon.astro';
 import { url } from '@/lib/paths';
+import { breadcrumbSchema } from '@/lib/schema';
 
 export type Crumb = { label: string; href?: string };
 
@@ -12,6 +13,8 @@ interface Props {
 const { items, tone = 'light' } = Astro.props;
 const all: Crumb[] = [{ label: 'Home', href: '/' }, ...items];
 ---
+
+<script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema(all))} />
 
 <nav aria-label="Breadcrumb" class:list={['crumbs', `crumbs--${tone}`]}>
   <ol role="list">

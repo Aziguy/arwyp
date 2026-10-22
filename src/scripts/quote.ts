@@ -9,6 +9,9 @@ function render(quote: QuoteId) {
   document.querySelectorAll<HTMLElement>('[data-set-quote]').forEach((el) => {
     el.setAttribute('aria-pressed', String(el.dataset.setQuote === quote));
   });
+  document.querySelectorAll<HTMLScriptElement>('script[data-ld-quote]').forEach((el) => {
+    el.type = el.dataset.ldQuote === quote ? 'application/ld+json' : 'text/plain';
+  });
 }
 
 export function setQuote(quote: QuoteId) {

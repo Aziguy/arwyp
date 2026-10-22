@@ -62,7 +62,7 @@ const config: Record<Props['area'], { nav: typeof adminNav; home: string; user: 
 const c = config[area];
 ---
 
-<BaseLayout title={title} bodyClass={`app-body${area === 'portal' ? ' app-has-tabbar' : ''}`}>
+<BaseLayout title={title} noindex bodyClass={`app-body${area === 'portal' ? ' app-has-tabbar' : ''}`}>
   <script is:inline>
     try {
       if (localStorage.getItem('arwyp.sidebar') === 'collapsed') document.documentElement.dataset.sb = 'collapsed';

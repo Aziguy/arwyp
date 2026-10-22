@@ -4,19 +4,16 @@ import AlertBanner from '@/components/site/AlertBanner.astro';
 import Header from '@/components/site/Header.astro';
 import Footer from '@/components/site/Footer.astro';
 import WhatsAppButton from '@/components/site/WhatsAppButton.astro';
-import { organizationSchema } from '@/lib/schema';
+import type { SeoProps } from '@/components/seo/Seo.astro';
+import { organizationSchema, websiteSchema } from '@/lib/schema';
 
-interface Props {
-  title: string;
-  description?: string;
-  schema?: Record<string, unknown> | Record<string, unknown>[];
-}
+type Props = SeoProps;
 
-const { title, description, schema } = Astro.props;
-const graph = [organizationSchema(), ...(schema ? (Array.isArray(schema) ? schema : [schema]) : [])];
+const { schema, ...props } = Astro.props;
+const graph = [organizationSchema(), websiteSchema(), ...(schema ? (Array.isArray(schema) ? schema : [schema]) : [])];
 ---
 
-<BaseLayout title={title} description={description} schema={graph}>
+<BaseLayout {...props} schema={graph}>
   <AlertBanner />
   <Header />
   <main id="main">
