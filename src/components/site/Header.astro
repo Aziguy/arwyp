@@ -91,7 +91,7 @@ const path = Astro.url.pathname;
       <a class="btn btn--accent only-b header__cta" href={url('/specialists/')}>
         <Icon name="calendar-check" /> Book online
       </a>
-      <a class="header__icon only-b" href={url('/portal/')} aria-label="Patient portal">
+      <a class="header__icon header__portal only-b" href={url('/portal/')} aria-label="Patient portal">
         <Icon name="circle-user-round" size={22} />
       </a>
       <a class="header__icon header__icon--sos" href={site.emergency.href} aria-label={`Emergency ${site.emergency.display}`}>
@@ -435,6 +435,19 @@ const path = Astro.url.pathname;
     }
     .header__inner {
       gap: var(--sp-3);
+    }
+    .header__actions {
+      gap: 2px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .header__portal {
+      display: none !important;
+    }
+    .header__icon {
+      width: 2.5rem;
+      height: 2.5rem;
     }
   }
 

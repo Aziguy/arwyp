@@ -84,13 +84,20 @@ const { tone = 'dark', compact = false, href = '/' } = Astro.props;
     opacity: 0.68;
   }
 
-  @media (max-width: 380px) {
+  @media (max-width: 480px) {
+    .logo {
+      gap: 0.5rem;
+    }
     .logo__name {
-      font-size: 0.9rem;
+      font-size: 0.84rem;
+    }
+    .logo__sub {
+      font-size: 0.56rem;
+      letter-spacing: 0.1em;
     }
     .logo__mark {
-      width: 44px;
-      height: 33px;
+      width: 42px;
+      height: 32px;
     }
   }
 </style>
