@@ -1,0 +1,296 @@
+---
+import Icon from '@/components/ui/Icon.astro';
+import Avatar from '@/components/ui/Avatar.astro';
+import { url } from '@/lib/paths';
+
+export type AppUser = { name: string; role: string; roleA?: string };
+export type AppAlert = { icon: string; text: string; at: string; quote?: 'a' | 'b' };
+
+interface Props {
+  user: AppUser;
+  alerts: AppAlert[];
+  signOut: string;
+  searchPlaceholder?: string;
+}
+
+const { user, alerts, signOut, searchPlaceholder = 'Search' } = Astro.props;
+---
+
+<header class="tb">
+  <button type="button" class="icon-btn tb__menu" data-sidebar-open aria-label="Open navigation" aria-controls="app-sidebar">
+    <Icon name="menu" size={20} />
+  </button>
+  <button type="button" class="icon-btn tb__collapse" data-sidebar-collapse aria-label="Collapse navigation">
+    <Icon name="panel-left-close" size={20} />
+  </button>
+
+  <form class="tb__search" role="search" data-demo-form>
+    <Icon name="search" size={18} />
+    <input class="tb__input" type="search" placeholder={searchPlaceholder} aria-label={searchPlaceholder} />
+    <kbd>/</kbd>
+  </form>
+
+  <div class="tb__actions">
+    <a class="btn btn--ghost btn--sm tb__site" href={url('/')}><Icon name="external-link" /> View website</a>
+
+    <div class="tb__pop" data-pop>
+      <button type="button" class="icon-btn tb__bell" aria-expanded="false" aria-haspopup="true" data-pop-trigger aria-label="Notifications">
+        <Icon name="bell" size={20} />
+        <span class="tb__dot"></span>
+      </button>
+      <div class="tb__menu-panel tb__menu-panel--wide" data-pop-panel hidden>
+        <p class="tb__menu-title">Notifications</p>
+        <ul role="list" class="list-rows">
+          {
+            alerts.map((a) => (
+              <li class={a.quote ? `only-${a.quote}` : undefined}>
+                <span class="icon-dot">
+                  <Icon name={a.icon} size={16} />
+                </span>
+                <span class="list-rows__main">
+                  <strong>{a.text}</strong>
+                  <small>{a.at}</small>
+                </span>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </div>
+
+    <div class="tb__pop" data-pop>
+      <button type="button" class="tb__user" aria-expanded="false" aria-haspopup="true" data-pop-trigger>
+        <Avatar name={user.name} size={34} />
+        <span class="tb__who">
+          <strong>{user.name}</strong>
+          {
+            user.roleA ? (
+              <>
+                <small class="only-a">{user.roleA}</small>
+                <small class="only-b">{user.role}</small>
+              </>
+            ) : (
+              <small>{user.role}</small>
+            )
+          }
+        </span>
+        <Icon name="chevron-down" size={16} />
+      </button>
+      <div class="tb__menu-panel" data-pop-panel hidden>
+        <a href="#" class="tb__item"><Icon name="user-round" size={16} /> Profile</a>
+        <a href="#" class="tb__item only-b"><Icon name="key-square" size={16} /> Two-factor authentication</a>
+        <a href={url('/')} class="tb__item"><Icon name="globe" size={16} /> View website</a>
+        <a href={url(signOut)} class="tb__item tb__item--danger"><Icon name="log-out" size={16} /> Sign out</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<style>
+  .tb {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+    min-height: 68px;
+    padding: 0 var(--sp-6);
+    background: rgb(255 255 255 / 0.92);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .tb__menu {
+    display: none;
+  }
+
+  .tb__search {
+    position: relative;
+    display: flex;
+    align-items: center;
+    flex: 1;
+    max-width: 440px;
+    margin-left: var(--sp-2);
+    color: var(--ink-3);
+  }
+
+  .tb__search > :global(svg) {
+    position: absolute;
+    left: 0.85rem;
+    pointer-events: none;
+  }
+
+  .tb__input {
+    width: 100%;
+    min-height: 2.5rem;
+    padding: 0.5rem 2.5rem 0.5rem 2.6rem;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-pill);
+    background: var(--surface-2);
+    font-size: var(--fs-sm);
+    color: var(--ink);
+    transition:
+      border-color var(--dur) var(--ease),
+      box-shadow var(--dur) var(--ease),
+      background-color var(--dur) var(--ease);
+  }
+
+  .tb__input:focus {
+    outline: none;
+    background: var(--surface);
+    border-color: var(--teal-600);
+    box-shadow: var(--ring);
+  }
+
+  .tb kbd {
+    position: absolute;
+    right: 0.75rem;
+    padding: 0 0.4rem;
+    border: 1px solid var(--line-2);
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 0.6875rem;
+    color: var(--ink-3);
+  }
+
+  .tb__actions {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+    margin-left: auto;
+  }
+
+  .tb__pop {
+    position: relative;
+  }
+
+  .tb__bell {
+    position: relative;
+  }
+
+  .tb__dot {
+    position: absolute;
+    top: 9px;
+    right: 10px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--red-600);
+    box-shadow: 0 0 0 2px var(--surface);
+  }
+
+  .tb__user {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3);
+    padding: 4px var(--sp-2) 4px 4px;
+    border-radius: var(--radius-pill);
+    color: var(--ink-2);
+    transition: background-color var(--dur) var(--ease);
+  }
+
+  .tb__user:hover {
+    background: var(--surface-3);
+  }
+
+  .tb__who {
+    display: grid;
+    text-align: left;
+    line-height: 1.25;
+  }
+
+  .tb__who strong {
+    font-size: var(--fs-sm);
+    color: var(--navy-900);
+    white-space: nowrap;
+  }
+
+  .tb__who small {
+    font-size: var(--fs-xs);
+    color: var(--ink-3);
+    white-space: nowrap;
+  }
+
+  .tb__menu-panel {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    z-index: 70;
+    min-width: 230px;
+    padding: var(--sp-2);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    box-shadow: var(--shadow-lg), 0 0 0 1px var(--line);
+  }
+
+  .tb__menu-panel--wide {
+    width: min(360px, calc(100vw - 2rem));
+    padding: var(--sp-2) 0;
+  }
+
+  .tb__menu-panel--wide :global(.list-rows > li) {
+    padding-inline: var(--sp-4);
+  }
+
+  .tb__menu-panel--wide :global(.list-rows__main strong) {
+    white-space: normal;
+    font-weight: 600;
+  }
+
+  .tb__menu-title {
+    padding: var(--sp-2) var(--sp-4) var(--sp-3);
+    font-size: var(--fs-xs);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+
+  .tb__item {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3);
+    padding: 0.6rem 0.75rem;
+    border-radius: var(--radius-md);
+    font-size: var(--fs-sm);
+    font-weight: 550;
+    color: var(--ink-2);
+    text-decoration: none;
+  }
+
+  .tb__item:hover {
+    background: var(--surface-2);
+    color: var(--navy-900);
+  }
+
+  .tb__item--danger {
+    color: var(--red-700);
+  }
+
+  @media (max-width: 1023px) {
+    .tb {
+      padding: 0 var(--sp-4);
+    }
+    .tb__menu {
+      display: grid;
+    }
+    .tb__collapse {
+      display: none;
+    }
+  }
+
+  @media (max-width: 760px) {
+    .tb__site,
+    .tb__who,
+    .tb kbd {
+      display: none;
+    }
+    .tb__user > :global(svg) {
+      display: none;
+    }
+    .tb__user {
+      padding: 4px;
+    }
+  }
+</style>

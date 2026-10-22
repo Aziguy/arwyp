@@ -1,0 +1,34 @@
+---
+import Icon from '@/components/ui/Icon.astro';
+
+interface Props {
+  id: string;
+  title: string;
+  subtitle?: string;
+  submit?: string;
+  toast?: string;
+  center?: boolean;
+}
+
+const { id, title, subtitle, submit = 'Save', toast = 'Saved successfully', center = false } = Astro.props;
+---
+
+<div class:list={['drawer-panel', { 'drawer-panel--center': center }]} id={id} data-drawer-panel hidden>
+  <div class="drawer-panel__scrim" data-drawer-dismiss></div>
+  <form class="drawer-panel__sheet" role="dialog" aria-modal="true" aria-labelledby={`${id}-title`} data-demo-form data-toast={toast}>
+    <header class="drawer-panel__head">
+      <div>
+        <h2 id={`${id}-title`} data-panel-title>{title}</h2>
+        {subtitle && <p>{subtitle}</p>}
+      </div>
+      <button type="button" class="icon-btn" data-drawer-dismiss aria-label="Close"><Icon name="x" size={20} /></button>
+    </header>
+    <div class="drawer-panel__body form">
+      <slot />
+    </div>
+    <footer class="drawer-panel__foot">
+      <button type="button" class="btn btn--outline btn--sm" data-drawer-dismiss>Cancel</button>
+      <button type="submit" class="btn btn--sm">{submit}</button>
+    </footer>
+  </form>
+</div>

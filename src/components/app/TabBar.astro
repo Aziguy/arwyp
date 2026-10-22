@@ -1,0 +1,85 @@
+---
+import Icon from '@/components/ui/Icon.astro';
+import { portalNav, portalTabs } from '@/data/app/nav';
+import { url } from '@/lib/paths';
+
+const items = portalNav[0].items.filter((i) => portalTabs.includes(i.href));
+const path = Astro.url.pathname;
+---
+
+<nav class="tabbar only-b" aria-label="Portal">
+  {
+    items.map((i) => (
+      <a href={url(i.href)} aria-current={(i.href === '/portal/' ? path === url(i.href) : path.startsWith(url(i.href))) ? 'page' : undefined}>
+        <span class="tabbar__icon">
+          <Icon name={i.icon} size={22} />
+          {i.badge && <span class="tabbar__badge">{i.badge}</span>}
+        </span>
+        <span>{i.label}</span>
+      </a>
+    ))
+  }
+</nav>
+
+<style>
+  .tabbar {
+    position: fixed;
+    inset: auto 0 0;
+    z-index: 55;
+    display: none;
+    grid-template-columns: repeat(5, 1fr);
+    padding: 6px 6px calc(6px + env(safe-area-inset-bottom));
+    background: rgb(255 255 255 / 0.96);
+    backdrop-filter: blur(12px);
+    border-top: 1px solid var(--line);
+  }
+
+  .tabbar a {
+    display: grid;
+    justify-items: center;
+    gap: 2px;
+    padding: 6px 0;
+    border-radius: var(--radius-md);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    color: var(--ink-3);
+    text-decoration: none;
+  }
+
+  .tabbar a[aria-current='page'] {
+    color: var(--teal-700);
+  }
+
+  .tabbar a[aria-current='page'] .tabbar__icon {
+    background: var(--teal-50);
+  }
+
+  .tabbar__icon {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 3rem;
+    height: 1.9rem;
+    border-radius: var(--radius-pill);
+  }
+
+  .tabbar__badge {
+    position: absolute;
+    top: -2px;
+    right: 6px;
+    min-width: 1rem;
+    padding: 0 4px;
+    border-radius: var(--radius-pill);
+    background: var(--red-600);
+    color: #fff;
+    font-size: 0.625rem;
+    line-height: 1rem;
+    text-align: center;
+  }
+
+  @media (max-width: 899px) {
+    :global(html[data-quote='b']) .tabbar {
+      display: grid;
+    }
+  }
+</style>

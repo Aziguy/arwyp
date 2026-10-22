@@ -1,0 +1,161 @@
+---
+import Icon from '@/components/ui/Icon.astro';
+
+interface Props {
+  label: string;
+  value: string;
+  delta?: number;
+  upIsGood?: boolean;
+  period?: string;
+  trend?: number[];
+  icon?: string;
+}
+
+const { label, value, delta, upIsGood = true, period = 'vs last month', trend, icon } = Astro.props;
+const good = delta === undefined ? true : delta >= 0 === upIsGood;
+
+let points = '';
+let last = { x: 0, y: 0 };
+if (trend && trend.length > 1) {
+  const min = Math.min(...trend);
+  const max = Math.max(...trend);
+  const span = max - min || 1;
+  const coords = trend.map((v, i) => ({ x: (i / (trend.length - 1)) * 84 + 2, y: 28 - ((v - min) / span) * 24 - 2 }));
+  points = coords.map((c) => `${c.x.toFixed(2)},${c.y.toFixed(2)}`).join(' ');
+  last = coords[coords.length - 1];
+}
+---
+
+<article class="kpi">
+  <header class="kpi__head">
+    <p class="kpi__label">{label}</p>
+    {icon && <span class="kpi__icon"><Icon name={icon} size={16} /></span>}
+  </header>
+  <p class="kpi__value">{value}</p>
+  <div class="kpi__foot">
+    {
+      delta !== undefined && (
+        <p class:list={['kpi__delta', good ? 'is-good' : 'is-bad']}>
+          <Icon name={delta >= 0 ? 'trending-up' : 'trending-down'} size={14} />
+          {delta > 0 ? '+' : ''}
+          {delta}% <span>{period}</span>
+        </p>
+      )
+    }
+    {
+      points && (
+        <svg class="kpi__spark" viewBox="0 0 88 30" aria-hidden="true">
+          <polyline points={points} />
+          <circle cx={last.x} cy={last.y} r="2.6" />
+        </svg>
+      )
+    }
+  </div>
+</article>
+
+<style>
+  .kpi {
+    display: grid;
+    gap: var(--sp-2);
+    padding: var(--sp-5);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    box-shadow: 0 0 0 1px var(--line);
+    min-width: 0;
+  }
+
+  .kpi__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sp-2);
+  }
+
+  .kpi__label {
+    font-size: var(--fs-sm);
+    color: var(--ink-2);
+    font-weight: 550;
+  }
+
+  .kpi__icon {
+    display: grid;
+    place-items: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: var(--radius-md);
+    background: var(--teal-50);
+    color: var(--teal-700);
+  }
+
+  .kpi__value {
+    font-size: clamp(1.5rem, 1.25rem + 0.8vw, 1.875rem);
+    font-weight: 650;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    color: var(--navy-950);
+  }
+
+  .kpi__foot {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--sp-3);
+    min-height: 30px;
+  }
+
+  .kpi__delta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: var(--fs-xs);
+    font-weight: 650;
+    white-space: nowrap;
+  }
+
+  .kpi__delta span {
+    font-weight: 500;
+    color: var(--ink-3);
+  }
+
+  .kpi__delta.is-good {
+    color: #006300;
+  }
+
+  .kpi__delta.is-bad {
+    color: var(--red-700);
+  }
+
+  .kpi__spark {
+    flex: none;
+    width: 88px;
+    height: 30px;
+    overflow: visible;
+  }
+
+  .kpi__spark polyline {
+    fill: none;
+    stroke: #898781;
+    stroke-width: 2;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+    vector-effect: non-scaling-stroke;
+  }
+
+  @media (max-width: 560px) {
+    .kpi {
+      padding: var(--sp-4);
+    }
+    .kpi__icon,
+    .kpi__spark,
+    .kpi__delta span {
+      display: none;
+    }
+  }
+
+  .kpi__spark circle {
+    fill: #2a78d6;
+    stroke: var(--surface);
+    stroke-width: 2;
+    vector-effect: non-scaling-stroke;
+  }
+</style>

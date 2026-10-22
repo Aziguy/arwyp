@@ -1,0 +1,389 @@
+---
+import Icon from '@/components/ui/Icon.astro';
+import Avatar from '@/components/ui/Avatar.astro';
+import { badgeClass } from '@/lib/app/status';
+import { money, longDate, count } from '@/lib/format';
+
+export type Column = {
+  key: string;
+  label: string;
+  kind?: 'text' | 'status' | 'money' | 'date' | 'person' | 'mono' | 'masked' | 'number' | 'progress' | 'strong';
+  sub?: string;
+  align?: 'end';
+  hideSm?: boolean;
+  quote?: 'a' | 'b';
+};
+
+type Row = Record<string, unknown>;
+
+interface Props {
+  id: string;
+  columns: Column[];
+  rows: Row[];
+  filter?: { key: string; label: string };
+  search?: string | false;
+  pageSize?: number;
+  titleKey?: string;
+  kicker?: string;
+  dense?: boolean;
+}
+
+const { id, columns, rows, filter, search = 'Search', pageSize = 10, titleKey, kicker = 'Record', dense = false } = Astro.props;
+
+const text = (row: Row, col: Column): string => {
+  const v = row[col.key];
+  if (v === undefined || v === null || v === '') return '';
+  if (col.kind === 'money') return money(Number(v));
+  if (col.kind === 'date') return longDate(String(v));
+  if (col.kind === 'number') return count(Number(v));
+  if (col.kind === 'progress') return `${v}%`;
+  return String(v);
+};
+
+const sortValue = (row: Row, col: Column) => {
+  const v = row[col.key];
+  return typeof v === 'number' ? String(v) : String(v ?? '').toLowerCase();
+};
+
+const record = (row: Row) => JSON.stringify(Object.fromEntries(columns.map((c) => [c.label, text(row, c) || '-'])));
+const filterValues = filter ? [...new Set(rows.map((r) => String(r[filter.key])))].sort() : [];
+const titleCol = titleKey ?? columns[0].key;
+---
+
+<div class="dt" data-table={id} data-page-size={pageSize}>
+  {
+    (search || filter || Astro.slots.has('default')) && (
+      <div class="dt__bar">
+        {search && (
+          <label class="dt__search">
+            <Icon name="search" size={16} />
+            <span class="sr-only">{search}</span>
+            <input type="search" class="input input--sm" placeholder={search} data-table-search />
+          </label>
+        )}
+        {filter && (
+          <label class="dt__filter">
+            <span class="sr-only">{filter.label}</span>
+            <select class="select select--sm" data-table-filter>
+              <option value="">All {filter.label.toLowerCase()}</option>
+              {filterValues.map((v) => (
+                <option value={v}>{v}</option>
+              ))}
+            </select>
+          </label>
+        )}
+        <div class="dt__extra">
+          <slot />
+        </div>
+      </div>
+    )
+  }
+
+  <div class="dt__scroll">
+    <table class:list={['dt__table', { 'dt__table--dense': dense }]}>
+      <thead>
+        <tr>
+          {
+            columns.map((c, i) => (
+              <th
+                scope="col"
+                class:list={[c.align === 'end' && 'is-end', c.hideSm && 'hide-sm', c.quote && `only-${c.quote}`]}
+                aria-sort="none"
+              >
+                <button type="button" data-sort-col={i}>
+                  {c.label}
+                  <Icon name="chevrons-up-down" size={14} />
+                </button>
+              </th>
+            ))
+          }
+          <th class="dt__actions"><span class="sr-only">Actions</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        {
+          rows.map((row) => (
+            <tr
+              data-row
+              data-filter={filter ? String(row[filter.key]) : undefined}
+              data-record={record(row)}
+              data-record-title={String(row[titleCol] ?? '')}
+              data-record-kicker={kicker}
+              tabindex="0"
+            >
+              {columns.map((c) => (
+                <td
+                  data-sort={sortValue(row, c)}
+                  class:list={[c.align === 'end' && 'is-end', c.hideSm && 'hide-sm', c.quote && `only-${c.quote}`, c.kind === 'money' || c.kind === 'number' ? 'tabular' : '']}
+                >
+                  {c.kind === 'status' ? (
+                    text(row, c) && <span class={badgeClass(text(row, c))}>{text(row, c)}</span>
+                  ) : c.kind === 'person' ? (
+                    <span class="dt__person">
+                      <Avatar name={text(row, c)} size={32} />
+                      <span>
+                        <strong>{text(row, c)}</strong>
+                        {c.sub && <small>{String(row[c.sub] ?? '')}</small>}
+                      </span>
+                    </span>
+                  ) : c.kind === 'progress' ? (
+                    <span class="dt__progress">
+                      <span class="progress">
+                        <span style={`width:${row[c.key]}%`} />
+                      </span>
+                      <span class="tabular">{text(row, c)}</span>
+                    </span>
+                  ) : c.kind === 'strong' ? (
+                    <span class="dt__strong">
+                      <strong>{text(row, c)}</strong>
+                      {c.sub && <small>{String(row[c.sub] ?? '')}</small>}
+                    </span>
+                  ) : (
+                    <span class:list={[c.kind === 'mono' && 'mono', c.kind === 'masked' && 'masked']}>{text(row, c)}</span>
+                  )}
+                </td>
+              ))}
+              <td class="dt__actions">
+                <button type="button" class="icon-btn" data-row-open aria-label="Open record">
+                  <Icon name="chevron-right" size={18} />
+                </button>
+              </td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+    <p class="dt__empty" data-table-empty hidden>No matching records.</p>
+  </div>
+
+  <footer class="dt__foot">
+    <p class="tabular" data-table-count>{rows.length} records</p>
+    <div class="dt__pager">
+      <button type="button" class="icon-btn" data-page="-1" aria-label="Previous page"><Icon name="chevron-left" size={18} /></button>
+      <span class="tabular" data-page-label></span>
+      <button type="button" class="icon-btn" data-page="1" aria-label="Next page"><Icon name="chevron-right" size={18} /></button>
+    </div>
+  </footer>
+</div>
+
+<script>
+  import '@/scripts/datatable';
+</script>
+
+<style>
+  .dt__bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sp-3);
+    padding: var(--sp-4) var(--sp-5);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .dt__search {
+    position: relative;
+    flex: 1 1 240px;
+    max-width: 340px;
+    color: var(--ink-3);
+  }
+
+  .dt__search > :global(svg) {
+    position: absolute;
+    left: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+  }
+
+  .dt__search .input {
+    padding-left: 2.25rem;
+    border-radius: var(--radius-pill);
+  }
+
+  .dt__filter .select {
+    min-width: 180px;
+    border-radius: var(--radius-pill);
+  }
+
+  .dt__extra {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-2);
+    margin-left: auto;
+  }
+
+  .dt__scroll {
+    position: relative;
+    overflow-x: auto;
+  }
+
+  .dt__table {
+    width: 100%;
+    font-size: var(--fs-sm);
+  }
+
+  th {
+    padding: 0 var(--sp-4);
+    height: 2.75rem;
+    background: var(--surface-2);
+    border-bottom: 1px solid var(--line);
+    text-align: left;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  th button {
+    vertical-align: middle;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: var(--fs-xs);
+    font-weight: 650;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+
+  th button :global(svg) {
+    opacity: 0.5;
+  }
+
+  th[aria-sort='ascending'] button,
+  th[aria-sort='descending'] button {
+    color: var(--navy-900);
+  }
+
+  th:first-child,
+  td:first-child {
+    padding-left: var(--sp-5);
+  }
+
+  td {
+    padding: var(--sp-3) var(--sp-4);
+    border-bottom: 1px solid var(--line);
+    color: var(--ink-2);
+    vertical-align: middle;
+    white-space: nowrap;
+  }
+
+  .dt__table--dense td {
+    padding-block: var(--sp-2);
+  }
+
+  tbody tr {
+    cursor: pointer;
+    transition: background-color var(--dur) var(--ease);
+  }
+
+  tbody tr:hover,
+  tbody tr:focus-visible {
+    background: var(--surface-2);
+    outline: none;
+  }
+
+  tbody tr:focus-visible {
+    box-shadow: inset 3px 0 0 var(--teal-600);
+  }
+
+  .is-end {
+    text-align: right;
+  }
+
+  th.is-end button {
+    flex-direction: row-reverse;
+  }
+
+  .dt__actions {
+    width: 3rem;
+    padding-right: var(--sp-3);
+    text-align: right;
+  }
+
+  .dt__person,
+  .dt__strong {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3);
+    line-height: 1.3;
+  }
+
+  .dt__strong {
+    display: grid;
+    gap: 0;
+  }
+
+  .dt__person strong,
+  .dt__strong strong {
+    display: block;
+    color: var(--navy-900);
+    font-weight: 600;
+  }
+
+  .dt__person small,
+  .dt__strong small {
+    display: block;
+    font-size: var(--fs-xs);
+    color: var(--ink-3);
+  }
+
+  .dt__progress {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3);
+    min-width: 140px;
+  }
+
+  .dt__progress .progress {
+    flex: 1;
+  }
+
+  .dt__empty {
+    padding: var(--sp-10);
+    text-align: center;
+    color: var(--ink-3);
+    font-size: var(--fs-sm);
+  }
+
+  .dt__foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sp-3);
+    padding: var(--sp-3) var(--sp-5);
+    font-size: var(--fs-xs);
+    color: var(--ink-3);
+  }
+
+  .dt__pager {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+  }
+
+  .dt__pager .icon-btn {
+    width: 2rem;
+    height: 2rem;
+  }
+
+  .dt__pager .icon-btn:disabled {
+    opacity: 0.35;
+    pointer-events: none;
+  }
+
+  @media (max-width: 760px) {
+    .hide-sm {
+      display: none;
+    }
+    .dt__bar {
+      padding: var(--sp-3) var(--sp-4);
+    }
+    .dt__search {
+      max-width: none;
+    }
+    .dt__filter,
+    .dt__filter .select {
+      flex: 1;
+      min-width: 0;
+    }
+  }
+</style>

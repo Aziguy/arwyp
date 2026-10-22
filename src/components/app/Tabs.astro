@@ -1,0 +1,65 @@
+---
+interface Props {
+  tabs: { id: string; label: string; count?: number | string }[];
+  active?: string;
+  label: string;
+}
+
+const { tabs, active = tabs[0]?.id, label } = Astro.props;
+---
+
+<div class="tabs" role="tablist" aria-label={label} data-tabs>
+  {
+    tabs.map((t) => (
+      <button type="button" role="tab" data-tab={t.id} aria-selected={t.id === active ? 'true' : 'false'}>
+        {t.label}
+        {t.count !== undefined && <span class="tabs__count">{t.count}</span>}
+      </button>
+    ))
+  }
+</div>
+
+<style>
+  .tabs {
+    display: flex;
+    gap: var(--sp-1);
+    overflow-x: auto;
+    border-bottom: 1px solid var(--line);
+    scrollbar-width: none;
+  }
+
+  .tabs button {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-2);
+    min-height: 2.75rem;
+    padding: 0 var(--sp-3);
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    color: var(--ink-3);
+    white-space: nowrap;
+    transition:
+      color var(--dur) var(--ease),
+      border-color var(--dur) var(--ease);
+  }
+
+  .tabs button:hover {
+    color: var(--navy-900);
+  }
+
+  .tabs button[aria-selected='true'] {
+    color: var(--navy-900);
+    border-bottom-color: var(--teal-600);
+  }
+
+  .tabs__count {
+    padding: 0 0.45rem;
+    border-radius: var(--radius-pill);
+    background: var(--surface-3);
+    font-size: 0.6875rem;
+    line-height: 1.35rem;
+    color: var(--ink-2);
+  }
+</style>

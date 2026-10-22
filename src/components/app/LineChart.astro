@@ -1,0 +1,300 @@
+---
+import { compact, money, count } from '@/lib/format';
+
+interface Series {
+  name: string;
+  values: number[];
+}
+
+interface Props {
+  id: string;
+  labels: string[];
+  series: Series[];
+  height?: number;
+  format?: 'number' | 'money';
+  area?: boolean;
+  caption: string;
+}
+
+const { id, labels, series, height = 240, format = 'number', area = false, caption } = Astro.props;
+const palette = ['#2a78d6', '#eb6834', '#1baf7a'];
+
+const max = Math.max(...series.flatMap((s) => s.values));
+const step = (() => {
+  const raw = max / 4;
+  const mag = 10 ** Math.floor(Math.log10(raw));
+  return [1, 2, 2.5, 5, 10].map((m) => m * mag).find((m) => m >= raw) ?? raw;
+})();
+const top = step * 4;
+const ticks = [0, 1, 2, 3, 4].map((i) => step * i);
+const n = labels.length;
+const x = (i: number) => (n === 1 ? 50 : (i / (n - 1)) * 100);
+const y = (v: number) => 100 - (v / top) * 100;
+const path = (vals: number[]) => vals.map((v, i) => `${i ? 'L' : 'M'}${x(i).toFixed(3)},${y(v).toFixed(3)}`).join('');
+const fmt = (v: number) => (format === 'money' ? money(v) : count(v));
+const tickFmt = (v: number) => (format === 'money' ? `R${compact(v)}` : compact(v));
+const every = Math.ceil(n / 7);
+const data = JSON.stringify({ top, labels, series: series.map((s, i) => ({ name: s.name, color: palette[i], values: s.values, text: s.values.map(fmt) })) });
+---
+
+<figure class="lc" data-line-chart={data} id={id}>
+  {
+    series.length > 1 && (
+      <ul class="lc__legend" role="list">
+        {series.map((s, i) => (
+          <li>
+            <span class="lc__key" style={`background:${palette[i]}`} />
+            {s.name}
+          </li>
+        ))}
+      </ul>
+    )
+  }
+  <div class="lc__frame" style={`height:${height}px`}>
+    <div class="lc__yaxis" aria-hidden="true">
+      {ticks.map((t) => <span style={`bottom:${(t / top) * 100}%`}>{tickFmt(t)}</span>)}
+    </div>
+    <div class="lc__plot" data-plot>
+      <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+        {ticks.map((t) => <line class:list={['lc__grid', { 'lc__base': t === 0 }]} x1="0" x2="100" y1={y(t)} y2={y(t)} />)}
+        {series.map((s, i) => area && <path class="lc__area" d={`${path(s.values)}L100,100L0,100Z`} fill={palette[i]} />)}
+        {series.map((s, i) => <path class="lc__line" d={path(s.values)} stroke={palette[i]} />)}
+      </svg>
+      {
+        series.map((s, i) => {
+          const v = s.values[n - 1];
+          return <span class="lc__end" style={`left:100%;top:${y(v)}%;background:${palette[i]}`} />;
+        })
+      }
+      <span class="lc__cross" data-cross hidden></span>
+      {series.map((_, i) => <span class="lc__dot" data-dot={i} style={`background:${palette[i]}`} hidden />)}
+      <div class="lc__tip" data-tip hidden></div>
+    </div>
+    <div class="lc__xaxis" aria-hidden="true">
+      {labels.map((l, i) => (i % every === 0 || i === n - 1 ? <span class:list={{ 'is-key': i === 0 || i === n - 1 || i === Math.floor((n - 1) / 2) }} style={`left:${x(i)}%`}>{l}</span> : null))}
+    </div>
+  </div>
+  <details class="lc__table">
+    <summary>View data table</summary>
+    <div class="lc__tablewrap">
+      <table>
+        <caption class="sr-only">{caption}</caption>
+        <thead>
+          <tr>
+            <th scope="col">Period</th>
+            {series.map((s) => <th scope="col">{s.name}</th>)}
+          </tr>
+        </thead>
+        <tbody>
+          {
+            labels.map((l, i) => (
+              <tr>
+                <th scope="row">{l}</th>
+                {series.map((s) => (
+                  <td class="tabular">{fmt(s.values[i])}</td>
+                ))}
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+  </details>
+</figure>
+
+<script>
+  import '@/scripts/charts';
+</script>
+
+<style>
+  .lc {
+    display: grid;
+    gap: var(--sp-4);
+    margin: 0;
+  }
+
+  .lc__legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-2) var(--sp-5);
+    margin: 0;
+    font-size: var(--fs-xs);
+    color: var(--ink-2);
+  }
+
+  .lc__legend li {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-2);
+  }
+
+  .lc__key {
+    width: 14px;
+    height: 3px;
+    border-radius: 2px;
+  }
+
+  .lc__frame {
+    position: relative;
+    margin: 6px 6px 26px 44px;
+  }
+
+  .lc__yaxis span {
+    position: absolute;
+    right: calc(100% + 10px);
+    transform: translateY(50%);
+    font-size: 0.6875rem;
+    color: #898781;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  .lc__plot {
+    position: absolute;
+    inset: 0;
+    cursor: crosshair;
+    touch-action: pan-y;
+  }
+
+  .lc__plot svg {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+
+  .lc__grid {
+    stroke: #e1e0d9;
+    stroke-width: 1;
+    vector-effect: non-scaling-stroke;
+  }
+
+  .lc__base {
+    stroke: #c3c2b7;
+  }
+
+  .lc__line {
+    fill: none;
+    stroke-width: 2;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+    vector-effect: non-scaling-stroke;
+  }
+
+  .lc__area {
+    opacity: 0.1;
+  }
+
+  .lc__end,
+  .lc__dot {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    box-shadow: 0 0 0 2px var(--surface);
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+
+  .lc__cross {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: #c3c2b7;
+    pointer-events: none;
+  }
+
+  .lc__xaxis span {
+    position: absolute;
+    top: calc(100% + 8px);
+    transform: translateX(-50%);
+    font-size: 0.6875rem;
+    color: #898781;
+    white-space: nowrap;
+  }
+
+  .lc__xaxis span:first-child {
+    transform: none;
+  }
+
+  .lc__xaxis span:last-child {
+    transform: translateX(-100%);
+  }
+
+  @media (max-width: 600px) {
+    .lc__xaxis span:not(.is-key) {
+      display: none;
+    }
+  }
+
+  .lc__tip {
+    position: absolute;
+    top: 0;
+    z-index: 2;
+    min-width: 150px;
+    padding: var(--sp-2) var(--sp-3);
+    border-radius: var(--radius-md);
+    background: var(--surface);
+    box-shadow: var(--shadow-md), 0 0 0 1px var(--line);
+    font-size: var(--fs-xs);
+    pointer-events: none;
+  }
+
+  .lc__tip :global(p) {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+    color: var(--ink-2);
+  }
+
+  .lc__tip :global(p:first-child) {
+    margin-bottom: 4px;
+    font-weight: 700;
+    color: var(--navy-900);
+  }
+
+  .lc__tip :global(i) {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+  }
+
+  .lc__tip :global(b) {
+    margin-left: auto;
+    color: var(--navy-900);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .lc__table summary {
+    width: max-content;
+    font-size: var(--fs-xs);
+    font-weight: 600;
+    color: var(--accent-ink);
+    cursor: pointer;
+  }
+
+  .lc__tablewrap {
+    position: relative;
+    max-height: 240px;
+    margin-top: var(--sp-3);
+    overflow: auto;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-md);
+  }
+
+  .lc__table table {
+    width: 100%;
+    font-size: var(--fs-xs);
+  }
+
+  .lc__table th,
+  .lc__table td {
+    padding: 6px var(--sp-3);
+    border-bottom: 1px solid var(--line);
+    text-align: left;
+  }
+
+  .lc__table td {
+    text-align: right;
+  }
+</style>

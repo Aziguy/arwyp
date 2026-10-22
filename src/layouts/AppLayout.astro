@@ -1,0 +1,173 @@
+---
+import '@/styles/app.css';
+import BaseLayout from './BaseLayout.astro';
+import Sidebar from '@/components/app/Sidebar.astro';
+import Topbar, { type AppAlert, type AppUser } from '@/components/app/Topbar.astro';
+import TabBar from '@/components/app/TabBar.astro';
+import QuoteGate from '@/components/ui/QuoteGate.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { adminNav, doctorNav, portalNav } from '@/data/app/nav';
+import { doctor } from '@/data/app/doctor';
+import { patient } from '@/data/app/portal';
+
+interface Props {
+  title: string;
+  area: 'admin' | 'doctor' | 'portal';
+  gate?: boolean;
+}
+
+const { title, area, gate = area !== 'admin' } = Astro.props;
+
+const config: Record<Props['area'], { nav: typeof adminNav; home: string; user: AppUser; signOut: string; search: string; alerts: AppAlert[] }> = {
+  admin: {
+    nav: adminNav,
+    home: '/admin/',
+    user: { name: 'Carmen Abrahams', role: 'Super-admin', roleA: 'Content admin' },
+    signOut: '/admin/login/',
+    search: 'Search pages, specialists, patients...',
+    alerts: [
+      { icon: 'inbox', text: '7 new form submissions to route', at: '10 min ago' },
+      { icon: 'calendar-days', text: '12 bookings awaiting payment', at: '25 min ago', quote: 'b' },
+      { icon: 'send', text: '4 new GP referrals', at: '1 h ago', quote: 'b' },
+      { icon: 'shield-plus', text: 'Pre-auth PA-55123 approved by Bonitas', at: '2 h ago', quote: 'b' },
+      { icon: 'briefcase', text: 'Vacancy AMC-M-2610 closes in 8 days', at: 'Yesterday' },
+    ],
+  },
+  doctor: {
+    nav: doctorNav,
+    home: '/doctor/',
+    user: { name: doctor.name, role: doctor.discipline },
+    signOut: '/admin/login/',
+    search: 'Search my patients...',
+    alerts: [
+      { icon: 'calendar-check', text: 'New booking: Monday 09:30', at: '5 min ago' },
+      { icon: 'credit-card', text: 'Payment received via PayFast', at: '32 min ago' },
+      { icon: 'flask-conical', text: 'Lab results ready for 2 patients', at: '1 h ago' },
+    ],
+  },
+  portal: {
+    nav: portalNav,
+    home: '/portal/',
+    user: { name: patient.name, role: `${patient.scheme} member` },
+    signOut: '/portal/login/',
+    search: 'Search records, invoices...',
+    alerts: [
+      { icon: 'calendar-check', text: 'Reminder: follow-up in 4 days', at: 'Today' },
+      { icon: 'flask-conical', text: 'New lab results available', at: '2 days ago' },
+      { icon: 'message-square', text: 'New message from your specialist rooms', at: 'Tue' },
+    ],
+  },
+};
+
+const c = config[area];
+---
+
+<BaseLayout title={title} bodyClass={`app-body${area === 'portal' ? ' app-has-tabbar' : ''}`}>
+  <script is:inline>
+    try {
+      if (localStorage.getItem('arwyp.sidebar') === 'collapsed') document.documentElement.dataset.sb = 'collapsed';
+    } catch (e) {}
+  </script>
+  <div class="app" data-area={area}>
+    <Sidebar groups={c.nav} area={area} home={c.home} />
+    <div class="app__main">
+      <Topbar user={c.user} alerts={c.alerts} signOut={c.signOut} searchPlaceholder={c.search} />
+      <main id="main" class="app__content">
+        {
+          gate ? (
+            <QuoteGate
+              fallbackHref={area === 'admin' ? '/admin/' : '/'}
+              fallbackLabel={area === 'admin' ? 'Back to dashboard' : 'Back to the website'}
+              text={
+                area === 'admin'
+                  ? 'Quote A includes content management. Switch to Quote B to preview this operational module with fictitious data.'
+                  : undefined
+              }
+            >
+              <slot />
+            </QuoteGate>
+          ) : (
+            <slot />
+          )
+        }
+      </main>
+    </div>
+  </div>
+  {area === 'portal' && <TabBar />}
+
+  <div class="drawer-panel" id="record-drawer" data-drawer-panel hidden>
+    <div class="drawer-panel__scrim" data-drawer-dismiss></div>
+    <section class="drawer-panel__sheet" role="dialog" aria-modal="true" aria-labelledby="record-title">
+      <header class="drawer-panel__head">
+        <div>
+          <p data-record-kicker></p>
+          <h2 id="record-title" data-record-title>Record</h2>
+        </div>
+        <button type="button" class="icon-btn" data-drawer-dismiss aria-label="Close"><Icon name="x" size={20} /></button>
+      </header>
+      <div class="drawer-panel__body">
+        <dl class="kv" data-record-body></dl>
+        <p class="secure-note"><Icon name="lock" size={14} /> Access logged to the audit trail. Data encrypted at rest (AES-256).</p>
+      </div>
+      <footer class="drawer-panel__foot">
+        <button type="button" class="btn btn--outline btn--sm" data-drawer-dismiss>Close</button>
+        <button type="button" class="btn btn--sm" data-toast-click="Changes saved">Edit record</button>
+      </footer>
+    </section>
+  </div>
+
+  <div class="toasts" aria-live="polite" data-toasts></div>
+
+  <script>
+    import '@/scripts/app';
+  </script>
+</BaseLayout>
+
+<style>
+  :global(html) {
+    --sb-w: 264px;
+    scroll-padding-top: 84px;
+  }
+
+  :global(html[data-sb='collapsed']) {
+    --sb-w: 76px;
+  }
+
+  .app {
+    display: flex;
+    min-height: 100dvh;
+  }
+
+  .app__main {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .app__content {
+    flex: 1;
+    width: 100%;
+    max-width: 1480px;
+    margin-inline: auto;
+    padding: var(--sp-8) var(--sp-6) var(--sp-16);
+  }
+
+  .app__content :global(.gate) {
+    min-height: calc(100dvh - 68px - 6rem);
+    border-radius: var(--radius-xl);
+    background:
+      radial-gradient(60% 50% at 50% 0%, rgb(0 216 206 / 0.1), transparent 70%),
+      var(--surface);
+    box-shadow: 0 0 0 1px var(--line);
+  }
+
+  @media (max-width: 760px) {
+    .app__content {
+      padding: var(--sp-5) var(--sp-4) var(--sp-16);
+    }
+    [data-area='portal'] .app__content {
+      padding-bottom: 120px;
+    }
+  }
+</style>

@@ -1,0 +1,125 @@
+---
+import { count, money } from '@/lib/format';
+
+interface Props {
+  items: { label: string; value: number }[];
+  format?: 'number' | 'money' | 'percent';
+  caption: string;
+  color?: string;
+}
+
+const { items, format = 'number', caption, color = '#2a78d6' } = Astro.props;
+const max = Math.max(...items.map((i) => i.value));
+const total = items.reduce((sum, i) => sum + i.value, 0);
+const fmt = (v: number) => (format === 'money' ? money(v) : format === 'percent' ? `${v}%` : count(v));
+---
+
+<figure class="bc" style={`--bar:${color}`}>
+  <figcaption class="sr-only">{caption}</figcaption>
+  <ul role="list">
+    {
+      items.map((i) => (
+        <li tabindex="0">
+          <span class="bc__label">{i.label}</span>
+          <span class="bc__track">
+            <span class="bc__bar" style={`width:${Math.max(2, (i.value / max) * 100)}%`} />
+            <span class="bc__value tabular">{fmt(i.value)}</span>
+          </span>
+          <span class="bc__tip" role="tooltip">
+            <strong>{i.label}</strong>
+            {fmt(i.value)}
+            {format !== 'percent' && <> &middot; {Math.round((i.value / total) * 100)}% of total</>}
+          </span>
+        </li>
+      ))
+    }
+  </ul>
+</figure>
+
+<style>
+  .bc {
+    margin: 0;
+  }
+
+  ul {
+    display: grid;
+    gap: var(--sp-3);
+    margin: 0;
+  }
+
+  li {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(96px, 38%) minmax(0, 1fr);
+    align-items: center;
+    gap: var(--sp-3);
+    padding: 2px 0;
+    border-radius: var(--radius-sm);
+    outline: none;
+  }
+
+  .bc__label {
+    font-size: var(--fs-xs);
+    color: var(--ink-2);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .bc__track {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+    min-width: 0;
+  }
+
+  .bc__bar {
+    height: 16px;
+    border-radius: 0 4px 4px 0;
+    background: var(--bar);
+    transition: opacity var(--dur) var(--ease);
+  }
+
+  .bc__value {
+    flex: none;
+    font-size: var(--fs-xs);
+    font-weight: 600;
+    color: var(--navy-900);
+  }
+
+  ul:hover .bc__bar,
+  ul:focus-within .bc__bar {
+    opacity: 0.45;
+  }
+
+  li:hover .bc__bar,
+  li:focus-visible .bc__bar {
+    opacity: 1;
+  }
+
+  .bc__tip {
+    position: absolute;
+    left: 38%;
+    bottom: calc(100% + 4px);
+    z-index: 2;
+    display: none;
+    padding: var(--sp-2) var(--sp-3);
+    border-radius: var(--radius-md);
+    background: var(--surface);
+    box-shadow: var(--shadow-md), 0 0 0 1px var(--line);
+    font-size: var(--fs-xs);
+    color: var(--ink-2);
+    white-space: nowrap;
+    pointer-events: none;
+  }
+
+  .bc__tip strong {
+    display: block;
+    color: var(--navy-900);
+  }
+
+  li:hover .bc__tip,
+  li:focus-visible .bc__tip {
+    display: block;
+  }
+</style>

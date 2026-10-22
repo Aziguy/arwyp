@@ -1,0 +1,221 @@
+---
+import { badgeClass } from '@/lib/app/status';
+import { time, weekdayShort, dayMonth, TODAY } from '@/data/app/common';
+
+export type CalEvent = { day: number; start: number; minutes: number; title: string; sub?: string; status?: string };
+export type CalBlock = { day: number; start: number; minutes: number; label: string };
+
+interface Props {
+  days: string[];
+  events: CalEvent[];
+  blocks?: CalBlock[];
+  from?: number;
+  to?: number;
+  newPanel?: string;
+}
+
+const { days, events, blocks = [], from = 7, to = 18, newPanel } = Astro.props;
+const hours = Array.from({ length: to - from }, (_, i) => from + i);
+const rowH = 64;
+const pos = (start: number, minutes: number) => `top:${((start - from * 60) / 60) * rowH}px;height:${(minutes / 60) * rowH - 3}px`;
+---
+
+<div class="wc" style={`--days:${days.length};--rows:${hours.length};--row:${rowH}px`}>
+  <div class="wc__head">
+    <span></span>
+    {
+      days.map((d) => (
+        <span class:list={['wc__day', { 'is-today': d === TODAY }]}>
+          <small>{weekdayShort(d)}</small>
+          {dayMonth(d)}
+        </span>
+      ))
+    }
+  </div>
+  <div class="wc__body">
+    <div class="wc__hours" aria-hidden="true">
+      {hours.map((h) => <span>{time(h * 60)}</span>)}
+    </div>
+    {
+      days.map((d, di) => (
+        <div class:list={['wc__col', { 'is-today': d === TODAY }]}>
+          {hours.map((h) => (
+            <button
+              type="button"
+              class="wc__slot"
+              aria-label={`Available ${weekdayShort(d)} ${time(h * 60)}`}
+              data-open={newPanel}
+              data-title={`${weekdayShort(d)} ${dayMonth(d)}, ${time(h * 60)}`}
+            />
+          ))}
+          {blocks
+            .filter((b) => b.day === di)
+            .map((b) => (
+              <div class="wc__block" style={pos(b.start, b.minutes)}>
+                {b.label}
+              </div>
+            ))}
+          {events
+            .filter((e) => e.day === di)
+            .map((e) => (
+              <div class:list={['wc__event', { 'is-compact': e.minutes < 45 }, e.status && `is-${e.status.toLowerCase().replace(/\s+/g, '-')}`]} style={pos(e.start, e.minutes)} title={`${time(e.start)} ${e.title}`}>
+                <strong>
+                  {time(e.start)} {e.title}
+                </strong>
+                {e.sub && <small>{e.sub}</small>}
+                {e.status && e.minutes >= 45 && <span class={badgeClass(e.status)}>{e.status}</span>}
+              </div>
+            ))}
+        </div>
+      ))
+    }
+  </div>
+</div>
+
+<style>
+  .wc {
+    position: relative;
+    overflow-x: auto;
+    font-size: var(--fs-xs);
+  }
+
+  .wc__head,
+  .wc__body {
+    display: grid;
+    grid-template-columns: 56px repeat(var(--days), minmax(128px, 1fr));
+    min-width: calc(56px + var(--days) * 128px);
+  }
+
+  .wc__head {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: var(--surface);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .wc__day {
+    display: grid;
+    padding: var(--sp-3);
+    font-weight: 700;
+    font-size: var(--fs-sm);
+    color: var(--navy-900);
+    border-left: 1px solid var(--line);
+  }
+
+  .wc__day small {
+    font-size: var(--fs-xs);
+    font-weight: 600;
+    color: var(--ink-3);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .wc__day.is-today {
+    color: var(--teal-700);
+    box-shadow: inset 0 -2px 0 var(--teal-600);
+  }
+
+  .wc__hours {
+    display: grid;
+    grid-auto-rows: var(--row);
+  }
+
+  .wc__hours span {
+    padding: 4px 8px 0 0;
+    text-align: right;
+    color: var(--ink-3);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .wc__col {
+    position: relative;
+    display: grid;
+    grid-auto-rows: var(--row);
+    border-left: 1px solid var(--line);
+  }
+
+  .wc__col.is-today {
+    background: rgb(0 216 206 / 0.035);
+  }
+
+  .wc__slot {
+    border-bottom: 1px solid var(--line);
+    transition: background-color var(--dur) var(--ease);
+  }
+
+  .wc__slot:hover {
+    background: var(--teal-50);
+  }
+
+  .wc__event,
+  .wc__block {
+    position: absolute;
+    left: 4px;
+    right: 4px;
+    display: grid;
+    align-content: start;
+    gap: 2px;
+    padding: 4px 8px;
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    line-height: 1.3;
+  }
+
+  .wc__event {
+    background: #e8f1fc;
+    box-shadow: inset 3px 0 0 #2a78d6;
+    color: var(--navy-900);
+  }
+
+  .wc__event strong {
+    font-weight: 650;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .wc__event small {
+    color: var(--ink-2);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .wc__event.is-compact {
+    padding-block: 3px;
+  }
+
+  .wc__event.is-compact small {
+    display: none;
+  }
+
+  .wc__event .badge {
+    justify-self: start;
+    font-size: 0.625rem;
+    padding: 0 0.4rem;
+  }
+
+  .wc__event.is-completed {
+    background: var(--surface-3);
+    box-shadow: inset 3px 0 0 #898781;
+    color: var(--ink-2);
+  }
+
+  .wc__event.is-pending-payment {
+    background: var(--amber-50);
+    box-shadow: inset 3px 0 0 #fab219;
+  }
+
+  .wc__event.is-no-show,
+  .wc__event.is-cancelled {
+    background: var(--red-50);
+    box-shadow: inset 3px 0 0 #d03b3b;
+  }
+
+  .wc__block {
+    background: repeating-linear-gradient(135deg, var(--surface-3) 0 6px, var(--surface-2) 6px 12px);
+    color: var(--ink-3);
+    font-weight: 600;
+  }
+</style>

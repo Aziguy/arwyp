@@ -1,0 +1,63 @@
+---
+interface Props {
+  title: string;
+  subtitle?: string;
+  kicker?: string;
+}
+
+const { title, subtitle, kicker } = Astro.props;
+---
+
+<header class="ph">
+  <div class="ph__copy">
+    {kicker && <p class="eyebrow">{kicker}</p>}
+    <h1>{title} <slot name="tag" /></h1>
+    {subtitle && <p class="ph__sub">{subtitle}</p>}
+  </div>
+  {
+    Astro.slots.has('default') && (
+      <div class="ph__actions">
+        <slot />
+      </div>
+    )
+  }
+</header>
+
+<style>
+  .ph {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--sp-4) var(--sp-6);
+    margin-bottom: var(--sp-8);
+  }
+
+  .ph__copy {
+    display: grid;
+    gap: var(--sp-2);
+    min-width: 0;
+  }
+
+  .ph h1 {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sp-3);
+    font-size: clamp(1.5rem, 1.2rem + 1vw, 2rem);
+    font-weight: 750;
+    letter-spacing: -0.02em;
+  }
+
+  .ph__sub {
+    max-width: 70ch;
+    font-size: var(--fs-sm);
+    color: var(--ink-2);
+  }
+
+  .ph__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-2);
+  }
+</style>

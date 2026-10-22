@@ -1,0 +1,50 @@
+---
+import Icon from '@/components/ui/Icon.astro';
+
+interface Props {
+  icon?: string;
+  title: string;
+  text?: string;
+}
+
+const { icon = 'inbox', title, text } = Astro.props;
+---
+
+<div class="empty">
+  <span class="empty__icon"><Icon name={icon} size={24} /></span>
+  <p class="empty__title">{title}</p>
+  {text && <p class="empty__text">{text}</p>}
+  <slot />
+</div>
+
+<style>
+  .empty {
+    display: grid;
+    justify-items: center;
+    gap: var(--sp-2);
+    padding: var(--sp-12) var(--sp-6);
+    text-align: center;
+  }
+
+  .empty__icon {
+    display: grid;
+    place-items: center;
+    width: 3rem;
+    height: 3rem;
+    margin-bottom: var(--sp-2);
+    border-radius: 50%;
+    background: var(--surface-3);
+    color: var(--ink-3);
+  }
+
+  .empty__title {
+    font-weight: 700;
+    color: var(--navy-900);
+  }
+
+  .empty__text {
+    max-width: 40ch;
+    font-size: var(--fs-sm);
+    color: var(--ink-3);
+  }
+</style>
