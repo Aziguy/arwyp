@@ -1,49 +1,51 @@
 ---
 import Icon from '@/components/ui/Icon.astro';
 import { url } from '@/lib/paths';
-import type { Tour } from '@/config/media';
+import type { Embed } from '@/config/media';
 
 interface Props {
-  tour: Tour;
+  media: Embed;
   deferred?: boolean;
+  tall?: boolean;
   class?: string;
 }
 
-const { tour, deferred = false, class: className } = Astro.props;
-const poster = url(tour.poster);
+const { media, deferred = false, tall = false, class: className } = Astro.props;
+const poster = url(media.poster);
+const allow = 'fullscreen; autoplay; encrypted-media; picture-in-picture; xr-spatial-tracking; gyroscope; accelerometer';
 ---
 
-<figure class:list={['tour-embed', className]} data-tour-embed>
-  <div class="tour-embed__stage" style={`background-image: url(${poster})`}>
+<figure class:list={['media-embed', { 'media-embed--tall': tall }, className]}>
+  <div class="media-embed__stage" style={`background-image: url(${poster})`}>
     {
       deferred ? (
-        <button type="button" class="tour-embed__start" data-tour-start data-src={tour.src} data-title={tour.title}>
-          <span class="tour-embed__play">
+        <button type="button" class="media-embed__start" data-embed-start data-src={media.src} data-title={media.title} data-allow={allow}>
+          <span class="media-embed__play">
             <Icon name="play" size={28} />
           </span>
-          <span class="tour-embed__label">Start the 3D tour</span>
+          <span class="media-embed__label">{media.start}</span>
         </button>
       ) : (
-        <iframe src={tour.src} title={tour.title} loading="lazy" allow="fullscreen; xr-spatial-tracking; gyroscope; accelerometer" allowfullscreen />
+        <iframe src={media.src} title={media.title} loading="lazy" allow={allow} allowfullscreen />
       )
     }
   </div>
-  <figcaption class="tour-embed__bar">
-    <span><Icon name="move-3d" size={16} /> Drag to look around, click the floor to move</span>
-    <a href={tour.src} target="_blank" rel="noopener">
-      <Icon name="maximize" size={16} /> Open full screen
+  <figcaption class="media-embed__bar">
+    <span><Icon name={media.hintIcon} size={16} /> {media.hint}</span>
+    <a href={media.link} target="_blank" rel="noopener">
+      <Icon name="external-link" size={16} /> {media.linkLabel}
     </a>
   </figcaption>
 </figure>
 
 <script>
   document.addEventListener('click', (event) => {
-    const button = (event.target as Element).closest<HTMLButtonElement>('[data-tour-start]');
+    const button = (event.target as Element).closest<HTMLButtonElement>('[data-embed-start]');
     if (!button) return;
     const frame = document.createElement('iframe');
     frame.src = button.dataset.src!;
     frame.title = button.dataset.title!;
-    frame.allow = 'fullscreen; xr-spatial-tracking; gyroscope; accelerometer';
+    frame.allow = button.dataset.allow!;
     frame.allowFullscreen = true;
     button.replaceWith(frame);
     frame.focus();
@@ -51,12 +53,12 @@ const poster = url(tour.poster);
 </script>
 
 <style>
-  .tour-embed {
+  .media-embed {
     display: grid;
     gap: var(--sp-3);
   }
 
-  .tour-embed__stage {
+  .media-embed__stage {
     position: relative;
     aspect-ratio: 16 / 9;
     border-radius: var(--radius-xl);
@@ -65,8 +67,8 @@ const poster = url(tour.poster);
     box-shadow: var(--shadow-lg);
   }
 
-  .tour-embed__stage :global(iframe),
-  .tour-embed__start {
+  .media-embed__stage :global(iframe),
+  .media-embed__start {
     position: absolute;
     inset: 0;
     width: 100%;
@@ -74,7 +76,7 @@ const poster = url(tour.poster);
     border: 0;
   }
 
-  .tour-embed__start {
+  .media-embed__start {
     display: grid;
     place-content: center;
     justify-items: center;
@@ -84,7 +86,7 @@ const poster = url(tour.poster);
     cursor: pointer;
   }
 
-  .tour-embed__play {
+  .media-embed__play {
     display: grid;
     place-items: center;
     width: 5rem;
@@ -96,17 +98,17 @@ const poster = url(tour.poster);
     transition: transform var(--dur) var(--ease);
   }
 
-  .tour-embed__start:hover .tour-embed__play,
-  .tour-embed__start:focus-visible .tour-embed__play {
+  .media-embed__start:hover .media-embed__play,
+  .media-embed__start:focus-visible .media-embed__play {
     transform: scale(1.06);
   }
 
-  .tour-embed__label {
+  .media-embed__label {
     font-weight: 700;
     text-shadow: 0 1px 8px rgb(0 0 0 / 0.4);
   }
 
-  .tour-embed__bar {
+  .media-embed__bar {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
@@ -115,23 +117,23 @@ const poster = url(tour.poster);
     color: var(--ink-2);
   }
 
-  .tour-embed__bar span,
-  .tour-embed__bar a {
+  .media-embed__bar span,
+  .media-embed__bar a {
     display: inline-flex;
     align-items: center;
     gap: var(--sp-2);
   }
 
-  .tour-embed__bar a {
+  .media-embed__bar a {
     font-weight: 600;
     color: inherit;
   }
 
   @media (max-width: 520px) {
-    .tour-embed__stage {
+    .media-embed--tall .media-embed__stage {
       aspect-ratio: 4 / 5;
     }
-    .tour-embed__play {
+    .media-embed__play {
       width: 4rem;
       height: 4rem;
     }

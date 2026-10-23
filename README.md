@@ -37,7 +37,7 @@ The [comparison page](https://aziguy.github.io/arwyp/compare/) shows both scopes
 | `/patients/` + `visiting-hours`, `pre-admission`, `rights-charter`, `amenities`, `maternity`, `experience` | Patient Information |
 | `/specialists/`, `/specialists/[slug]/` | Find a Specialist, specialist profiles |
 | `/medical-tourism/` | Medical Tourism & Travel Clinic |
-| `/news/`, `/news/[slug]/`, `/news/3d-tour/` | Media & News, live embed of the existing 3D maternity tour |
+| `/news/`, `/news/[slug]/`, `/news/3d-tour/` | Media & News, live 3D maternity tour, hospital film (Quote B) |
 | `/careers/`, `/careers/[ref]/` | Careers, one page per vacancy |
 | `/training/`, `/contact/` | Training Institute, Contact Us |
 | `/gp-referral/` | GP Referral Portal (Quote B) |

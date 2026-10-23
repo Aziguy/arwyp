@@ -202,6 +202,21 @@ export function courseListSchema(courses: { slug: string; name: string; summary:
   };
 }
 
+export function videoSchema(v: { title: string; description: string; poster: string; uploaded: string; duration: string; src: string; link: string }): Schema {
+  return {
+    '@context': ctx,
+    '@type': 'VideoObject',
+    name: v.title,
+    description: v.description,
+    thumbnailUrl: absolute(v.poster),
+    uploadDate: v.uploaded,
+    duration: v.duration,
+    embedUrl: v.src.split('?')[0],
+    url: v.link,
+    publisher: orgRef,
+  };
+}
+
 export function itemListSchema(name: string, paths: string[]): Schema {
   return {
     '@context': ctx,

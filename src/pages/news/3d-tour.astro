@@ -1,21 +1,16 @@
 ---
 import SiteLayout from '@/layouts/SiteLayout.astro';
 import PageHero from '@/components/ui/PageHero.astro';
-import Icon from '@/components/ui/Icon.astro';
-import Visual from '@/components/ui/Visual.astro';
-import TourEmbed from '@/components/sections/TourEmbed.astro';
-import { maternityTour } from '@/config/media';
-
-const areas = [
-  { id: 'icu', label: 'ICU', icon: 'activity', tone: 'navy', text: 'Adult intensive care with one-to-one nursing and central monitoring.' },
-  { id: 'theatres', label: 'Theatres', icon: 'scissors', tone: 'teal', text: 'Hybrid Theatre, cardiac theatres and the O-Arm imaging suite.' },
-  { id: 'maternity', label: 'Maternity', icon: 'baby', tone: 'sky', text: 'Private birthing rooms, partner area and neonatal ICU.' },
-  { id: 'emergency', label: 'Emergency', icon: 'siren', tone: 'rose', text: 'Triage, resuscitation bays and the 24/7 trauma unit.' },
-  { id: 'wards', label: 'Wards', icon: 'bed-double', tone: 'sand', text: 'General, paediatric and private wards with family lounges.' },
-] as const;
+import MediaEmbed from '@/components/sections/MediaEmbed.astro';
+import { maternityTour, hospitalFilm } from '@/config/media';
+import { videoSchema } from '@/lib/schema';
 ---
 
-<SiteLayout title="3D Maternity Tour" description="Walk through our maternity facilities before you ever set foot inside.">
+<SiteLayout
+  title="3D Maternity Tour"
+  description="Walk through our maternity facilities before you ever set foot inside, then watch our hospital film of the wards, theatres and teams at Arwyp."
+  schemaB={videoSchema(hospitalFilm)}
+>
   <PageHero
     eyebrow="Media & News"
     title="Take a 3D Tour of Our <span class='serif'>Maternity Ward</span>"
@@ -25,81 +20,33 @@ const areas = [
 
   <section class="section">
     <div class="container">
-      <TourEmbed tour={maternityTour} />
+      <MediaEmbed media={maternityTour} tall />
     </div>
   </section>
 
   <section class="section section--tint only-b" id="virtual-tour">
-    <div class="container" data-tour>
+    <div class="container vt">
       <div class="vt__head">
         <span class="tag-b" data-label="360° Virtual Hospital Tour"></span>
-        <h2>Explore the whole hospital in 360&deg;</h2>
-        <p class="lead">An interactive walkthrough of ICU, theatres, maternity, emergency and wards, to reduce anxiety and build confidence before admission.</p>
+        <h2>Walk through the <span class="serif">whole hospital</span></h2>
+        <p class="lead">From emergency and theatres to the wards and maternity unit: meet the teams and see the spaces before admission, to arrive calm and confident.</p>
       </div>
-      <div class="vt__tabs" role="tablist" aria-label="Hospital areas">
-        {
-          areas.map((a, i) => (
-            <button type="button" role="tab" class="chip" aria-pressed={i === 0 ? 'true' : 'false'} data-tour-tab={a.id}>
-              <Icon name={a.icon} size={16} /> {a.label}
-            </button>
-          ))
-        }
-      </div>
-      {
-        areas.map((a, i) => (
-          <div class="vt__scene" data-tour-scene={a.id} hidden={i !== 0}>
-            <Visual icon={a.icon} tone={a.tone} ratio="21 / 9" label={`360° ${a.label} panorama`} />
-            <div class="vt__hint">
-              <Icon name="move-3d" size={18} /> Drag to look around. {a.text}
-            </div>
-          </div>
-        ))
-      }
+      <MediaEmbed media={hospitalFilm} deferred />
     </div>
   </section>
 </SiteLayout>
 
-<script>
-  document.querySelectorAll<HTMLElement>('[data-tour]').forEach((root) => {
-    root.querySelectorAll<HTMLButtonElement>('[data-tour-tab]').forEach((tab) =>
-      tab.addEventListener('click', () => {
-        root.querySelectorAll('[data-tour-tab]').forEach((t) => t.setAttribute('aria-pressed', String(t === tab)));
-        root.querySelectorAll<HTMLElement>('[data-tour-scene]').forEach((s) => (s.hidden = s.dataset.tourScene !== tab.dataset.tourTab));
-      }),
-    );
-  });
-</script>
-
 <style>
+  .vt {
+    display: grid;
+    gap: var(--sp-6);
+    max-width: 1040px;
+  }
+
   .vt__head {
     display: grid;
     gap: var(--sp-3);
     justify-items: start;
     max-width: 720px;
-    margin-bottom: var(--sp-6);
-  }
-
-  .vt__tabs {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--sp-2);
-    margin-bottom: var(--sp-5);
-  }
-
-  .vt__scene {
-    display: grid;
-    gap: var(--sp-3);
-  }
-
-  .vt__scene[hidden] {
-    display: none;
-  }
-
-  .vt__hint {
-    display: flex;
-    align-items: center;
-    gap: var(--sp-2);
-    font-size: var(--fs-sm);
-    color: var(--ink-2);
   }
 </style>

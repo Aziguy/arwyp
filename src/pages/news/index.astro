@@ -4,7 +4,7 @@ import PageHero from '@/components/ui/PageHero.astro';
 import NewsCard from '@/components/sections/NewsCard.astro';
 import EmptyResults from '@/components/ui/EmptyResults.astro';
 import Icon from '@/components/ui/Icon.astro';
-import TourEmbed from '@/components/sections/TourEmbed.astro';
+import MediaEmbed from '@/components/sections/MediaEmbed.astro';
 import { maternityTour } from '@/config/media';
 import { articles, articleCategories } from '@/data/news';
 import ResultsBar from '@/components/listing/ResultsBar.astro';
@@ -75,7 +75,7 @@ import { itemListSchema } from '@/lib/schema';
 
   <section class="section section--dark">
     <div class="container tour">
-      <TourEmbed tour={maternityTour} deferred />
+      <MediaEmbed media={maternityTour} deferred />
       <div class="stack" style="--stack: var(--sp-5)">
         <p class="eyebrow">3D tour</p>
         <h2>Take a 3D Tour of Our <span class="serif">Maternity Ward</span></h2>
@@ -124,7 +124,7 @@ import { itemListSchema } from '@/lib/schema';
     color: rgb(255 255 255 / 0.75);
   }
 
-  .tour :global(.tour-embed__bar) {
+  .tour :global(.media-embed__bar) {
     color: rgb(255 255 255 / 0.75);
   }
 
