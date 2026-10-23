@@ -37,7 +37,7 @@ The [comparison page](https://aziguy.github.io/arwyp/compare/) shows both scopes
 | `/patients/` + `visiting-hours`, `pre-admission`, `rights-charter`, `amenities`, `maternity`, `experience` | Patient Information |
 | `/specialists/`, `/specialists/[slug]/` | Find a Specialist, specialist profiles |
 | `/medical-tourism/` | Medical Tourism & Travel Clinic |
-| `/news/`, `/news/[slug]/`, `/news/3d-tour/` | Media & News |
+| `/news/`, `/news/[slug]/`, `/news/3d-tour/` | Media & News, live embed of the existing 3D maternity tour |
 | `/careers/`, `/careers/[ref]/` | Careers, one page per vacancy |
 | `/training/`, `/contact/` | Training Institute, Contact Us |
 | `/gp-referral/` | GP Referral Portal (Quote B) |
@@ -135,4 +135,4 @@ Every push to `main` builds the site and publishes it to GitHub Pages through `.
 
 ## Content to be supplied by Arwyp
 
-Photography, headshots and logos, final specialist details, the Patients' Rights Charter, legal texts, vacancy and programme content, and the 3D maternity tour video. Placeholders are clearly labelled in the template.
+Photography, headshots and logos, final specialist details, the Patients' Rights Charter, legal texts, and vacancy and programme content. Placeholders are clearly labelled in the template.

@@ -3,6 +3,8 @@ import SiteLayout from '@/layouts/SiteLayout.astro';
 import PageHero from '@/components/ui/PageHero.astro';
 import Icon from '@/components/ui/Icon.astro';
 import Visual from '@/components/ui/Visual.astro';
+import TourEmbed from '@/components/sections/TourEmbed.astro';
+import { maternityTour } from '@/config/media';
 
 const areas = [
   { id: 'icu', label: 'ICU', icon: 'activity', tone: 'navy', text: 'Adult intensive care with one-to-one nursing and central monitoring.' },
@@ -23,16 +25,7 @@ const areas = [
 
   <section class="section">
     <div class="container">
-      <div class="player">
-        <Visual icon="box" tone="navy" ratio="16 / 9" label="3D tour video supplied by Arwyp" />
-        <button type="button" class="player__btn" aria-label="Play video"><Icon name="play" size={32} /></button>
-        <div class="player__bar" aria-hidden="true">
-          <Icon name="play" size={16} />
-          <span class="player__track"><span></span></span>
-          <span class="player__time">00:00 / 03:42</span>
-          <Icon name="maximize" size={16} />
-        </div>
-      </div>
+      <TourEmbed tour={maternityTour} />
     </div>
   </section>
 
@@ -78,59 +71,6 @@ const areas = [
 </script>
 
 <style>
-  .player {
-    position: relative;
-    border-radius: var(--radius-xl);
-    overflow: hidden;
-    box-shadow: var(--shadow-lg);
-  }
-
-  .player__btn {
-    position: absolute;
-    inset: 0;
-    margin: auto;
-    display: grid;
-    place-items: center;
-    width: 6rem;
-    height: 6rem;
-    border-radius: 50%;
-    background: var(--teal-400);
-    color: var(--navy-950);
-    box-shadow: 0 0 0 14px rgb(0 216 206 / 0.2);
-  }
-
-  .player__bar {
-    position: absolute;
-    left: var(--sp-4);
-    right: var(--sp-4);
-    bottom: var(--sp-4);
-    display: flex;
-    align-items: center;
-    gap: var(--sp-3);
-    padding: var(--sp-3) var(--sp-4);
-    border-radius: var(--radius-pill);
-    background: rgb(0 0 0 / 0.45);
-    backdrop-filter: blur(8px);
-    color: #fff;
-    font-size: var(--fs-xs);
-    font-variant-numeric: tabular-nums;
-  }
-
-  .player__track {
-    flex: 1;
-    height: 4px;
-    border-radius: 2px;
-    background: rgb(255 255 255 / 0.25);
-  }
-
-  .player__track span {
-    display: block;
-    width: 18%;
-    height: 100%;
-    border-radius: 2px;
-    background: var(--teal-400);
-  }
-
   .vt__head {
     display: grid;
     gap: var(--sp-3);
@@ -161,15 +101,5 @@ const areas = [
     gap: var(--sp-2);
     font-size: var(--fs-sm);
     color: var(--ink-2);
-  }
-
-  @media (max-width: 520px) {
-    .player__bar {
-      display: none;
-    }
-    .player__btn {
-      width: 4rem;
-      height: 4rem;
-    }
   }
 </style>
